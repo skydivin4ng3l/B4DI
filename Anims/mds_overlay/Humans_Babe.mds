@@ -1,0 +1,48 @@
+// BABE
+
+// OVERLAYED ANIS: WALK, RUN
+
+Model ("HuS")
+{
+	meshAndTree ("Hum_Body_Naked0.ASC" DONT_USE_MESH)
+
+	aniEnum
+	{
+
+//////////////////////////
+// NORMAL MOVEMENT
+//////////////////////////
+
+//--- RUN
+
+			ani			("t_Run_2_RunL"			1	"s_RunL"		0.0	0.0	M.	"Hum_BabeRun_A01.asc"		F	0	6)
+			ani			("s_RunL"				1	"s_RunL"		0.0	0.1	M.	"Hum_BabeRun_A01.asc"		F	6	29)
+			{
+				*eventSFXGrnd	(7	"Run")
+				*eventSFXGrnd	(19	"Run")
+			}
+
+			ani			("t_RunL_2_Run"			1	"s_Run"			0.0	0.0	M.	"Hum_BabeRun_A01.asc"		F	29	38)
+			aniBlend	("t_RunR_2_Run"				"s_Run"			0.2	0.2)
+
+//--- WALK
+
+			ani			("t_Walk_2_WalkL"		1	"s_WalkL"		0.0	0.0	M.	"Hum_BabeWalk_A01.asc"		F	1	10)
+			ani			("s_WalkL"				1	"s_WalkL"		0.0	0.1	M.	"Hum_BabeWalk_A01.asc"		F	10	41)
+			{
+				*eventSFXGrnd	(15	"Run")
+				*eventSFXGrnd	(30	"Run")
+			}
+
+			ani			("t_WalkL_2_Walk"		1	"s_Walk"		0.0	0.0	M.	"Hum_BabeWalk_A01.asc"		F	41	50)
+			aniBlend	("t_WalkR_2_Walk"			"s_Walk"		0.2	0.2)
+			
+//-- WALK BACK
+			
+			aniBlend	("t_Walk_2_WalkBL"			"s_WalkBL"		0.3	0.3)
+			aniAlias	("s_WalkBL"				1	"s_WalkBL"		0.0	0.0	M.	"s_WalkL"					R)
+			aniBlend	("t_WalkBL_2_Walk"			"s_Walk"		0.3	0.3)
+			aniAlias	("t_WalkBR_2_Walk"		1	"s_Walk"		0.0	0.0	M.	"t_Walk_2_WalkL"			R)
+
+	}
+}

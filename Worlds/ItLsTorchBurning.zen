@@ -1,0 +1,109 @@
+ZenGin Archive
+ver 1
+zCArchiverGeneric
+ASCII
+saveGame 0
+date 17.9.2002 15:21:26
+user mario.roeske
+END
+objects 6        
+END
+
+[% oCWorld:zCWorld 64513 0]
+	[VobTree % 0 0]
+		childs0=int:1
+		[% zCVob 52224 1]
+			pack=int:0
+			presetName=string:TORCH_BURN
+			bbox3DWS=rawFloat:1482.40002 750.891418 -6297.15137 1537.59998 761.283752 -6288.15137 
+			trafoOSToWSRot=raw:0000803f0000000000000000000000000000803f0000000000000000000000000000803f
+			trafoOSToWSPos=vec3:1527.40002 756.087585 -6294.15137
+			vobName=string:TORCH_BURN
+			visual=string:ITLS_TORCHBURNED_01.3DS
+			showVisual=bool:1
+			visualCamAlign=enum:0
+			visualAniMode=enum:0
+			visualAniModeStrength=float:0
+			vobFarClipZScale=float:1
+			cdStatic=bool:0
+			cdDyn=bool:0
+			staticVob=bool:0
+			dynShadow=enum:0
+			zbias=int:1
+			isAmbient=bool:0
+			[visual zCProgMeshProto 64513 2]
+			[]
+			[ai % 0 0]
+			[]
+		[]
+		childs1=int:2
+		[% zCVob 52224 3]
+			pack=int:0
+			presetName=string:
+			bbox3DWS=rawFloat:1440.17944 710.0354 -6340.56348 1533.71252 847.174866 -6241.31055 
+			trafoOSToWSRot=raw:3528b23de78a7ebf43dc7b3db1067f3fd07eb23d86b039b54999afbbc8e67a3d02847f3f
+			trafoOSToWSPos=vec3:1486.93518 755.303833 -6291.45947
+			vobName=string:FIRE_PFX
+			visual=string:TORCH.pfx
+			showVisual=bool:1
+			visualCamAlign=enum:0
+			visualAniMode=enum:0
+			visualAniModeStrength=float:0
+			vobFarClipZScale=float:1
+			cdStatic=bool:0
+			cdDyn=bool:0
+			staticVob=bool:0
+			dynShadow=enum:0
+			zbias=int:1
+			isAmbient=bool:0
+			[visual zCParticleFX 0 4]
+			[]
+			[ai % 0 0]
+			[]
+		[]
+		childs2=int:0
+		[% zCVobLight:zCVob 39168 5]
+			pack=int:0
+			presetName=string:TORCH
+			bbox3DWS=rawFloat:486.935181 -244.696167 -7291.45947 2486.93506 1755.30383 -5291.45947 
+			trafoOSToWSRot=raw:3528b23de78a7ebf43dc7b3db1067f3fd07eb23d86b039b54999afbbc8e67a3d02847f3f
+			trafoOSToWSPos=vec3:1486.93518 755.303833 -6291.45947
+			vobName=string:
+			visual=string:
+			showVisual=bool:0
+			visualCamAlign=enum:0
+			visualAniMode=enum:0
+			visualAniModeStrength=float:0
+			vobFarClipZScale=float:1
+			cdStatic=bool:0
+			cdDyn=bool:0
+			staticVob=bool:0
+			dynShadow=enum:0
+			zbias=int:1
+			isAmbient=bool:0
+			[visual % 0 0]
+			[]
+			[ai % 0 0]
+			[]
+			lightPresetInUse=string:TORCH
+			lightType=enum:0
+			range=float:1000
+			color=color:211 147 107 255
+			spotConeAngle=float:0
+			lightStatic=bool:0
+			lightQuality=enum:2
+			lensflareFX=string:TORCHFX01
+			turnedOn=bool:1
+			rangeAniScale=string:
+			rangeAniFPS=float:0
+			rangeAniSmooth=bool:1
+			colorAniList=string:(211 147 107) (223 173 117) (211 147 107) (223 173 117) (225 197 100) (223 173 117) (227 209 106) (223 173 117) (211 147 107) (223 173 117) (225 197 100) (227 209 106) (223 173 117) (211 147 107) (225 197 100) (223 173 117) (225 197 100) (211 147 107) (223 173 117) (227 209 106) (225 197 100) (211 147 107) (225 197 100) (223 173 117) (225 197 100) (227 209 106) (223 173 117) (211 147 107) (223 173 117) (211 147 107) (225 197 100) (227 209 106) (223 173 117) 
+			colorAniFPS=float:10.0000105
+			colorAniSmooth=bool:0
+			canMove=bool:0
+		[]
+		childs3=int:0
+	[]
+	[EndMarker % 0 0]
+	[]
+[]

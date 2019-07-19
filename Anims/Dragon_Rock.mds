@@ -1,0 +1,427 @@
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Last Changes:
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Model ("Dragon")
+{
+
+	meshAndTree ("Dragon_Fire_Body.ASC" DONT_USE_MESH)
+
+	registerMesh ("Dragon_Fire_Body.ASC")
+	registerMesh ("Dragon_Rock_Body.ASC")
+	registerMesh ("Dragon_Swamp_Body.ASC")
+	registerMesh ("Dragon_Ice_Body.ASC")
+	registerMesh ("Dragon_Undead_Body.ASC")
+
+
+	aniEnum
+	{
+
+//	|	KEYWORD		|	ANI-NAME					|LAYER|	NEXT-ANI	  |	BI | BO |F	|ASC-FILE				|	DIR |FF |LF
+//----------------------------------------------------------------------------------------------------------------------------
+//////////////////////////
+// FIST MOVEMENT
+//////////////////////////
+
+// FISTRUN
+			ani			("s_FistRun"					1	"s_FistRun"		0.1	0.1	M.	"Dra_RunAmbient_A01.asc"		F	0  100)
+			{	
+				*eventSFX	(11	"DRG_Rock_Ambient"	EMPTY_SLOT	)
+				*eventPFX		(35 	1 	"DRAGON_BREATH_SMOKE"			"BIP01 HEAD"	ATTACH)
+				*eventPFXStop	(45		1)	
+			}
+						
+			aniBlend	("t_FistRun_2_FistRunL"		"s_FistRunL"	0.2	0.2)
+			ani			("s_FistRunL"					1	"s_FistRunL"	0.0	0.0	M.	"Dra_Run_A01.asc"				F	17	42)
+			{
+				*eventSFX	(19	"DRG_Rock_Crumble"	EMPTY_SLOT	)
+				*eventPFX	(23	 1	"DRAGON_STEPS"	"Bip01 R Foot"	)
+				*eventSFX	(25	"TRO_STEPBOOM"		EMPTY_SLOT	)
+				*eventPFX	(37	 2	"DRAGON_STEPS"	"Bip01 L Foot"	)
+				*eventSFX	(38	"TRO_STEPBOOM"	EMPTY_SLOT	)
+				*eventCamTremor (24 1000	700	  2  5 )
+				*eventCamTremor (37 1000	700	  2  5 )
+	
+			}
+			
+			aniBlend	("t_FistRunL_2_FistRun"				"s_FistRun"	0.1	0.1)
+			aniBlend	("t_FistRunR_2_FistRun"				"s_FistRun"	0.1	0.1)
+			
+			ani			("t_FistJumpB"					1	"s_FistRun"		0.1	0.1	M.	"Dra_JumpB_A01.asc"				F	1	20)
+			{
+				*eventSFX	(17	"TRO_STEPBOOM"		EMPTY_SLOT	)
+				*eventPFX	(9	 1	"DRAGON_STEPS"	"Bip01 R Foot"	)
+				*eventPFX	(10	 2	"DRAGON_STEPS"	"Bip01 L Foot"	)
+			}
+	
+
+// NORMAL RUN MODE
+
+			ani			("s_Run"					1	"s_Run"		0.1	0.1	M.	"Dra_RunAmbient_A01.asc"		F	0  100)
+			{	
+				//*eventPFX	(3	 10	"DRAGON_STONES"	"Bip01 Bone19"	)
+				//*eventPFX	(5	 11	"DRAGON_STONES"	"Bip01 Bone04"	)
+				*eventSFX	(12	"DRG_Rock_Crumble"	EMPTY_SLOT	)
+				*eventPFX		(35 	1 	"DRAGON_BREATH_SMOKE"			"BIP01 HEAD"	ATTACH)
+				*eventPFXStop	(45		1)	
+			}
+			
+			aniBlend	("t_Run_2_RunL"		"s_RunL"	0.2	0.2)
+			ani			("s_RunL"					1	"s_RunL"	0.0	0.0	M.	"Dra_Run_A01.asc"				F	17	42)
+			{
+				*eventPFX	(24	 21	"DRAGON_STEPS"	"Bip01 R Foot"	)
+				*eventSFX	(25	"TRO_STEPBOOM"		EMPTY_SLOT	)
+				*eventCamTremor (24 1000	700	  2  5 )
+				*eventCamTremor (37 1000	700	  2  5 )
+				*eventPFX	(37	 22	"DRAGON_STEPS"	"Bip01 L Foot"	)
+				*eventSFX	(38	"TRO_STEPBOOM"	EMPTY_SLOT	)
+	
+			}
+			
+			aniBlend	("t_RunL_2_Run"				"s_Run")
+			aniBlend	("t_RunR_2_Run"				"s_Run")
+			
+// NORMAL WALK	
+			aniAlias	("s_Walk"						1	"s_Walk"		0.1	0.1	M.	"s_FistRun"		F)
+	
+// FISTWALK
+			ani			("s_FistWalk"					1	"s_FistWalk"	0.1	0.1	M.	"Dra_RunAmbient_A01.asc"		F	0  100)	
+			{
+				*eventPFX		(35 	1 	"DRAGON_BREATH_SMOKE"			"BIP01 HEAD"	ATTACH)
+				*eventPFXStop	(45		1)	
+				//*eventPFX	(46	 30	"DRAGON_STONES"	"Bip01 Bone18"	)
+				*eventSFX	(48	"DRG_Rock_Crumble"	EMPTY_SLOT	)
+			}
+
+			ani			("t_FistWalk_2_FistWalkL"		1	"s_FistWalkL"	0.1	0.1	M.	"Dra_Walk_A01.asc"				F	0	16)
+			ani			("s_FistWalkL"					1	"s_FistWalkL"	0.1	0.1	M.	"Dra_Walk_A01.asc"				F	17	50)
+			{
+				*eventSFX	(25	"TRO_STEPBOOM"		EMPTY_SLOT	)
+		//		*eventSFX	(40	"TRO_STEPBOOM"		EMPTY_SLOT	)
+			}
+			
+			aniAlias	("t_FistWalkL_2_FistWalk"		1	"s_FistWalk"	0.1	0.1	M.	"t_FistWalk_2_FistWalkL"		R)
+			aniAlias	("t_FistWalkR_2_FistWalk"		1	"s_FistWalk"	0.1	0.1	M.	"t_FistWalk_2_FistWalkL"		R)
+	
+//	FISTWALK Backwards
+			aniAlias	("t_FistWalk_2_FistWalkBL"		1	"s_FistWalkBL"	0.1	0.1	M.	"t_FistWalk_2_FistWalkL"		F)
+			aniAlias	("s_FistWalkBL"					1	"s_FistWalkBL"	0.1	0.1	M.	"s_FistWalkL"					R)
+			aniAlias	("t_FistWalkBL_2_FistWalk"		1	"s_FistWalk"	0.1	0.1	M.	"t_FistWalk_2_FistWalkL"		R)
+			aniBlend	("t_FistWalkBR_2_FistWalk"			"s_FistWalk"	0.2	0.2)			
+
+
+// TRANSITIONS  WALK - RUN - WALK
+
+			aniBlend	("t_FistRun_2_FistWalk"			"s_FistWalk")
+			aniBlend	("t_FistWalk_2_FistRun"			"s_FistRun")
+						
+			aniBlend	("t_FistRunL_2_FistWalkL"		"s_FistWalkL"	0.3	0.3)
+			aniBlend	("t_FistWalkL_2_FistRunL"		"s_FistRunL"	0.3	0.3)
+
+// STRAFE
+			ani			("t_FistRunStrafeL"				1	"t_FistRunStrafeL"		0.1	0.1	M.	"Dra_StrafeL_A01.asc"	F	0	50)
+			{
+				*eventSFX   ( 20     "DEM_WINGFLAP"		     )
+				*eventSFX	(45	"M_FALL_HUGE"	EMPTY_SLOT	)
+				*eventPFX	(43	 1	"DRAGON_STEPS"	"Bip01 L Foot"	)
+				*eventPFX	(44	 2	"DRAGON_STEPS"	"Bip01 R Foot"	)
+			}
+			ani			("t_FistRunStrafeR"				1	"t_FistRunStrafeR"		0.1	0.1	M.	"Dra_StrafeL_A01.asc"	F	50	100)
+			{
+				*eventSFX	(70	"DEM_WINGFLAP"		)
+				*eventSFX	(95	"M_FALL_HUGE"	EMPTY_SLOT	)
+				*eventPFX	(93	 3	"DRAGON_STEPS"	"Bip01 L Foot"	)
+				*eventPFX	(94	 4	"DRAGON_STEPS"	"Bip01 R Foot"	)
+			}
+			
+			aniAlias	("t_FistWalkStrafeL"			1	"t_FistWalkStrafeL"		0.1	0.1	M.	"t_FistRunStrafeL"		F)
+			aniAlias	("t_FistWalkStrafeR"			1	"t_FistWalkStrafeR"		0.1	0.1	M.	"t_FistRunStrafeL"		F)
+
+
+/////////////////////
+//	FIST TURNING
+/////////////////////
+
+			ani			("t_FistRunTurnL"					20	"t_FistRunTurnL"	0.1	1.0	M.	"Dra_TurnLeft_A01.asc"			F	0	25)
+			{
+				*eventSFX   ( 15     "DEM_WINGFLAP"		     )
+			}
+			aniAlias	("t_FistWalkTurnL"					20	"t_FistWalkTurnL"	0.1	1.0	M.	"t_FistRunTurnL"	F)
+			
+			ani			("t_FistRunTurnR"					20	"t_FistRunTurnR"	0.1	1.0	M.	"Dra_TurnRight_A01.asc"			F	0	25)
+			{
+				*eventSFX   ( 15     "DEM_WINGFLAP"		     )
+			}
+			
+			aniAlias	("t_FistWalkTurnR"					20	"t_FistWalkTurnR"	0.1	1.0	M.	"t_FistRunTurnR"	F)
+
+
+//////////////////////////
+// FALL
+//////////////////////////
+
+// -------------------------------------------------------------------------------------------------------------------------------------
+//	FALLDN
+	// ---------------------------------------------------------------------------------------------------------------------------------
+	// Freier Fall
+			ani		("s_FallDn"						1	"s_FallDn"		0.1	0.1	MF	"Dra_FallDn_A01.asc"	F	0	15)
+			{
+				*eventSFX   ( 10     "DEM_WINGFLAP"		     )
+			}
+			
+		// -----------------------------------------------------------------------------------------------------------------------------
+		// Landung auf den Beinen ohne Schaden
+			ani		("t_FallDn_2_Stand"				1	""				0.1	0.1	M.	"Dra_FallDn_A01.asc"	F	15	30)
+			{
+				*eventSFX	(25	"M_FALL_HUGE"	EMPTY_SLOT	)
+			}
+
+// -------------------------------------------------------------------------------------------------------------------------------------
+///////////////////
+// STUMBLE
+///////////////////
+		// -----------------------------------------------------------------------------------------------------------------------------
+		// Vorwärts Stolpern
+			ani			("t_Stumble"					20	""				0.1 0.1 M.	"Dra_Stumble2_A01.asc"	F	1	20)
+			{
+				//*eventPFX	(6	 1	"DRAGON_STONES"	"Bip01 Neck1"	)
+				*eventSFX	(7	"DRG_Rock_Crumble"	EMPTY_SLOT	)
+			}
+			
+		// -----------------------------------------------------------------------------------------------------------------------------
+		// Rückwärts Stolpern
+			ani			("t_StumbleB"					20	""				0.1 0.1 M.	"Dra_Stumble2_A01.asc"	F	1	20)
+			{
+				//*eventPFX	(6	 2	"DRAGON_STONES"	"Bip01 Neck1"	)
+				*eventSFX	(7	"DRG_Rock_Crumble"	EMPTY_SLOT	)
+			}
+
+		// GOTHIT
+
+			aniAlias	("t_GotHit"						2	""				0.1	0.1	M.	"t_Stumble"	F	)
+
+
+//////////////////////////
+// DIE
+//////////////////////////
+
+	// ---------------------------------------------------------------------------------------------------------------------------------
+	//	DEAD
+			ani			("t_Dead"						1	"s_Dead"		0.1	0.0	M.	"Dra_Dead_A01.asc"		F	1	84   FPS:15)
+			{
+				*eventSFX	(4	"DRG_Rock_Die"	EMPTY_SLOT	)
+				*eventPFX	(5	 1	"DRAGON_DIE"	"Bip01 Spine4"	ATTACH	)
+				*eventSFX	(60	"DRG_Rock_Fall"	EMPTY_SLOT	)
+       			*eventPFX	(75	 2	"DRAGON_DIE_SMOKE"	"Bip01 Spine4"	)
+       			*eventCamTremor (75 1000	700	  20  50 )
+			}
+			
+			ani			("s_Dead"						1	"s_Dead"		0.0	0.0	M.	"Dra_Dead_A01.asc"		F	85	85)
+
+	// ---------------------------------------------------------------------------------------------------------------------------------
+	//	DEADB
+			ani			("t_DeadB"						1	"s_DeadB"		0.1	0.0	M.	"Dra_Dead_A01.asc"		F	1	84  FPS:15)
+			{
+				*eventSFX	(4	"DRG_Rock_Die"	EMPTY_SLOT	)
+				*eventPFX	(5	 1	"DRAGON_DIE"	"Bip01 Spine4"	ATTACH	)
+				*eventSFX	(60	"DRG_Rock_Fall"	EMPTY_SLOT	)
+				*eventPFX	(75	 2	"DRAGON_DIE_SMOKE"	"Bip01 Spine4"	)
+       			*eventCamTremor (75 1000	700	  20  50 )
+			}
+			
+			ani			("s_DeadB"						1	"s_DeadB"		0.0	0.0	M.	"Dra_Dead_A01.asc"		F	85	85)
+
+// -------------------------------------------------------------------------------------------------------------------------------------
+// WhirlAround
+	// WhirlAround CCW
+			ani   		("t_surprise_CCW"      			1	"s_surprise"	0.2	0.2	MF	"Dra_TurnLeft_A01.asc"		F	1	25)
+	// WhirlAround CW
+			ani			("t_surprise_CW"				1	"s_surprise"	0.2	0.2	MF	"Dra_TurnRight_A01.asc"		F	1	25)
+	// Surprise
+			aniAlias	("s_surprise"					1	"s_surprise"	0.1	0.1	M.	"s_FistRun"	F)
+
+
+//////////////////////////
+// LOOK Autoaiming
+//////////////////////////
+// Seitenwinkel: +/- 60°	Höhenwinkel: +/- 45°
+			ani			("c_look_1"				9	""				0.0	0.0	.	"Dra_Look_A01.asc"	F	0	0)
+			ani			("c_look_2"				9	""				0.0	0.0	.	"Dra_Look_A01.asc"	F	1	1)
+			ani			("c_look_3"				9	""				0.0	0.0	.	"Dra_Look_A01.asc"	F	2	2)
+			ani			("c_look_4"				9	""				0.0	0.0	.	"Dra_Look_A01.asc"	F	3	3)
+			ani			("c_look_5"				9	""				0.0	0.0	.	"Dra_Look_A01.asc"	F	4	4)
+			ani			("c_look_6"				9	""				0.0	0.0	.	"Dra_Look_A01.asc"	F	5	5)
+			ani			("c_look_7"				9	""				0.0	0.0	.	"Dra_Look_A01.asc"	F	6	6)
+			ani			("c_look_8"				9	""				0.0	0.0	.	"Dra_Look_A01.asc"	F	7	7)
+			ani			("c_look_9"				9	""				0.0	0.0	.	"Dra_Look_A01.asc"	F	8	8)
+
+	//		aniComb		("t_look"				9	"t_look"		0.3	0.3	M.	"c_look_"	9)
+
+
+// FIST DRAW
+
+			ani			("t_Run_2_Fist"			1	"s_Fist"		0.1	0.0	M.	"Dra_MagReady_A01.asc"			F	1	4)
+			ani			("s_Fist"				1	"s_Fist"		0.0	0.0	M.	"Dra_MagReady_A01.asc"			F	5	5)
+			ani			("t_Fist_2_FistRun"		1	"s_FistRun"		0.0	0.1	M.	"Dra_MagReady_A01.asc"			F	6	10)
+			{
+				*eventTag		(6	"DEF_FIGHTMODE"	"FIST")
+			}
+
+			ani			("t_FistRun_2_Fist"		1	"s_Fist"		0.1	0.0	M.	"Dra_MagReady_A01.asc"			R	6	10)
+			{
+				*eventTag		(6	"DEF_FIGHTMODE"	"")
+			}
+			aniAlias	("t_Fist_2_Run"			1	""				0.0	0.1	M.	"t_Run_2_Fist"				R)
+
+
+/////////////////
+//	ATTACK
+/////////////////
+			ani			("s_FistAttack"			1	"s_FistAttack"	0.1	0.1	M.	"Dra_Attack01_A01.asc"		F	1	40)
+			{
+				*eventTag		(0	"DEF_HIT_LIMB"	"BIP01 HEAD")
+				*eventTag		(0	"DEF_OPT_FRAME"	"24")
+				*eventTag		(0	"DEF_HIT_END"	"40")
+				*eventTag		(0	"DEF_WINDOW"	"24	34")
+				*eventTag		(0	"DEF_DIR"		"O")
+				*eventSFX	(10	"DRG_Rock_Crumble"	EMPTY_SLOT	)
+				*eventPFX		(16		1	"DRAGON_FIREATTACK"	"BIP01 HEAD"	ATTACH)
+				*eventSFX	(21	"dem_wingflap"	EMPTY_SLOT	)
+				*eventPFXStop	(33		1)	
+			//	*eventSFX	(37	"M_FALL_HUGE"	EMPTY_SLOT	)
+			}
+
+
+			ani			("t_FistParadeJumpB"	1	""				0.1	0.1	M.	"Dra_JumpB_A01.asc"			F	1	20)
+			{
+				*eventSFX	(4	"TRO_STEPBOOM"		EMPTY_SLOT	)
+				*eventSFX	(17	"TRO_STEPBOOM"		EMPTY_SLOT	)
+			}
+			
+			aniAlias	("t_FistParade_0"		1	""				0.1	0.1	M.	"t_FistParadeJumpB"			F)
+
+/////////////////
+//	SCRIPT ANIS
+/////////////////
+			ani			("t_Warn"				1	""				0.1	0.1	M.	"Dra_Warn_A01.asc"			F	1	50)
+
+//			ani			("t_Perception"			2	""				0.1	0.1	M.	"Dra_Perception_A01.asc"	F	1	74 FPS:12.5)
+//
+//			ani			("t_spawn"				1	"s_fistrun"		0.0	0.1	M.	"Dra_Spawn_A01.asc"			F	1	49)
+
+
+
+//////////////////
+//  MAGIC
+//////////////////
+
+// ---------------------------------------------------------------------------------------------------
+// FIGHT MODE TRANSITIONS FOR MAGIC / FIST
+// ---------------------------------------------------------------------------------------------------
+		
+			aniBlend	("t_Fist_2_Mag"				"s_Mag"			0.2	0.2)
+			aniBlend	("t_Mag_2_Fist"				"s_Fist"		0.2	0.2)
+
+// ---------------------------------------------------------------------------------------------------		
+// DRAW MAGIC
+
+			ani			("t_Run_2_Mag"			1	"s_Mag"			0.1 0.1	M.	"Dra_MagReady_A01.asc"		F	1	4)
+			ani			("s_Mag"				1	"s_Mag"			0.0 0.0 M.	"Dra_MagReady_A01.asc"		F	5	5)
+			ani			("t_Mag_2_MagRun"		1	"s_MagRun"		0.0 0.1 M.	"Dra_MagReady_A01.asc"		F	6	10)
+			{
+				*eventTag		(7 "DEF_FIGHTMODE"	"MAG")
+			}
+			ani			("t_MagRun_2_Mag"		1	"s_Mag"			0.1 0.0 M.	"Dra_MagReady_A01.asc"		R	5	10)
+			{
+				*eventTag		(7 "DEF_FIGHTMODE"	"")
+			}
+			ani			("t_Mag_2_Run"			1	""				0.0 0.1	M.	"Dra_MagReady_A01.asc"	R	1	5)
+
+
+			ani			("t_FistMove_2_Move"		1	""			0.0	0.0	M.	"Dra_RunAmbient_A01.asc"	F	0	0)
+			{
+				*eventTag		(0	"DEF_FIGHTMODE"	"")
+			}
+			ani			("t_Move_2_FistMove"		1	""			0.0	0.0	M.	"Dra_RunAmbient_A01.asc"	F	0	0)
+			{
+				*eventTag		(0	"DEF_FIGHTMODE"	"FIST")
+			}
+			
+			ani			("t_MagMove_2_Move"		1	""			0.0	0.0	M.	"Dra_RunAmbient_A01.asc"	F	0	0)
+			{
+				*eventTag		(0	"DEF_FIGHTMODE"	"")
+			}
+			ani			("t_Move_2_MagMove"		1	""			0.0	0.0	M.	"Dra_RunAmbient_A01.asc"	F	0	0)
+			{
+				*eventTag		(0	"DEF_FIGHTMODE"	"MAG")
+			}
+			
+
+
+// ---------------------------------------------------------------------------------------------------
+//	MAGIC MOVEMENT
+
+			ani			("s_MagRun"					1	"s_MagRun"		0.1	0.1	M.	"Dra_RunAmbient_A01.asc"		F	0  100)
+			{	
+				*eventPFX		(35 	1 	"DRAGON_BREATH_SMOKE"			"BIP01 HEAD"	ATTACH)
+				*eventPFXStop	(45		1)	
+			}
+		
+			ani			("s_MagRunL"			1	"s_MagRunL"	0.0	0.0	M.	"Dra_Run_A01.asc"				F	17	42)
+			{
+				*eventSFX	(25	"TRO_STEPBOOM"		EMPTY_SLOT	)
+				*eventCamTremor (24 1000	700	  2  5 )
+				*eventCamTremor (37 1000	700	  2  5 )
+	
+			}
+			
+			aniBlend	("t_MagRun_2_MagRunL"		"s_MagRunL"				0.1	0.1	)
+			aniBlend	("t_MagRunL_2_MagRun"		"s_MagRun"				0.1	0.1	)
+			aniBlend	("t_MagRunR_2_MagRun"		"s_MagRun"				0.1	0.1	)	
+			
+			aniAlias	("t_MagJumpB"			1	"s_MagRun"				0.1	0.1	M.	"t_FistJumpB"				F)
+			aniAlias	("t_MagWalkStrafeL"		1	"t_MagWalkStrafeL"		0.1	0.1	M.	"t_FistRunStrafeL"			F)
+			aniAlias	("t_MagWalkStrafeR"		1	"t_MagWalkStrafeR"		0.1	0.1	M.	"t_FistRunStrafeR"			F)
+			aniAlias	("t_MagRunStrafeL"		1	"t_MagRunStrafeL"		0.1	0.1	M.	"t_FistRunStrafeL"			F)
+			aniAlias	("t_MagRunStrafeR"		1	"t_MagRunStrafeR"		0.1	0.1	M.	"t_FistRunStrafeR"			F)
+			aniAlias	("t_MagWalkTurnL"		20	"t_MagWalkTurnL"		0.1	1.0	M.	"t_FistRunTurnL"			F)
+			aniAlias	("t_MagWalkTurnR"		20	"t_MagWalkTurnR"		0.1	1.0	M.	"t_FistRunTurnR"			F)
+			aniAlias	("t_MagRunTurnL"		20	"t_MagRunTurnL"			0.1	1.0	M.	"t_FistRunTurnL"			F)
+			aniAlias	("t_MagRunTurnR"		20	"t_MagRunTurnR"			0.1	1.0	M.	"t_FistRunTurnR"			F)
+		
+// ---------------------------------------------------------------------------------------------------
+// MAGIC SPELLS
+//
+//	Firebolt (Magic Missile), Thunderbolt,...
+
+			ani			("t_MagRun_2_FBTShoot"		1	"s_FBTShoot"	0.1 0.0 M.	"Dra_Fireball_A01.asc"		F	1	7)
+			ani			("s_FBTShoot"				1	"s_FBTShoot"	0.0 0.0 M.	"Dra_Fireball_A01.asc"		F	8	8)
+			ani			("t_FBTShoot_2_Stand"		1	""				0.0 0.1 M.	"Dra_Fireball_A01.asc"		F	9	20)
+
+///////////////////////
+// MAGIC VICTIMS
+///////////////////////
+
+// kein Feuerschaden 
+
+// Lightning, Chainlightning, Thunderbolt, Thunderball
+//			ani			("t_Stand_2_Lightning_Victim"	1	"s_Lightning_Victim"	0.1	0.0	M.	"Dra_VicLightning_A01.asc"	F	0	14)
+//			ani			("s_Lightning_Victim"			1	"s_Lightning_Victim"	0.0	0.0	M.	"Dra_VicLightning_A01.asc"	F	14	84)
+
+
+// ------------------------------------------------------------------------------------------------------
+// TALK
+
+			ani			("t_Stand_2_Talk"				1	"s_Talk"	0.0	0.0	M.	"Dra_Talk_A01.asc"	F	1	50)
+			{
+						*eventCamTremor (14 1000	700	  2  5 )
+						*eventCamTremor (25 1000	700	  2  5 )
+						*eventCamTremor (34 1000	700	  2  5 )
+			}
+			
+			ani			("s_Talk"						1	"s_Talk"	0.0	0.0	M.	"Dra_Talk_A01.asc"	F	50	120)
+			aniAlias	("t_Talk_2_Stand"				1	""			0.0	0.0	M.	"t_Stand_2_Talk"	R)
+			
+};

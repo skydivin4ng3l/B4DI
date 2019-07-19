@@ -1,0 +1,202 @@
+ZenGin Archive
+ver 1
+zCArchiverGeneric
+ASCII
+saveGame 0
+date 25.7.2003 20:50:39
+user bjoern.pankratz
+END
+objects 11       
+END
+
+numVobLightPresets=int:11
+[% zCVobLightPreset 0 0]
+	presetName=string:FIRE
+	lightType=enum:0
+	range=float:100
+	color=color:255 0 0 255
+	spotConeAngle=float:0
+	lightStatic=bool:0
+	lightQuality=enum:2
+	lensflareFX=string:
+	turnedOn=bool:1
+	rangeAniScale=string:1 
+	rangeAniFPS=float:4
+	rangeAniSmooth=bool:1
+	colorAniList=string:(255 0 0) (255 128 0) (255 255 0) 
+	colorAniFPS=float:8
+	colorAniSmooth=bool:1
+	canMove=bool:0
+[]
+[% zCVobLightPreset 0 1]
+	presetName=string:POISON
+	lightType=enum:0
+	range=float:100
+	color=color:0 0 255 255
+	spotConeAngle=float:0
+	lightStatic=bool:0
+	lightQuality=enum:2
+	lensflareFX=string:
+	turnedOn=bool:1
+	rangeAniScale=string:1 
+	rangeAniFPS=float:5.00000525
+	rangeAniSmooth=bool:1
+	colorAniList=string:(0 0 255) (0 255 255) 255 (128 0 128) 
+	colorAniFPS=float:5.00000525
+	colorAniSmooth=bool:1
+	canMove=bool:0
+[]
+[% zCVobLightPreset 0 2]
+	presetName=string:FX_LIGHT1
+	lightType=enum:0
+	range=float:100
+	color=color:0 255 0 255
+	spotConeAngle=float:0
+	lightStatic=bool:0
+	lightQuality=enum:2
+	lensflareFX=string:
+	turnedOn=bool:1
+	rangeAniScale=string:1 
+	rangeAniFPS=float:4
+	rangeAniSmooth=bool:1
+	colorAniList=string:(0 20 0) (64 128 128) 255 
+	colorAniFPS=float:8
+	colorAniSmooth=bool:1
+	canMove=bool:0
+[]
+[% zCVobLightPreset 0 3]
+	presetName=string:REDAMBIENCE
+	lightType=enum:0
+	range=float:3000
+	color=color:255 0 0 255
+	spotConeAngle=float:0
+	lightStatic=bool:0
+	lightQuality=enum:2
+	lensflareFX=string:
+	turnedOn=bool:1
+	rangeAniScale=string:1 
+	rangeAniFPS=float:4
+	rangeAniSmooth=bool:1
+	colorAniList=string:(255 0 0) (80 0 0) (128 0 0) 
+	colorAniFPS=float:2
+	colorAniSmooth=bool:1
+	canMove=bool:0
+[]
+[% zCVobLightPreset 0 4]
+	presetName=string:AURA
+	lightType=enum:0
+	range=float:3000
+	color=color:255 0 0 255
+	spotConeAngle=float:0
+	lightStatic=bool:0
+	lightQuality=enum:2
+	lensflareFX=string:
+	turnedOn=bool:1
+	rangeAniScale=string:1 
+	rangeAniFPS=float:4
+	rangeAniSmooth=bool:1
+	colorAniList=string:(0 0 128) (0 128 255) (0 200 100) 
+	colorAniFPS=float:2
+	colorAniSmooth=bool:1
+	canMove=bool:0
+[]
+[% zCVobLightPreset 0 5]
+	presetName=string:FIRESMALL
+	lightType=enum:0
+	range=float:100
+	color=color:255 0 0 255
+	spotConeAngle=float:0
+	lightStatic=bool:0
+	lightQuality=enum:2
+	lensflareFX=string:
+	turnedOn=bool:1
+	rangeAniScale=string:1 
+	rangeAniFPS=float:4
+	rangeAniSmooth=bool:1
+	colorAniList=string:(255 80 0) (200 50 0) (255 100 0) 
+	colorAniFPS=float:2
+	colorAniSmooth=bool:1
+	canMove=bool:0
+[]
+[% zCVobLightPreset 0 6]
+	presetName=string:STOBOSKOP
+	lightType=enum:0
+	range=float:1500
+	color=color:255 0 0 255
+	spotConeAngle=float:0
+	lightStatic=bool:0
+	lightQuality=enum:2
+	lensflareFX=string:
+	turnedOn=bool:1
+	rangeAniScale=string:1 
+	rangeAniFPS=float:4
+	rangeAniSmooth=bool:1
+	colorAniList=string:255 0 255 
+	colorAniFPS=float:20.000021
+	colorAniSmooth=bool:0
+	canMove=bool:0
+[]
+[% zCVobLightPreset 0 7]
+	presetName=string:WHITEBLEND
+	lightType=enum:0
+	range=float:1500
+	color=color:255 0 0 255
+	spotConeAngle=float:0
+	lightStatic=bool:0
+	lightQuality=enum:2
+	lensflareFX=string:
+	turnedOn=bool:1
+	rangeAniScale=string:1 
+	rangeAniFPS=float:4
+	rangeAniSmooth=bool:1
+	colorAniList=string:0 255 0 
+	colorAniFPS=float:1
+	colorAniSmooth=bool:1
+	canMove=bool:0
+[]
+[% zCVobLightPreset 0 8]
+	presetName=string:CATACLYSM
+	lightType=enum:0
+	range=float:1500
+	color=color:255 0 0 255
+	spotConeAngle=float:0
+	lightStatic=bool:0
+	lightQuality=enum:2
+	lensflareFX=string:
+	turnedOn=bool:1
+	rangeAniScale=string:1 
+	rangeAniFPS=float:4
+	rangeAniSmooth=bool:1
+	colorAniList=string:(255 128 0) (255 255 0) (128 64 0) (128 0 0) (128 128 0) 
+	colorAniFPS=float:2
+	colorAniSmooth=bool:1
+	canMove=bool:0
+[]
+[% zCVobLightPreset 0 9]
+	presetName=string:JUSTWHITE
+	lightType=enum:0
+	range=float:1500
+	color=color:255 0 0 255
+	spotConeAngle=float:0
+	lightStatic=bool:0
+	lightQuality=enum:2
+	lensflareFX=string:
+	turnedOn=bool:1
+	rangeAniScale=string:1 
+	rangeAniFPS=float:4
+	rangeAniSmooth=bool:1
+	colorAniList=string:255 (255 255 240) 255 (255 240 255) (240 255 255) 255 
+	colorAniFPS=float:4
+	colorAniSmooth=bool:1
+	canMove=bool:0
+[]
+[% zCVobLightPreset 0 10]
+	presetName=string:TEST
+	lightType=enum:0
+	range=float:100
+	color=color:255 0 0 255
+	spotConeAngle=float:0
+	lightStatic=bool:1
+	lightQuality=enum:2
+	lensflareFX=string:
+[]

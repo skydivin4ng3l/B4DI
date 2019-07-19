@@ -1,0 +1,165 @@
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Last Changes:
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Model ("Irrlicht")
+{
+
+	meshAndTree ("Irrlicht_Body.asc" DONT_USE_MESH)
+
+	registerMesh ("Irrlicht_Body.ASC")
+
+	aniEnum
+	{
+
+//	|	KEYWORD		|	ANI-NAME					|LAYER|	NEXT-ANI	  |	BI | BO |F	|ASC-FILE				|	DIR |FF |LF
+//----------------------------------------------------------------------------------------------------------------------------
+//////////////////////////
+// FIST MOVEMENT
+//////////////////////////
+//	Fist-RUN
+	
+		ani			("s_FistRun"					1	"s_FistRun"		0.3	0.3	M.	"Irrlicht_RunAmbient_A01.asc"		F	0	50)
+		{
+				*eventPFXStop	(0		1)
+				*eventPFX		(1 		1 	"IRRLICHT"			"BIP01"	ATTACH)
+				*eventPFXStop	(2		5)	
+		}	
+	
+		aniBlend	("t_FistRun_2_FistRunL"				"s_FistRunL"	0.2	0.2)
+		ani			("s_FistRunL"					1	"s_FistRunL"	0.3	0.3	M.	"Irrlicht_Run_A01.asc"			F	1	20)
+		{
+			*eventSFX	(1	"WSP_Flare1"	EMPTY_SLOT	)
+		}
+		aniBlend	("t_FistRunL_2_FistRun"				"s_FistRun"		0.2	0.2)	
+		aniBlend	("t_FistRunR_2_FistRun"				"s_FistRun"		0.2	0.2)	
+
+// ---------------------------------------------------------------------------------------------------------------------------------
+
+		aniAlias	("t_FistJumpB"					1	"s_FistRun"		0.3	0.3	M.	"s_FistRunL"				R)
+		
+		ani			("t_FistRunStrafeL"				1	"t_FistRunStrafeL"	0.2	0.2	M.	"Irrlicht_StrafeL_A01.ASC"		F	0	10)	 
+		ani			("t_FistRunStrafeR"				1	"t_FistRunStrafeR"	0.2	0.2	M.	"Irrlicht_StrafeR_A01.ASC"		F	0	10)
+		{
+			*eventSFX	(1	"WSP_Flare2"	EMPTY_SLOT	)
+		}
+
+//----------------------------------------------------		
+// DEAD
+		
+		ani			("t_Dead"						1	"s_Dead"		0.1	0.0	M.	"Irrlicht_Dead_A01.asc"			F	1	99)
+		{
+			*eventSFX	(1	"WSP_Dead"	EMPTY_SLOT	)
+				*eventPFX		(1 		4 	"IRRLICHT_DIE"			"BIP01"	ATTACH)
+				*eventPFXStop	(2		5)	
+				*eventPFXStop	(20		1)	
+				*eventPFXStop	(98		4)	
+				*eventPFX		(99 	2 	"MFX_LIGHT_INIT"			"BIP01"	ATTACH)
+		}				
+		ani			("s_Dead"						1	"s_Dead"		0.0	0.0	M.	"Irrlicht_Dead_A01.asc"			F	100	100)
+		{
+				*eventPFXStop	(100		1)	
+		}				
+		ani			("t_DeadB"						1	"s_DeadB"		0.1	0.0	M.	"Irrlicht_Dead_A01.asc"			F	1	99)
+		{
+			*eventSFX	(10	"WSP_Dead"	EMPTY_SLOT	)
+				*eventPFX		(1 		4 	"IRRLICHT_DIE"			"BIP01"	ATTACH)
+				*eventPFXStop	(2		5)	
+				*eventPFXStop	(20		1)	
+				*eventPFXStop	(98		4)	
+				*eventPFX		(99 	2 	"MFX_LIGHT_INIT"			"BIP01"	ATTACH)
+		}
+		ani			("s_DeadB"						1	"s_DeadB"		0.0	0.0	M.	"Irrlicht_Dead_A01.asc"			F	100	100)
+		{
+				*eventPFXStop	(100		1)	
+		}	
+
+//----------------------------------------------------		
+// STUMBLE
+
+		ani			("t_StumbleB"					1	""				0.1	0.1	M.	"Irrlicht_Stumble_A01.asc"		F	0	10		)
+		{
+			*eventSFX	(1	"WSP_Flare1"	EMPTY_SLOT	)
+				*eventPFX		(0 		5 	"IRRLICHT_WARN"			"BIP01"	ATTACH)
+				*eventPFXStop	(10		5)	
+		}
+			
+		ani			("t_Stumble"					1	""				0.1 0.1 M.	"Irrlicht_Stumble_A01.asc"		R	0	10)
+		{
+			*eventSFX	(1	"WSP_Flare2"	EMPTY_SLOT	)
+				*eventPFX		(0 		5 	"IRRLICHT_WARN"			"BIP01"	ATTACH)
+				*eventPFXStop	(10		5)	
+		}		
+		
+//----------------------------------------------------		
+		
+		ani 	("t_warn"							1	""				0.2	0.2	M.	"Irrlicht_Still_A01.asc"	F	0	32)
+		{
+				*eventPFX		(1 		5 	"IRRLICHT_WARN"			"BIP01"	ATTACH)
+				*eventPFXStop	(30		5)	
+		}
+
+//----------------------------------------------------		
+
+		ani			("s_FallDn"					1	"s_FallDn"		0.2	0.2	MF	"Irrlicht_RunAmbient_A01.asc"		F	0	0)			
+		ani			("t_FallDn_2_Stand"			1	"s_FistRun"		0.2	0.2	M.	"Irrlicht_StandUp_A01.asc"			F	0	20)
+	
+/////////////////
+// JUMP / FLY
+/////////////////			
+			ani			("t_Stand_2_JumpUpLow"			1	"s_JumpUpLow"			0.1	0.0	M.	"Irrlicht_JumpUp_A01.asc"	F	1	5)
+			ani			("s_JumpUpLow"					1	"t_JumpUpLow_2_Stand"	0.0	0.0	MF	"Irrlicht_JumpUp_A01.asc"	F	5	15)
+			
+			ani			("t_JumpUpLow_2_Stand"			1	""				0.0	0.2	MF	"Irrlicht_JumpUp_A01.asc"		F	15	30)
+			
+		
+		
+//----------------------------------------------------
+// FIST ATTACK		
+		
+		ani			("s_FistAttack"					1	""	0.1	0.1	M.	"Irrlicht_Still_A01.asc"		F	0	10)
+		{
+				*eventTag		(0		"DEF_HIT_LIMB"		"BIP01"				)
+				*eventTag		(0		"DEF_OPT_FRAME"		"5"							)
+				*eventTag		(0		"DEF_HIT_END"		"9"							)
+				*eventTag		(0		"DEF_WINDOW"		"5	10"						)
+				*eventPFX		(0 	5 	"MFX_LIGHTNING_TARGET"			"BIP01"	ATTACH	)
+				*eventSFX	(2	"Wsp_ATTACK"	EMPTY_SLOT	)
+				*eventPFXStop	(10	5)	
+		}
+		
+		ani			("t_FistAttackMove"				2	""				0.2	0.2	M.	"Irrlicht_Run_A01.ASC"	F	1	20)	
+		{
+				*eventTag		(0 			"DEF_HIT_LIMB"					"BIP01"			)
+				*eventTag		(0 			"DEF_OPT_FRAME"					"10"			)
+				*eventPFX		(1 	5 		"MFX_LIGHTNING_TARGET"			"BIP01"	ATTACH	)
+				*eventSFX	(2	"Wsp_ATTACK"	EMPTY_SLOT	)
+				*eventPFXStop	(19	5)	
+		}
+		
+		aniAlias	("t_FistParade_0"				1	""				0.1	0.1	M.	"t_FistRunStrafeL"			F)
+		aniAlias	("t_FistParadeJumpB"			1	"s_FistRun"		0.3	0.3	M.	"s_FistRunL"				R)
+
+//----------------------------------------------------
+// ROAMS		
+			
+		ani			("Fly1"						1	""				0.3 0.3 M.	"Irrlicht_Roam01_A01.asc"	F	1	100)	
+		{
+			*eventSFX	(26	"Wsp_Whosh1"	EMPTY_SLOT	)
+		}
+		ani			("Fly2"						1	""				0.3 0.3 M.	"Irrlicht_Roam02_A01.asc"	F	1	100)	
+		{
+			*eventSFX	(20	"Wsp_Whosh2"	EMPTY_SLOT	)
+			*eventSFX	(60	"Wsp_Whosh3"	EMPTY_SLOT	)
+		}
+		ani			("Fly3"						1	""				0.3 0.3 M.	"Irrlicht_Roam03_A01.asc"	F	1	100)
+			
+		aniAlias	("r_Roam1"					2	""				0.1 0.1 M.	"Fly1"			F)	
+		aniAlias	("r_Roam2"					2	""				0.1 0.1 M.	"Fly2"			F)	
+		aniAlias	("r_Roam3"					2	""				0.1 0.1 M.	"Fly3"			F)
+
+	}
+}
+

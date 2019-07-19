@@ -1,0 +1,38 @@
+// MAGE
+
+// OVERLAYED ANIS: WALKLOOP, CHAIR, BENCH, SIT
+
+Model ("HuS")
+{
+	meshAndTree ("Hum_Body_Naked0.ASC" DONT_USE_MESH)
+
+	aniEnum
+	{
+
+//////////////////////////
+// NORMAL MOVEMENT
+//////////////////////////
+
+//			ani			("t_Run_2_Walk"			1	"s_Walk"		0.1	0.0	M.	"Hum_WalkMage_M01.asc"		F	1	19)
+//			aniAlias	("t_Walk_2_Run"			1	"s_Run"			0.0	0.1	M.	"t_Run_2_Walk"				R)
+
+//	WALK-Mode
+//			ani			("s_Walk"				1	"s_Walk"		0.0	0.0	M.	"Hum_Amb_WalkMage_M01.asc"	F	0	60	FPS:5)
+			ani			("t_Walk_2_WalkL"		1	"s_WalkL"		0.0	0.0	M.	"Hum_WalkMage_M01.asc"		F	21	29)
+
+//	Walk-Loop (linker Fuﬂ vorn)
+			ani			("s_WalkL"				1	"s_WalkL"		0.0	0.1	M.	"Hum_WalkMage_M01.asc"		F	30	64)
+			{
+				*eventSFXGrnd	(40	"Run")
+				*eventSFXGrnd	(60	"Run")
+			}
+
+			ani			("t_WalkL_2_Walk"		1	"s_Walk"		0.0	0.0	M.	"Hum_WalkMage_M01.asc"		F	65	79)
+			{
+				*eventSFXGrnd	(70	"Run")
+				*eventSFXGrnd	(77	"Run")
+			}
+			aniBlend	("t_WalkR_2_Walk"			"s_Walk"		0.2	0.2)
+
+	}
+}

@@ -1,0 +1,44 @@
+// ARROGANCE (EBR ONLY???)
+
+// OVERLAYED ANIS: WALKLOOP, CHAIR, BENCH, SIT
+
+
+Model ("HuS")
+{
+	meshAndTree ("Hum_Body_Naked0.ASC" DONT_USE_MESH)
+
+	aniEnum
+	{
+
+//////////////////////////
+// NORMAL MOVEMENT
+//////////////////////////
+//	WALK-Mode
+//			ani			("s_Walk"				1	"s_Walk"		0.0	0.0	M.	"Hum_Amb_EbrWalk_M01.asc"	F	0	50	FPS:5)
+			ani			("t_Walk_2_WalkL"		1	"s_WalkL"		0.0	0.0	M.	"Hum_EbrWalk_Jue00.asc"		F	1	12)
+			{
+				*eventSFXGrnd	(7	"Run")
+			}
+//	Walk-Loop (linker Fuﬂ vorn)
+			ani			("s_WalkL"				1	"s_WalkL"		0.0	0.1	M.	"Hum_EbrWalk_Jue00.asc"		F	13	55)
+			{
+				*eventSFXGrnd	(28	"Run")
+				*eventSFXGrnd	(48	"Run")
+			}
+
+			ani			("t_WalkL_2_Walk"		1	"s_Walk"		0.0	0.0	M.	"Hum_EbrWalk_Jue00.asc"		F	56	69)
+			{
+				*eventSFXGrnd	(63	"Run")
+				*eventSFXGrnd	(69	"Run")
+			}
+			aniBlend	("t_WalkR_2_Walk"			"s_Walk"		0.2	0.2)
+
+
+
+// Auf Boden setzen (FP)
+			ani			("t_Stand_2_Sit"			1	"s_Sit"			0.1	0.0	M.	"Hum_SitGround4_M01.asc"	F	1	39	FPS:15)
+			ani			("s_Sit"					1	"s_Sit"			0.0	0.0	MI	"Hum_SitGround4_M01.asc"	F	40	79)
+			aniAlias	("t_Sit_2_Stand"			1	""				0.0	0.2	M.	"t_Stand_2_Sit"				R)
+			
+	}
+}

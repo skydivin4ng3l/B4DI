@@ -1,0 +1,191 @@
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Last Changes:
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Model ("StoneGuardian")
+{
+
+	meshAndTree ("StG_Body.asc" DONT_USE_MESH)
+
+	registerMesh ("StG_Body.ASC")
+
+	aniEnum
+	{
+
+//	|	KEYWORD		|	ANI-NAME					|LAYER|	NEXT-ANI	  |	BI | BO |F	|ASC-FILE				|	DIR |FF |LF
+//----------------------------------------------------------------------------------------------------------------------------
+//////////////////////////
+// FIST MOVEMENT
+//////////////////////////
+//	Fist-RUN
+	
+		ani			("s_FistRun"					1	"s_FistRun"		0.0	0.0	M.	"StG_Ambient_A01.asc"		F	0	0)
+		
+	
+		ani			("t_FistRun_2_FistRunL"			1	"s_FistRunL"	0.0	0.0	M.	"StG_Run_A01.asc"			F	5	9)
+		ani			("s_FistRunL"					1	"s_FistRunL"	0.0	0.0	M.	"StG_Run_A01.asc"			F	10	34)
+		{
+				*eventSFX		(10		"AST_CRUMBLE"	)
+				*eventSFX		(11		"GOL_STEPBOOM"	)
+				*eventCamTremor	(11 1000	500	  2  8	)
+				*eventSFX		(21		"GOL_STEPBOOM"	)
+				*eventCamTremor	(22 1000	500	  2  8	)
+
+		}
+		ani			("t_FistRunL_2_FistRun"			1	"s_FistRun"		0.0	0.0	M.	"Stg_Run_A01.asc"			F	35	40)	
+		aniBlend	("t_FistRunR_2_FistRun"				"s_FistRun"		0.1	0.1)	
+
+//	Fist-WALK
+	
+		ani			("s_FistWalk"					1	"s_FistWalk"		0.0	0.0	M.	"StG_Ambient_A01.asc"		F	0	0)
+		
+	
+		ani			("t_FistWalk_2_FistWalkL"		1	"s_FistWalkL"	0.0	0.0	M.	"StG_Run_A01.asc"			F	5	9)
+		ani			("s_FistWalkL"					1	"s_FistWalkL"	0.0	0.0	M.	"StG_Run_A01.asc"			F	10	34)
+		{
+				*eventSFX		(10	"AST_CRUMBLE"		)
+				*eventSFX		(11		"GOL_STEPBOOM"	)
+				*eventCamTremor	(11 1000	500	  2  8	)
+				*eventSFX		(21		"GOL_STEPBOOM"	)
+				*eventCamTremor	(22 1000	500	  2  8	)
+		}
+		
+		ani			("t_FistWalkL_2_FistWalk"		1	"s_FistWalk"		0.0	0.0	M.	"Stg_Run_A01.asc"			F	35	40)	
+		aniBlend	("t_FistWalkR_2_FistWalk"			"s_FistWalk"		0.1	0.1)	
+
+		aniBlend	("t_FistWalk_2_FistWalkBL"			"s_FistWalkBL"		0.1	0.1)
+		aniAlias	("s_FistWalkBL"					1	"s_FistWalkBL"		0.0	0.0	M.	"s_FistWalkL"				R)
+		aniBlend	("t_FistWalkBL_2_FistWalk"			"s_FistWalk"		0.1	0.1)
+		aniBlend	("t_FistWalkBR_2_FistWalk"			"s_FistWalk"		0.1	0.1)
+
+// ---------------------------------------------------------------------------------------------------------------------------------
+
+		ani			("t_FistJumpB"					1	"s_FistRun"			0.0	0.0	M.	"StG_JumpBack_A01.asc"		F	0	15)
+		{
+				*eventSFX		(9		"GOL_STEPBOOM"	)
+				*eventCamTremor (10 1000	500	  2  8	)
+		}
+	//	ani			("t_FistRunStrafeL"				1	"t_FistRunStrafeL"	0.1	0.1	M.	"StG_Strafe_L_A01.ASC"		F	0	15)	 
+	//	ani			("t_FistRunStrafeR"				1	"t_FistRunStrafeR"	0.1	0.1	M.	"StG_Strafe_L_A01.ASC"		R	0	15)
+	
+	//	ani			("t_FistWalkStrafeL"			1	"t_FistWalkStrafeL"	0.1	0.1	M.	"StG_Strafe_L_A01.ASC"		F	0	15)	 
+	//	ani			("t_FistWalkStrafeR"			1	"t_FistWalkStrafeR"	0.1	0.1	M.	"StG_Strafe_L_A01.ASC"		R	0	15)
+		
+		ani			("t_FistRunTurnL"				20	"t_FistRunTurnL"	0.1	0.1	M.	"StG_Turn_L_A01.asc"	F	1	10)
+		{
+				*eventSFX		(9		"GOL_STEPBOOM"	)
+				*eventCamTremor (10 1000	500	  2  8	)
+		}
+		ani			("t_FistRunTurnR"				20	"t_FistRunTurnR"	0.1	0.1	M.	"StG_Turn_R_A01.asc"	F	1	10)
+		{
+				*eventSFX		(7		"GOL_STEPBOOM"	)
+				*eventCamTremor (10 1000	500	  2  8	)
+		}
+		ani			("t_FistWalkTurnL"				20	"t_FistWalkTurnL"	0.1	0.1	M.	"StG_Turn_L_A01.asc"	F	1	10)
+		{
+				*eventSFX		(8		"GOL_STEPBOOM"	)
+				*eventCamTremor (10 1000	500	  2  8	)
+		}
+		ani			("t_FistWalkTurnR"				20	"t_FistWalkTurnR"	0.1	0.1	M.	"StG_Turn_R_A01.asc"	F	1	10)
+		{
+				*eventSFX		(5		"GOL_STEPBOOM"	)
+				*eventCamTremor (10 1000	500	  2  8	)
+		}		
+		
+// FISTRUN <-> FISTWALK
+
+		aniBlend	("t_FistRun_2_FistWalk"				"s_FistWalk"	0.1	0.1)
+		aniBlend	("t_FistWalk_2_FistRun"				"s_FistRun"		0.1	0.1)
+
+		aniBlend	("t_FistRunL_2_FistWalkL"			"s_FistWalkL"	0.1	0.1)
+		aniBlend	("t_FistWalkL_2_FistRunL"			"s_FistRunL"	0.1	0.1)
+
+		
+//----------------------------------------------------		
+// DEAD
+		
+		ani			("t_Dead"						1	"s_Dead"		0.0	0.0	M.	"StG_Dead_A01.asc"			F	0	50)	
+		{
+			*eventPFX	(1	1	"STONEGUARDIANDIE"		"BIP01"		)
+			*eventSFX	(1		"GOL_FALLDOWN"	EMPTY_SLOT	)
+			*eventPFXStop (25	1)
+			
+		}
+		ani			("s_Dead"						1	"s_Dead"		0.0	0.0	M.	"StG_Dead_A01.asc"			F	50	50)
+					
+		ani			("t_DeadB"						1	"s_DeadB"		0.0	0.0	M.	"StG_Dead_A01.asc"			F	0	50)
+		{
+			*eventPFX	(1	1	"STONEGUARDIANDIE"		"BIP01"		)
+			*eventSFX	(1		"GOL_FALLDOWN"	EMPTY_SLOT	)
+			*eventPFXStop (25	1)
+		}
+		ani			("s_DeadB"						1	"s_DeadB"		0.0	0.0	M.	"StG_Dead_A01.asc"			F	50	50)
+		
+
+//----------------------------------------------------		
+// STUMBLE
+
+		ani			("t_StumbleB"					1	""				0.05 0.1 M.	"StG_Stumble_A01.asc"		F	0	10)
+		{
+				*eventSFX		(1		"AST_grind"	EMPTY_SLOT	)
+		}
+		
+		ani			("t_Stumble"					1	""				0.05 0.1 M.	"StG_Stumble_A01.asc"		R	0	10)
+		{
+				*eventSFX		(1		"AST_grind"	EMPTY_SLOT	)
+		}
+		
+		ani			("t_GotHit"						1	""				0.05 0.1 M.	"StG_Stumble_A01.asc"		F	0	10)
+		{
+				*eventSFX		(1		"AST_grind"	EMPTY_SLOT	)
+		}
+		
+		aniAlias	("s_FallDn"						1	"s_FallDn"		0.0	0.0	MF	"s_FistRun"					F)
+		aniAlias	("t_FallDn_2_Stand"				1	""				0.0	0.0	M.	"s_FistRun"					F)
+		aniAlias	("s_Fall"						1	"s_Fall"		0.1	0.0	MF	"s_FistRun"				F)
+
+//----------------------------------------------------		
+		
+//		ani 	("t_warn"							1	""				0.2	0.2	M.	".asc"	F	0	32)
+
+//----------------------------------------------------		
+
+		
+//----------------------------------------------------
+// FIST ATTACK		
+		
+		ani			("s_FistAttack"					1	""	0.1	0.0	M.	"StG_Attack_A01.asc"		F	0	24)
+		{
+				*eventTag		(0		"DEF_HIT_LIMB"		"BIP01 R FINGER0"		)
+				*eventTag		(0		"DEF_OPT_FRAME"		"8"						)
+				*eventTag		(0		"DEF_HIT_END"		"24"					)
+				*eventTag		(0		"DEF_WINDOW"		"15	24"					)
+				*eventSFX		(1		"AST_grind"									)	
+				*eventCamTremor (8 1000	500	  2  8 									)
+				*eventSFX		(9		"GOL_STEPBOOM"								)
+		}
+		
+		ani			("t_FistAttackMove"				2	""				0.1	0.0	M.	"StG_AttackMove_A01.ASC"	F	1	15)	
+		{
+				*eventTag		(0 			"DEF_HIT_LIMB"					"BIP01 R FINGER0"		)
+				*eventTag		(0 			"DEF_OPT_FRAME"					"6"						)
+				*eventSFX		(1			"AST_grind"												)
+				*eventSFX		(9			"GOL_STEPBOOM"											)
+		}
+		
+		ani			("t_FistParade_0"				1	""				0.0	0.0	M.	"StG_Parade_A01.asc"	F	1	20)
+		{
+				*eventSFX		(1			"AST_grind"												)
+		}
+		
+		ani			("t_FistParadeJumpB"			1	"s_FistRun"		0.0	0.0	M.	"StG_JumpBack_A01.asc"	F	1	15)
+		{
+				*eventCamTremor (10 1000	500	  2  8 )
+				*eventSFX		(11		"GOL_STEPBOOM"	)
+		}
+
+	}
+}
+

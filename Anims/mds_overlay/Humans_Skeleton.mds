@@ -1,0 +1,29 @@
+/////// Skeleton Dead
+
+Model ("HuS")
+{
+	meshAndTree ("Hum_Body_Naked0.ASC" DONT_USE_MESH)
+	aniEnum
+	{
+		
+	
+//////////////////////////
+// DIE
+//////////////////////////
+			ani			("t_Dead"				1	"s_Dead"		0.2 0.0 M.	"Ske_Dead_M01.asc"		F	 1	20)
+			{
+				*eventSFX	(3	"SKE_Die"	EMPTY_SLOT	)
+			}
+			ani			("s_Dead"				1	"s_Dead"		0.0 0.1 M.	"Ske_Dead_M01.asc"		F	21	21)
+
+			aniAlias	("t_DeadB"				1	"s_DeadB"		0.2 0.0 M.	"t_Dead"				F)
+			aniAlias	("s_DeadB"				1	"s_DeadB"		0.0 0.1 M.	"s_Dead"				F)
+
+
+			aniAlias	("t_Dive_2_Drowned"		1	"s_Drowned"		0.2	0.0	MF	"t_Dead"				F)
+			aniAlias	("s_Drowned"			1	"s_Drowned"		0.0	0.0	MF	"s_Dead"				F)
+
+	// Spawn
+			ani			("t_Spawn"				1	""				0.1	0.2	M.	"Ske_Spawn_A02.asc"			F	51	99)
+	}
+}

@@ -1,0 +1,92 @@
+ZenGin Archive
+ver 1
+zCArchiverGeneric
+ASCII
+saveGame 0
+date 17.9.2002 15:20:42
+user mario.roeske
+END
+objects 4        
+END
+
+[% oCWorld:zCWorld 64513 0]
+	[VobTree % 0 0]
+		childs0=int:1
+		[% zCVob 52224 1]
+			pack=int:0
+			presetName=string:
+			bbox3DWS=rawFloat:1524.47998 726.087585 -6291.68359 1564.47998 786.087585 -6291.68359 
+			trafoOSToWSRot=raw:0000803f0000000000000000000000000000803f0000000000000000000000000000803f
+			trafoOSToWSPos=vec3:1544.47998 756.087585 -6291.68359
+			vobName=string:
+			visual=string:FIRE_COMPLETE_A0.TGA
+			showVisual=bool:1
+			visualCamAlign=enum:1
+			visualAniMode=enum:0
+			visualAniModeStrength=float:0
+			vobFarClipZScale=float:1
+			cdStatic=bool:0
+			cdDyn=bool:0
+			staticVob=bool:1
+			dynShadow=enum:0
+			zbias=int:1
+			isAmbient=bool:0
+			[visual zCDecal 64513 2]
+				name=string:FIRE_COMPLETE_A0.TGA
+				decalDim=rawFloat:20 30 
+				decalOffset=rawFloat:0 0 
+				decal2Sided=bool:1
+				decalAlphaFunc=enum:3
+				decalTexAniFPS=float:8
+				decalAlphaWeight=int:255
+				ignoreDayLight=bool:1
+			[]
+			[ai % 0 0]
+			[]
+		[]
+		childs1=int:1
+		[% zCVobLight:zCVob 39168 3]
+			pack=int:0
+			presetName=string:FIRESMALL
+			bbox3DWS=rawFloat:744.070801 -128.8302 -7091.97803 2344.0708 1471.1698 -5491.97852 
+			trafoOSToWSRot=raw:0000803f0000000000000000000000000000803f0000000000000000000000000000803f
+			trafoOSToWSPos=vec3:1544.0708 671.1698 -6291.97803
+			vobName=string:
+			visual=string:
+			showVisual=bool:1
+			visualCamAlign=enum:0
+			visualAniMode=enum:0
+			visualAniModeStrength=float:0
+			vobFarClipZScale=float:1
+			cdStatic=bool:0
+			cdDyn=bool:0
+			staticVob=bool:0
+			dynShadow=enum:0
+			zbias=int:1
+			isAmbient=bool:0
+			[visual % 0 0]
+			[]
+			[ai % 0 0]
+			[]
+			lightPresetInUse=string:FIRESMALL
+			lightType=enum:0
+			range=float:800
+			color=color:255 106 54 255
+			spotConeAngle=float:0
+			lightStatic=bool:0
+			lightQuality=enum:2
+			lensflareFX=string:
+			turnedOn=bool:1
+			rangeAniScale=string:
+			rangeAniFPS=float:4
+			rangeAniSmooth=bool:1
+			colorAniList=string:(255 139 83) (255 104 53) (255 139 83) 
+			colorAniFPS=float:1
+			colorAniSmooth=bool:1
+			canMove=bool:0
+		[]
+		childs2=int:0
+	[]
+	[EndMarker % 0 0]
+	[]
+[]

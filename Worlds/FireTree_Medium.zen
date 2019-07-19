@@ -1,0 +1,145 @@
+ZenGin Archive
+ver 1
+zCArchiverGeneric
+ASCII
+saveGame 0
+date 17.9.2002 15:21:1
+user mario.roeske
+END
+objects 7        
+END
+
+[% oCWorld:zCWorld 64513 0]
+	[VobTree % 0 0]
+		childs0=int:1
+		[% zCVobLight:zCVob 39168 1]
+			pack=int:0
+			presetName=string:LIGHT
+			bbox3DWS=rawFloat:334.003906 -443.912476 -7493.55371 2734.00391 1956.08765 -5093.55371 
+			trafoOSToWSRot=raw:974226bf00000000a9a9423f000000000000803f00000000a9a942bf00000000974226bf
+			trafoOSToWSPos=vec3:1534.00403 756.087585 -6293.55371
+			vobName=string:LIGHT
+			visual=string:
+			showVisual=bool:0
+			visualCamAlign=enum:0
+			visualAniMode=enum:0
+			visualAniModeStrength=float:0
+			vobFarClipZScale=float:1
+			cdStatic=bool:0
+			cdDyn=bool:0
+			staticVob=bool:1
+			dynShadow=enum:0
+			zbias=int:1
+			isAmbient=bool:0
+			[visual % 0 0]
+			[]
+			[ai % 0 0]
+			[]
+			lightPresetInUse=string:LIGHT
+			lightType=enum:0
+			range=float:1200
+			color=color:211 147 107 255
+			spotConeAngle=float:0
+			lightStatic=bool:0
+			lightQuality=enum:2
+			lensflareFX=string:TORCHFX01
+			turnedOn=bool:1
+			rangeAniScale=string:
+			rangeAniFPS=float:0
+			rangeAniSmooth=bool:1
+			colorAniList=string:(211 147 107) (223 173 117) (211 147 107) (223 173 117) (225 197 100) (223 173 117) (227 209 106) (223 173 117) (211 147 107) (223 173 117) (225 197 100) (227 209 106) (223 173 117) (211 147 107) (225 197 100) (223 173 117) (225 197 100) (211 147 107) (223 173 117) (227 209 106) (225 197 100) (211 147 107) (225 197 100) (223 173 117) (225 197 100) (227 209 106) (223 173 117) (211 147 107) (223 173 117) (211 147 107) (225 197 100) (227 209 106) (223 173 117) 
+			colorAniFPS=float:11.0000172
+			colorAniSmooth=bool:0
+			canMove=bool:0
+		[]
+		childs1=int:3
+		[% zCVobSound:zCVob 12289 2]
+			pack=int:0
+			presetName=string:
+			bbox3DWS=rawFloat:934.003418 156.087524 -6893.55371 2134.00342 1356.08765 -5693.55371 
+			trafoOSToWSRot=raw:ce6b443f00000000e12d243f000000000000803f00000000e12d24bf00000000ce6b443f
+			trafoOSToWSPos=vec3:1534.00354 756.087585 -6293.55371
+			vobName=string:SOUND
+			visual=string:
+			showVisual=bool:0
+			visualCamAlign=enum:0
+			visualAniMode=enum:0
+			visualAniModeStrength=float:0
+			vobFarClipZScale=float:1
+			cdStatic=bool:0
+			cdDyn=bool:0
+			staticVob=bool:1
+			dynShadow=enum:0
+			zbias=int:1
+			isAmbient=bool:0
+			[visual % 0 0]
+			[]
+			[ai % 0 0]
+			[]
+			sndVolume=float:100
+			sndMode=enum:0
+			sndRandDelay=float:5
+			sndRandDelayVar=float:2
+			sndStartOn=bool:1
+			sndAmbient3D=bool:0
+			sndObstruction=bool:0
+			sndConeAngle=float:0
+			sndVolType=enum:0
+			sndRadius=float:600
+			sndName=string:FIRE_MEDIUM
+		[]
+		childs2=int:0
+		[% zCVob 52224 3]
+			pack=int:0
+			presetName=string:
+			bbox3DWS=rawFloat:1466.46985 725.087585 -6364.68359 1609.83472 995.02417 -6218.92139 
+			trafoOSToWSRot=raw:4cfb7d3f00000000725600be000000000000803f000000007256003e000000004cfb7d3f
+			trafoOSToWSPos=vec3:1534.00354 756.087585 -6293.55371
+			vobName=string:SMOKE
+			visual=string:FIRE_SMOKE.pfx
+			showVisual=bool:1
+			visualCamAlign=enum:0
+			visualAniMode=enum:0
+			visualAniModeStrength=float:0
+			vobFarClipZScale=float:1
+			cdStatic=bool:0
+			cdDyn=bool:0
+			staticVob=bool:1
+			dynShadow=enum:0
+			zbias=int:1
+			isAmbient=bool:0
+			[visual zCParticleFX 0 4]
+			[]
+			[ai % 0 0]
+			[]
+		[]
+		childs3=int:0
+		[% zCVob 52224 5]
+			pack=int:0
+			presetName=string:
+			bbox3DWS=rawFloat:1488.43701 725.504395 -6348.47217 1580.77405 869.738525 -6244.64551 
+			trafoOSToWSRot=raw:e0a47e3f00000000e884d23d000000000000803f00000000e884d2bd00000000e0a47e3f
+			trafoOSToWSPos=vec3:1534.00354 772.087585 -6293.55371
+			vobName=string:FIRE
+			visual=string:FIRE_MEDIUM.pfx
+			showVisual=bool:1
+			visualCamAlign=enum:0
+			visualAniMode=enum:0
+			visualAniModeStrength=float:0
+			vobFarClipZScale=float:1
+			cdStatic=bool:0
+			cdDyn=bool:0
+			staticVob=bool:1
+			dynShadow=enum:0
+			zbias=int:1
+			isAmbient=bool:0
+			[visual zCParticleFX 0 6]
+			[]
+			[ai % 0 0]
+			[]
+		[]
+		childs4=int:0
+	[]
+	[EndMarker % 0 0]
+	[]
+[]

@@ -1,0 +1,33 @@
+// MILITIA
+
+// OVERLAYED ANIS: WALKLOOP, CHAIR, BENCH, SIT
+
+Model ("HuS")
+{
+	meshAndTree ("Hum_Body_Naked0.ASC" DONT_USE_MESH)
+
+	aniEnum
+	{
+
+//////////////////////////
+// NORMAL MOVEMENT
+//////////////////////////
+//	WALK-Mode
+			ani			("t_Walk_2_WalkL"		1	"s_WalkL"		0.0	0.0	M.	"Hum_WalkA3_M01.asc"		F	1	5)
+
+//	Walk-Loop (linker Fuﬂ vorn)
+			ani			("s_WalkL"				1	"s_WalkL"		0.0	0.1	M.	"Hum_WalkA3_M01.asc"		F	6	40)
+			{
+				*eventSFXGrnd	(14	"Run")
+				*eventSFXGrnd	(33	"Run")
+			}
+
+			ani			("t_WalkL_2_Walk"		1	"s_Walk"		0.0	0.0	M.	"Hum_WalkA3_M01.asc"		F	41	50)
+			{
+				*eventSFXGrnd	(46	"Run")
+			}
+			aniBlend	("t_WalkR_2_Walk"			"s_Walk"		0.2	0.2)
+
+
+	}
+}

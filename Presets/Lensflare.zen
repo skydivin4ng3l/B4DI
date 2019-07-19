@@ -1,0 +1,120 @@
+ZenGin Archive
+ver 0
+ASCII
+saveGame 0
+objects 0
+END
+
+[LensFlareFXList % 0 0]
+		[% zCLensFlareFX 0 0]
+		name=string:ZSUN_FLARE
+		numFlares=int:2
+		[% % 0 0]
+			texName=string:sun_02.tga
+			type=enum;FT_CORONA;FT_GLOW;FT_FLARE:2 
+			size=float:2.5
+			alpha=float:255
+			rangeMin=float:0
+			posScale=float:0.01
+		[]
+		[% % 0 0]
+			texName=string:sun_01.tga
+			type=enum;FT_CORONA;FT_GLOW;FT_FLARE:2 
+			size=float:6.0
+			alpha=float:150
+			rangeMin=float:0
+			posScale=float:0.02
+		[]
+	[]
+	[% zCLensFlareFX 0 0]
+		name=string:GLOW0
+		numFlares=int:1
+		[% % 0 0]
+			texName=string:zflare1.tga
+			type=enum;FT_CORONA;FT_GLOW;FT_FLARE:1
+			size=float:1.5
+			alpha=float:150
+			rangeMin=float:100
+			rangeMax=float:0
+			posScale=float:0.0
+			fadeScale=float:0
+		[]
+		fadeScale=float:0
+	[]
+	[% zCLensFlareFX 0 0]
+		name=string:CORONA0
+		numFlares=int:1
+		[% % 0 0]
+			texName=string:zflare1.tga
+			type=enum;FT_CORONA;FT_GLOW;FT_FLARE:0
+			size=float:1.0
+			alpha=float:155
+			rangeMin=float:100
+			rangeMax=float:0
+			posScale=float:0.0
+			fadeScale=float:0
+		[]
+		fadeScale=float:0
+	[]	
+	[% zCLensFlareFX 0 0]
+		name=string:GLOW1
+		numFlares=int:1
+		[% % 0 0]
+			texName=string:zflare1.tga
+			type=enum;FT_CORONA;FT_GLOW;FT_FLARE:1
+			size=float:0.5
+			alpha=float:200
+			rangeMin=float:5
+			rangeMax=float:0
+			posScale=float:0.0
+			fadeScale=float:0
+		[]
+		fadeScale=float:0
+	[]
+	[% zCLensFlareFX 0 0]
+		name=string:TorchFX01
+		numFlares=int:1
+		[% % 0 0]
+			texName=string:zflare1.tga
+			type=enum;FT_CORONA;FT_GLOW;FT_FLARE:1
+			size=float:0.5
+			alpha=float:80
+			rangeMin=float:0
+			rangeMax=float:4500
+			posScale=float:0.0
+			fadeScale=float:0
+		[]
+		fadeScale=float:0
+	[]
+	[% zCLensFlareFX 0 0]
+		name=string:TempleFX01
+		numFlares=int:1
+		[% % 0 0]
+			texName=string:cflareblue.tga
+			type=enum;FT_CORONA;FT_GLOW;FT_FLARE:1
+			size=float:0.6
+			alpha=float:80
+			rangeMin=float:0
+			rangeMax=float:4500
+			posScale=float:0.0
+			fadeScale=float:0
+		[]
+		fadeScale=float:0
+	[]
+	[% zCLensFlareFX 0 0]
+		name=string:TempleFX02
+		numFlares=int:1
+		[% % 0 0]
+			texName=string:zflare6.tga
+			type=enum;FT_CORONA;FT_GLOW;FT_FLARE:1
+			size=float:0.6
+			alpha=float:80
+			rangeMin=float:0
+			rangeMax=float:4500
+			posScale=float:0.0
+			fadeScale=float:0
+		[]
+		fadeScale=float:0
+	[]	
+[]
+

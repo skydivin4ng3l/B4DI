@@ -1,0 +1,28 @@
+// TIRED
+
+// OVERLAYED ANIS:	WALKLOOP, SIT, BENCH
+
+Model ("HuS")
+{
+	meshAndTree ("Hum_Body_Naked0.ASC" DONT_USE_MESH)
+
+	aniEnum
+	{
+
+//////////////////////////
+// NORMAL MOVEMENT
+//////////////////////////
+//	WALK-Mode
+			ani			("t_Walk_2_WalkL"		1	"s_WalkL"		0.0	0.0	M.	"Hum_WalkTired_M01.asc"		F	1	14)
+//	Walk-Loop (linker Fuﬂ vorn)
+			ani			("s_WalkL"				1	"s_WalkL"		0.0	0.1	M.	"Hum_WalkTired_M01.asc"		F	15	40)
+			{
+				*eventSFXGrnd	(15	"Run")
+				*eventSFXGrnd	(28	"Run")
+			}
+
+			ani			("t_WalkL_2_Walk"		1	"s_Walk"		0.0	0.0	M.	"Hum_WalkTired_M01.asc"		F	41	47)
+			aniBlend	("t_WalkR_2_Walk"			"s_Walk"		0.2	0.2)
+
+	}
+}

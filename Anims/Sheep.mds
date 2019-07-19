@@ -1,0 +1,130 @@
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Last Changes:
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Model ("Sheep")
+{
+	MeshAndTree ("Sheep_Body.asc" DONT_USE_MESH)
+
+	registerMesh ("Sheep_Body.ASC")
+	registerMesh ("Hammel_Body.ASC")
+
+	aniEnum
+	{
+
+//	|	KEYWORD		|	ANI-NAME					|LAYER|	NEXT-ANI	  |	BI | BO |F	|ASC-FILE				|	DIR |FF |LF
+//----------------------------------------------------------------------------------------------------------------------------
+//////////////////////////
+// FIST MOVEMENT
+//////////////////////////
+//	Fist-RUN
+		// -----------------------------------------------------------------------------------------------------------------------------
+		// Ambient
+			ani			("s_FistRun"					1	"s_FistRun"		0.0	0.0	M.	"Sheep_Ambient_A01.asc"	F	0	50)	
+			{
+				*eventSFX	(10	"SHP_Ambient"	EMPTY_SLOT	)
+			}
+		
+	// ---------------------------------------------------------------------------------------------------------------------------------
+	// Forward
+		// -----------------------------------------------------------------------------------------------------------------------------
+		// Ambient -> Loop
+			ani			("t_FistRun_2_FistRunL"			1	"s_FistRunL"	0.0	0.0	M.	"Sheep_Run_A01.asc"			F	5	10)
+		// -----------------------------------------------------------------------------------------------------------------------------
+		// Loop
+			ani			("s_FistRunL"					1	"s_FistRunL"	0.0	0.0	M.	"Sheep_Run_A01.asc"			F	10	26)
+			{
+				*eventSFX	(11	"SHP_Ambient"	EMPTY_SLOT	)
+			}
+			
+		// -----------------------------------------------------------------------------------------------------------------------------
+		// Loop -> Ambient
+			ani			("t_FistRunL_2_FistRun"			1	"s_FistRun"		0.1	0.1	M.	"Sheep_Run_A01.asc"			F	26	35)
+			aniAlias	("t_FistRunR_2_FistRun"			1	"s_FistRun"		0.1	0.1	M.	"t_FistRunL_2_FistRun"		F)	
+
+//	Fist-WALK
+		// -----------------------------------------------------------------------------------------------------------------------------
+		// Ambient
+			aniAlias	("s_FistWalk"					1	"s_FistWalk"	0.0	0.0	M.	"s_FistRun"					F)
+	// ---------------------------------------------------------------------------------------------------------------------------------
+	// Forward
+		// -----------------------------------------------------------------------------------------------------------------------------
+		// Ambient -> Loop
+			ani			("t_FistWalk_2_FistWalkL"		1	"s_FistWalkL"	0.0	0.0	M.	"Sheep_Walk_A01.asc"			F	1	10)
+		// -----------------------------------------------------------------------------------------------------------------------------
+		// Loop
+			ani			("s_FistWalkL"					1	"s_FistWalkL"	0.0	0.1	M.	"Sheep_Walk_A01.asc"			F	10	30)
+			{
+				*eventSFX	(11	"SHP_Ambient"	EMPTY_SLOT	)
+			}
+			
+		// -----------------------------------------------------------------------------------------------------------------------------
+		// Loop -> Ambient
+			ani			("t_FistWalkL_2_FistWalk"		1	"s_FistWalk"	0.0	0.0	M.	"Sheep_Walk_A01.asc"			F	30	40)
+			aniBlend	("t_FistWalkR_2_FistWalk"			"s_FistWalk"	0.2	0.2)
+	
+	// Backward 	
+		aniBlend	("t_FistWalk_2_FistWalkBL"			"s_FistWalkBL"		0.1	0.1)
+		aniAlias	("s_FistWalkBL"					1	"s_FistWalkBL"		0.0	0.0	M.	"s_FistWalkL"				R)
+		aniBlend	("t_FistWalkBL_2_FistWalk"			"s_FistWalk"		0.1	0.1)
+		aniBlend	("t_FistWalkBR_2_FistWalk"			"s_FistWalk"		0.1	0.1)
+
+
+/////////////////////
+//	FIST TURNING
+/////////////////////
+// -------------------------------------------------------------------------------------------------------------------------------------
+// FIST-WALK
+			ani			("t_FistWalkTurnL"				20	""				0.3	0.3	M.	"Sheep_TurnL_A01.asc"		F	1	24)
+			ani			("t_FistWalkTurnR"				20	""				0.3	0.3	M.	"Sheep_TurnR_A01.asc"		F	1	24)
+// -------------------------------------------------------------------------------------------------------------------------------------
+// FIST-RUN
+			aniAlias	("t_FistRunTurnL"				20	""				0.2	0.2	M.	"t_FistWalkTurnL"		F)
+			aniAlias	("t_FistRunTurnR"				20	""				0.2	0.2	M.	"t_FistWalkTurnR"		F)			
+	
+
+/////////////////////
+//	FIST TRANSITIONS
+/////////////////////
+//	Movement-Modes
+			aniBlend	("t_FistRun_2_FistWalk"				"s_FistWalk"		0.2	0.2)
+			aniBlend	("t_FistWalk_2_FistRun"				"s_FistRun"			0.2	0.2)
+			aniBlend	("t_FistRunL_2_FistWalkL"			"s_FistWalkL"		0.2	0.2)
+			aniBlend	("t_FistWalkL_2_FistRunL"			"s_FistRunL"		0.2	0.2)
+
+
+	// Fallpose (Armrudern evtl.)
+			ani			("s_FallDn"						1	"s_FallDn"		0.0	0.1	MF	"Sheep_Ambient_A01.asc"	F	1	1)
+		// Sauber landen
+			ani			("t_FallDn_2_Stand"				1	""				0.1	0.0	M.	"Sheep_Ambient_A01.asc"	F	1	1)
+			
+//////////////////////////
+// DIE
+//////////////////////////
+
+			ani			("t_Dead"						1	"s_Dead"		0.1 0.0 M.	"Sheep_Dead_A01.asc"		F	0	20)
+			{
+				*eventSFX	(1	"SHP_Hurt"	EMPTY_SLOT	)
+			}
+			ani			("s_Dead"						1	"s_Dead"		0.0 0.1 M.	"Sheep_Dead_A01.asc"		F	20	20)
+			aniAlias	("t_DeadB"						1	"s_DeadB"		0.1	0.0	M.	"t_Dead"	F)
+			aniAlias	("s_DeadB"						1	"s_DeadB"		0.0	0.0	M.	"s_Dead"	F)
+
+// ***************************************************************************************
+// MM DAYCYCLE
+// ***************************************************************************************
+			ani			("t_eat"			2	""			0.1 0.1 M.	"Sheep_Eat_A01.asc"			F	0	100)	
+			{
+				*eventSFX	(60	"SHP_Eat"	EMPTY_SLOT	)
+			}
+	
+
+			aniAlias	("r_Roam1"			2	""			0.1 0.1 M.	"t_eat"			F)	
+			ani			("r_Roam2"			2	""			0.1 0.1 M.	"Sheep_Scharren_A01.asc"	F	0	50)	
+			aniAlias	("r_Roam3"			2	""			0.1 0.1 M.	"t_eat"		F)
+// ***************************************************************************************
+
+}
+			aniBlend	("t_FistRunL_2_FistWalkL"		"s_FistWalkL"		0.1	0.1)
