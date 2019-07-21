@@ -19,8 +19,8 @@ prototype B4DI_MyXpBar(Bar) {
 //////
 
 instance B4DI_XpBar(B4DI_MyXpBar){
-	//x = 100;
-	//y = 20;
+	x = 10+128;
+	y = 20+16;
 };
 
 
@@ -67,7 +67,7 @@ func int B4DI_xpBar_create(){
 	var int s0;s0=SB_New();
 	SB_Use(s0);
 	SB("V0: ");	SBi(v0_ptr.psizex); SB(" , "); SBi(v0_ptr.psizey); SB(" ");
-	v1_ptr = _^(getPtr(b.v1));
+	v1_ptr = View_Get(b.v1);
 	SB("V1: ");	SBi(v1_ptr.psizex); SB(" , "); SBi(v1_ptr.psizey); SB(" ");
 	Print_Ext(500,500, SB_ToString(), FONT_Screen, RGBA(255,0,0,200),5000);
 	SB_Destroy();
@@ -75,7 +75,7 @@ func int B4DI_xpBar_create(){
 	return XpBar;
 };
 
-func void B4DI_XpBar_View_ResizePxl(var int hndl, var int percentage ) { 
+func void B4DI_XpBar_View_ResizePercent(var int hndl, var int percentage ) { 
 	// Get the basic Settings for scaling from the original
 	Print_GetScreenSize();
     var int ptr; ptr = create(B4DI_XpBar);
@@ -140,13 +140,13 @@ func void B4DI_Bar_fadeOut(var int bar) {
 };
 
 func void B4DI_Bar_pulse(var int bar) {
-	var int a8_XpBar_pulse; a8_XpBar_pulse = Anim8_NewExt(100 , B4DI_XpBar_View_ResizePxl, bar, false); //height input
+	var int a8_XpBar_pulse; a8_XpBar_pulse = Anim8_NewExt(100 , B4DI_XpBar_View_ResizePercent, bar, false); //height input
 	Anim8_RemoveIfEmpty(a8_XpBar_pulse, true);
 	Anim8_RemoveDataIfEmpty(a8_XpBar_pulse, false);
 	
-	Anim8 (a8_XpBar_pulse, 100,  500, A8_Wait);
-	Anim8q(a8_XpBar_pulse, 150, 2000, A8_SlowEnd);
-	Anim8q(a8_XpBar_pulse, 100, 2000, A8_SlowEnd);
+	Anim8 (a8_XpBar_pulse, 100,  100, A8_Wait);
+	Anim8q(a8_XpBar_pulse, 150, 500, A8_Constant);
+	Anim8q(a8_XpBar_pulse, 100, 500, A8_Constant);
 
 };
 
