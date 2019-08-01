@@ -44,6 +44,7 @@ instance GothicBar@(GothicBar);
 //========================================
 class _bar {
     var int valMax;
+    var int val;
     var int barW;
     var int v0; // zCView(h)
     var int v1; // zCView(h)
@@ -76,6 +77,7 @@ func void Bar_SetPromille(var int bar, var int pro) {
     if(!Hlp_IsValidHandle(bar)) { return; };
     var _bar b; b = get(bar);
     if(pro > 1000) { pro = 1000; };
+    b.val = Print_ToPixel((pro * b.barW) / 1000, PS_X); //to keep both valMax | val in the same space
     View_Resize(b.v1, (pro * b.barW) / 1000, -1);
 };
 
@@ -186,10 +188,10 @@ func void Bar_MoveTo(var int bar, var int x, var int y) {
 func void Bar_SetAlpha(var int bar, var int alpha) {
 	if(!Hlp_IsValidHandle(bar)) { return; };
 	var _bar b; b = get(bar);
-	var zCView v; v = View_Get(b.v0);
-	v.alpha = alpha;
-	v = View_Get(b.v1);
-	v.alpha = alpha;
+	var zCView v0; v0 = View_Get(b.v0);
+	v0.alpha = alpha;
+	var zCView v1; v1 = View_Get(b.v1);
+	v1.alpha = alpha;
 };
 
 //========================================

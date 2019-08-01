@@ -51,31 +51,39 @@ func int B4DI_xpBar_create(){
 	//};
 
 	// ------ XP Setup ------
-	var int level_next; level_next = hero.level+1;
-	var int exp_lastLvlUp; exp_lastLvlUp = (500*(level_next/2)*level_next);
-	//var int exp_next		= (500*((hero.level+2)/2)*(hero.level+1));
+	var int level_last; var int exp_lastLvlUp;
+
+	level_last = hero.level-1;
+	if (level_last<0){
+		level_last =0;
+		exp_lastLvlUp=0;
+	}
+	else{
+		exp_lastLvlUp = (500*((level_last+2)/2)*(level_last+1));
+		//var int exp_next = (500*((hero.level+2)/2)*(hero.level+1));
+	};
 
 	//var int exp_neededFromThisLvlToNext = exp_next - exp_lastLvlUp;
-	Bar_SetMax(XpBar, hero.exp_next);
+	Bar_SetMax(XpBar, hero.exp_next- exp_lastLvlUp);
 	Bar_SetValue(XpBar, hero.exp - exp_lastLvlUp);
 
 	////---debug print
-	var _bar b; b = get(XpBar);
-	var zCView v0_ptr; var zCView v1_ptr;
-	v0_ptr = View_Get(b.v0);
+	//var _bar b; b = get(XpBar);
+	//var zCView v0_ptr; var zCView v1_ptr;
+	//v0_ptr = View_Get(b.v0);
 	
-	var int s0;s0=SB_New();
-	SB_Use(s0);
-	SB("V0: ");	SBi(v0_ptr.psizex); SB(" , "); SBi(v0_ptr.psizey); SB(" ");
-	v1_ptr = View_Get(b.v1);
-	SB("V1: ");	SBi(v1_ptr.psizex); SB(" , "); SBi(v1_ptr.psizey); SB(" ");
-	Print_Ext(500,500, SB_ToString(), FONT_Screen, RGBA(255,0,0,200),5000);
-	SB_Destroy();
+	//var int s0;s0=SB_New();
+	//SB_Use(s0);
+	//SB("V0: ");	SBi(v0_ptr.psizex); SB(" , "); SBi(v0_ptr.psizey); SB(" ");
+	//v1_ptr = View_Get(b.v1);
+	//SB("V1: ");	SBi(v1_ptr.psizex); SB(" , "); SBi(v1_ptr.psizey); SB(" ");
+	//Print_Ext(500,500, SB_ToString(), FONT_Screen, RGBA(255,0,0,200),5000);
+	//SB_Destroy();
 
 	return XpBar;
 };
 
-func void B4DI_XpBar_View_ResizePercent(var int hndl, var int percentage ) { 
+func void B4DI_XpBar_View_ResizePercent(var int hndl, var int x_percentage, var int y_percentage ) { 
 	// Get the basic Settings for scaling from the original
 	Print_GetScreenSize();
     var int ptr; ptr = create(B4DI_XpBar);
@@ -84,6 +92,7 @@ func void B4DI_XpBar_View_ResizePercent(var int hndl, var int percentage ) {
     var int buhh; var int buwh;
     var int ah; var int aw;
     buhh = bu.height / 2;
+    buwh = bu.width / 2;
     if(buhh*2 < bu.height) {ah = 1;} else {ah = 0;};
     if(buwh*2 < bu.width) {aw = 1;} else {aw = 0;};
 
@@ -93,40 +102,62 @@ func void B4DI_XpBar_View_ResizePercent(var int hndl, var int percentage ) {
 	var zCView v0_ptr; var zCView v1_ptr;
 	//v0_ptr = View_Get(b.v0);
 	
-	var int s0;s0=SB_New();
-	SB_Use(s0);
+	//var int s0;s0=SB_New();
+	//SB_Use(s0);
 	//SB("V0: ");	SBi(v0_ptr.vsizex); SB(" , "); SBi(v0_ptr.vsizey); SB(" ");
 	
 	//View_ResizePxl(b.v0, roundf(mulf(mkf(v0_ptr.psizex), percentageF)), roundf(mulf(mkf(v0_ptr.psizey), percentageF)) );
 
 	v1_ptr = View_Get(b.v1);
-	SB("V1: ");	SBi(v1_ptr.psizex); SB(" , "); SBi(v1_ptr.psizey); SB(" ");
+	//SB("V1: ");	SBi(v1_ptr.psizex); SB(" , "); SBi(v1_ptr.psizey); SB(" ");
 
-	var int sizex_pre; sizex_pre = b.val;
+	var int sizex_pre; sizex_pre = Print_ToVirtual(b.val,PS_X);
 	var int sizey_pre; sizey_pre = Print_ToVirtual((buhh-bu.barTop)*2+ah+1,PS_Y);
 	//var int barValueV; barValueV = ((b.value * 1000) / b.valMax)* b.barW) / 1000); //same as Bar_SetValue->BarSetPromille
 
-	View_Resize(b.v1, sizex_pre * percentage /100, sizey_pre * percentage / 100 );
+	//scale on all axis
+	//View_Resize(b.v1, sizex_pre * percentage /100, sizey_pre * percentage / 100 );
+	//scale just on y axis
+	View_Resize(b.v1, sizex_pre * x_percentage / 100 , sizey_pre * y_percentage / 100 );
 	//(v1_ptr.psizex - sizex_pre) / 2
 	var int posDifY; posDifY = (v1_ptr.vsizey - sizey_pre)/2;
 	if (posDifY>0){
 		posDifY *= -1;
 	};
-	//var int compenstedTargetX; compenstedTargetX = bu.y + posDifX;
+	var int posDifX; posDifX = (v1_ptr.vsizex - sizex_pre)/2;
+	if (posDifX>0){
+		posDifX *= -1;
+	};
+	
+	var int compenstedTargetX; 
+	compenstedTargetX = Print_ToVirtual(bu.x - buwh + bu.barLeft + aw, PS_X ) + posDifX;
 
 	var int compenstedTargetY; 
-	compenstedTargetY = Print_ToVirtual(bu.y-buhh+bu.barTop+ah+1, PS_Y) + posDifY;
+	compenstedTargetY = Print_ToVirtual(bu.y - buhh + bu.barTop + ah +1, PS_Y) + posDifY;
 	//x -= v.vsizex>>1;
 	//y -= v.vsizey>>1;
 	//x -= v.vposx;
 	//y -= v.vposy;
-	View_MoveTo(b.v1, v1_ptr.vposx, compenstedTargetY );
+	//View_MoveTo(b.v1, v1_ptr.vposx, compenstedTargetY ); //<--- worked
+	View_MoveTo(b.v1, compenstedTargetX, compenstedTargetY );
 
-	Print_Ext(300,300, SB_ToString(), FONT_Screen, RGBA(255,0,0,200),100);
-	SB_Destroy();
+	//Print_Ext(300,300, SB_ToString(), FONT_Screen, RGBA(255,0,0,200),100);
+	//SB_Destroy();
 
 	free(ptr, B4DI_XpBar);
 
+};
+
+func void B4DI_Bar_View_ResizePercentageY(var int hndl, var int y_percentage){
+	B4DI_XpBar_View_ResizePercent(hndl, 100, y_percentage);
+};
+
+func void B4DI_Bar_View_ResizePercentageX(var int hndl, var int x_percentage){
+	B4DI_XpBar_View_ResizePercent(hndl, x_percentage,100 );
+};
+
+func void B4DI_Bar_View_ResizePercentageXY(var int hndl, var int xy_percentage){
+	B4DI_XpBar_View_ResizePercent(hndl, xy_percentage, xy_percentage );
 };
 
 func void B4DI_Bar_fadeOut(var int bar) {
@@ -140,13 +171,13 @@ func void B4DI_Bar_fadeOut(var int bar) {
 };
 
 func void B4DI_Bar_pulse(var int bar) {
-	var int a8_XpBar_pulse; a8_XpBar_pulse = Anim8_NewExt(100 , B4DI_XpBar_View_ResizePercent, bar, false); //height input
+	var int a8_XpBar_pulse; a8_XpBar_pulse = Anim8_NewExt(100 , B4DI_Bar_View_ResizePercentageXY, bar, false); //height input
 	Anim8_RemoveIfEmpty(a8_XpBar_pulse, true);
 	Anim8_RemoveDataIfEmpty(a8_XpBar_pulse, false);
 	
 	Anim8 (a8_XpBar_pulse, 100,  100, A8_Wait);
-	Anim8q(a8_XpBar_pulse, 150, 500, A8_Constant);
-	Anim8q(a8_XpBar_pulse, 100, 500, A8_Constant);
+	Anim8q(a8_XpBar_pulse, 150, 200, A8_SlowEnd);
+	Anim8q(a8_XpBar_pulse, 100, 100, A8_SlowStart);
 
 };
 
@@ -154,7 +185,7 @@ func void B4DI_xpBar_show(){
 	var int XpBar; XpBar = B4DI_xpBar_create();
 	B4DI_Bar_fadeOut(XpBar);
 	Bar_Show(XpBar);
-	B4DI_Bar_pulse(XpBar);
+	//B4DI_Bar_pulse(XpBar);
 	
 };
 
