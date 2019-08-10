@@ -55,6 +55,27 @@ const int PS_Y = 1;
 const int PS_VMax = 8192;
 
 //========================================
+// Bars Extened
+//========================================
+
+//Access for initialDynamicVSize Array
+const int IDS_V0_X = 0;
+const int IDS_V0_Y = 1;
+const int IDS_V1_X = 2;
+const int IDS_V1_Y = 3;
+
+//Access for initialVPosition Array
+const int IP_V0_CENTER_X = 0;
+const int IP_V0_CENTER_Y = 1;
+const int IP_V1_CENTER_X = 2;
+const int IP_V1_CENTER_Y = 3;
+const int IP_V0_LEFT =4;
+const int IP_V0_TOP =5;
+const int IP_V1_LEFT =6;
+const int IP_V1_TOP =7;
+
+
+//========================================
 // Gamestate
 //========================================
 const int Gamestate_NewGame     = 0;

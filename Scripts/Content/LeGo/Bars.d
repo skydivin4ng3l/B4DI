@@ -3,7 +3,7 @@
 \***********************************/
 
 //========================================
-// Klasse für den Nutzer
+// Klasse fÃ¼r den Nutzer
 //========================================
 class Bar {
     var int x;
@@ -19,7 +19,7 @@ class Bar {
 };
 
 //========================================
-// Prototyp für Konstruktor-Instanz
+// Prototyp fÃ¼r Konstruktor-Instanz
 //========================================
 prototype GothicBar(Bar) {
     x = Print_Screen[PS_X] / 2;
@@ -35,12 +35,12 @@ prototype GothicBar(Bar) {
 };
 
 //========================================
-// Beispiel für Konstruktor-Instanz
+// Beispiel fÃ¼r Konstruktor-Instanz
 //========================================
 instance GothicBar@(GothicBar);
 
 //========================================
-// [intern] Klasse für PermMem
+// [intern] Klasse fÃ¼r PermMem
 //========================================
 class _bar {
     var int valMax;
@@ -48,6 +48,8 @@ class _bar {
     var int barW;
     var int v0; // zCView(h)
     var int v1; // zCView(h)
+    var int initialDynamicVSizes[4];
+    var int initialVPositions[8];
 };
 
 instance _bar@(_bar);
@@ -59,10 +61,73 @@ func void _bar_Delete(var _bar b) {
     if(Hlp_IsValidHandle(b.v1)) {
         delete(b.v1);
     };
+}; 
+
+//========================================
+// [intern] Helper store initial VPos and VSize
+//========================================
+
+func void Bar_storeInitPosSize(var int bar){
+    if(!Hlp_IsValidHandle(bar)) { return; };
+    var _bar b; b = get(bar);
+    var zCView v; v = View_Get(b.v0);
+
+    b.initialVPositions[IP_V0_LEFT] = v.vposx;
+    b.initialVPositions[IP_V0_TOP] = v.vposy;
+    b.initialVPositions[IP_V0_CENTER_X] = v.vposx - v.vsizex>>1; // >>1 durch 2
+    b.initialVPositions[IP_V0_CENTER_Y] = v.vposy - v.vsizey>>1;
+    b.initialDynamicVSizes[IDS_V0_X] = v.vsizex;
+    b.initialDynamicVSizes[IDS_V0_Y] = v.vsizey;
+    
+    v = View_Get(b.v1);
+
+    b.initialVPositions[IP_V1_LEFT] = v.vposx;
+    b.initialVPositions[IP_V1_TOP] = v.vposy;
+    b.initialVPositions[IP_V1_CENTER_X] = v.vposx - v.vsizex>>1; // >>1 durch 2
+    b.initialVPositions[IP_V1_CENTER_Y] = v.vposy - v.vsizey>>1;
+    b.initialDynamicVSizes[IDS_V1_X] = v.vsizex;
+    b.initialDynamicVSizes[IDS_V1_Y] = v.vsizey;
+    
 };
 
 //========================================
-// Höchstwert setzen
+// [intern] Helper Scales depenting on Resolution
+//========================================
+func void Bar_dynamicScale(var int bar){
+    if(!Hlp_IsValidHandle(bar)) { return; };
+    var _bar b; b = get(bar);
+    var zCView vBack; vBack = View_Get(b.v0);
+    var zCView vBar; vBar = View_Get(b.v1);
+
+    //TODO SCALE according system INI / Resolution
+    var int dynScalingFactor; dynScalingFactor = 300/100;
+
+    var int barTop; barTop = vBack.vposy - vBar.vposy;
+    var int barTopOffset; barTopOffset = barTop * dynScalingFactor - barTop;
+    var int barLeft; barLeft =  vBack.vposx - vBar.vposx;
+    var int barLeftOffset; barLeftOffset = barLeft * dynScalingFactor - barLeft;
+    
+    b.barW *= dynScalingFactor;
+    View_Resize(b.v0, vBack.vsizex * dynScalingFactor, vBack.vsizey * dynScalingFactor );
+    View_Resize(b.v1, vBar.vsizex * dynScalingFactor, vBar.vsizey * dynScalingFactor );
+    //TODO Adjust offset of BarTop and BarLeft caused by "Texture Stretching"
+
+    View_MoveTo(b.v1, vBar.vposx- barLeftOffset , vBar.vposy-barTopOffset);
+
+    ////---debug print
+    
+    var int s0;s0=SB_New();
+    SB_Use(s0);
+    SB("BACK: ");   SBi(vBack.psizex); SB(" , "); SBi(vBack.psizey); SB(" ");
+    SB("BAR: ");   SBi(vBar.psizex); SB(" , "); SBi(vBar.psizey); SB(" ");
+    SB("barW: "); SBi(b.barW);
+    Print_ExtPxl(50,Print_Screen[PS_Y] / 2, SB_ToString(), FONT_Screen, RGBA(255,0,0,200),50000);
+    SB_Destroy();
+};
+
+
+//========================================
+// HÃ¶chstwert setzen
 //========================================
 func void Bar_SetMax(var int bar, var int max) {
     if(!Hlp_IsValidHandle(bar)) { return; };
@@ -125,10 +190,15 @@ func int Bar_Create(var int inst) {
     b.v1 = View_CreatePxl(bu.x - buwh, bu.y - buhh, bu.x + buwh + aw, bu.y + buhh + ah);
     View_SetTexture(b.v0, bu.backTex);
     View_SetTexture(b.v1, bu.barTex);
+    
+    Bar_dynamicScale(bh);
+    Bar_storeInitPosSize(bh);
+    
     var zCView v; v = View_Get(b.v0);
     v.fxOpen = 0;
     v.fxClose = 0;
     v = View_Get(b.v1);
+   
     v.fxOpen = 0;
     v.fxClose = 0;
     View_Open(b.v0);
@@ -138,8 +208,37 @@ func int Bar_Create(var int inst) {
     return bh;
 };
 
+func int Bar_CreateCenterDynamic(var int constructor_instance) {
+    Print_GetScreenSize();
+    var int ptr; ptr = create(constructor_instance);
+    var bar bar_constr; bar_constr = MEM_PtrToInst(ptr);
+    var int new_bar_hndl; new_bar_hndl = new(_bar@);
+    var _bar bar; bar = get(new_bar_hndl);
+    bar.valMax = bar_constr.valueMax;
+    //TODO change back to virtual
+    bar.v0 = View_CreateCenterPxl(bar_constr.x, bar_constr.y, bar_constr.width, bar_constr.height);
+    bar.barW = bar_constr.width - bar_constr.barLeft *2;
+    bar.v1 = View_CreateCenterPxl(bar_constr.x, bar_constr.y, bar.barW, bar_constr.height- bar_constr.barTop *2);
+    //TODO remove
+    bar.barW = Print_ToVirtual(bar.barW, PS_X);
+    //^^
+    View_SetTexture(bar.v0, bar_constr.backTex);
+    View_SetTexture(bar.v1, bar_constr.barTex);
+
+    Bar_dynamicScale(new_bar_hndl);
+    Bar_storeInitPosSize(new_bar_hndl);
+
+    var zCView v; v = View_Get(bar.v0);
+    v = View_Get(bar.v1);
+    View_Open(bar.v0);
+    View_Open(bar.v1);
+    Bar_SetValue(new_bar_hndl, bar_constr.value);
+    free(ptr, constructor_instance);
+    return new_bar_hndl;
+};
+
 //========================================
-// Bar löschen
+// Bar lÃ¶schen
 //========================================
 func void Bar_Delete(var int bar) {
     if(Hlp_IsValidHandle(bar)) {
