@@ -1,7 +1,5 @@
-//Constants
-const int oCNpc__OpenScreen_Status = 7592320; // 0x73D980 // HookLen: 7
-
 //////
+/// TODO move all changes in LeGo Classes here or at least seperate additions from vanilla LeGo
 
 prototype B4DI_MyXpBar(Bar) {
 	x = Print_Screen[PS_X] / 2;
@@ -19,8 +17,8 @@ prototype B4DI_MyXpBar(Bar) {
 //////
 
 instance B4DI_XpBar(B4DI_MyXpBar){
-	x = 10+128;
-	y = 20+16;
+	//x = 10+128;
+	//y = 20+16;
 };
 
 
@@ -93,21 +91,20 @@ func void B4DI_Bar_SetSizeCenteredPercent(var int hndl, var int x_percentage, va
 	//TODO: After dynamic scaling use it here
 	// Get the basic Settings for scaling from the original
 	Print_GetScreenSize();
-    var int ptr; ptr = create(B4DI_XpBar);
-    var bar bu; bu = MEM_PtrToInst(ptr);
-
-    var int buhh; var int buwh;
-    var int ah; var int aw;
-    buhh = bu.height / 2;
-    buwh = bu.width / 2;
-    if(buhh*2 < bu.height) {ah = 1;} else {ah = 0;};
-    if(buwh*2 < bu.width) {aw = 1;} else {aw = 0;};
+ //   var int ptr; ptr = create(B4DI_XpBar);
+ //   var bar bu; bu = MEM_PtrToInst(ptr);
+ //   var int buhh; var int buwh;
+ //   var int ah; var int aw;
+ //   buhh = bu.height / 2;
+ //   buwh = bu.width / 2;
+ //   if(buhh*2 < bu.height) {ah = 1;} else {ah = 0;};
+ //   if(buwh*2 < bu.width) {aw = 1;} else {aw = 0;};
 
 	//------------------
 	if(!Hlp_IsValidHandle(hndl)) { return; };
 	var _bar b; b = get(hndl);
 	var zCView v0_ptr; var zCView v1_ptr;
-	//v0_ptr = View_Get(b.v0);
+	
 	
 	var int s0;s0=SB_New();
 	SB_Use(s0);
@@ -152,10 +149,12 @@ func void B4DI_Bar_SetSizeCenteredPercent(var int hndl, var int x_percentage, va
 	View_MoveTo(b.v1, compenstedTargetX, compenstedTargetY );
 
 	SB("V1: ");	SBi(v1_ptr.psizex); SB(" , "); SBi(v1_ptr.psizey); SB(" ");
-	Print_Ext(300,300, SB_ToString(), FONT_Screen, RGBA(255,0,0,200),100);
+	var int DebugText; DebugText = Print_Ext(1,1, SB_ToString(), FONT_Screen, RGBA(255,0,0,200),100);
+	var zCViewText DebugTextObject; DebugTextObject = Print_GetText(DebugText);
+	DebugTextObject.posy = Print_ToVirtual( Print_Screen[PS_Y]/2 , PS_X);  
 	SB_Destroy(); 
 
-	free(ptr, B4DI_XpBar);
+	//free(ptr, B4DI_XpBar);
 
 };
 

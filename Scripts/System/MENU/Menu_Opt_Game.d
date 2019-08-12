@@ -34,8 +34,10 @@ INSTANCE MENU_OPT_GAME(C_MENU_DEF)
 	
 	items[13]		= "MENUITEM_GAME_OLDCONTROLS";
 	items[14]		= "MENUITEM_GAME_OLDCONTROLS_CHOICE";
+
+	items[15]		= "MENUITEM_B4DI_OPTIONS";
 				
-	items[15]		= "MENUITEM_GAME_BACK";
+	items[16]		= "MENUITEM_GAME_BACK";
 	
 	flags = flags | MENU_SHOW_INFO;
 };
@@ -374,7 +376,20 @@ INSTANCE MENUITEM_GAME_OLDCONTROLS_CHOICE(C_MENU_ITEM_DEF)
 	flags		= flags  | IT_TXT_CENTER;
 };
 
+INSTANCE MENUITEM_B4DI_OPTIONS(C_MENU_ITEM_DEF)
+{
+	backpic 	= 	MENU_ITEM_BACK_PIC;
+	text[0]		=	"Dynamic HUD Options";
+	text[1]		=	"Configure the HUD to your liking.";
+	// Position und Dimension
+	posx		= 0;			posy 		= MENU_START_Y + MENU_SOUND_DY*7;
+	dimx		= 8192;			dimy		= 750;
 
+	// Aktionen
+	onSelAction[0]	= SEL_ACTION_STARTMENU;
+	onSelAction_S[0]= "MENU_GAME_OPT_B4DI";
+	flags = flags | IT_TXT_CENTER;
+};
 
 
 INSTANCE MENUITEM_GAME_BACK(C_MENU_ITEM_DEF)
@@ -382,7 +397,7 @@ INSTANCE MENUITEM_GAME_BACK(C_MENU_ITEM_DEF)
 	backpic		=	MENU_ITEM_BACK_PIC;
 	text[0]		=	"Zurück";
 	// Position und Dimension	
-	posx		=	1000;		posy		=	MENU_BACK_Y;
+	posx		=	1000;		posy		=	MENU_BACK_Y + 300;
 	dimx		=	6192;		dimy		=	MENU_SOUND_DY;
 	// Aktionen
 	onSelAction[0]	= 	SEL_ACTION_BACK;	

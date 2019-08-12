@@ -12,6 +12,7 @@ menu\menu_opt_graphics.d
 menu\menu_opt_video.d
 menu\menu_opt_audio.d
 menu\menu_opt_controls.d
+menu\menu_opt_B4DI.d
 menu\menu_opt_ext.d
 menu\menu_misc.d
 menu\menu_savegame.d

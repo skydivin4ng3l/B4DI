@@ -65,14 +65,21 @@ const int IDS_V1_X = 2;
 const int IDS_V1_Y = 3;
 
 //Access for initialVPosition Array
-const int IP_V0_CENTER_X = 0;
-const int IP_V0_CENTER_Y = 1;
-const int IP_V1_CENTER_X = 2;
-const int IP_V1_CENTER_Y = 3;
-const int IP_V0_LEFT =4;
-const int IP_V0_TOP =5;
-const int IP_V1_LEFT =6;
-const int IP_V1_TOP =7;
+const int IP_V0_CENTER_X	= 0;
+const int IP_V0_CENTER_Y	= 1;
+const int IP_V1_CENTER_X	= 2;
+const int IP_V1_CENTER_Y	= 3;
+const int IP_V0_LEFT		=4;
+const int IP_V0_TOP			=5;
+const int IP_V1_LEFT		=6;
+const int IP_V1_TOP			=7;
+
+// interpretations of ini Setting
+const int B4DI_BarScale_off		= 100; // will not be used?
+const int B4DI_BarScale_auto	= 100; // will not be used?
+const int B4DI_BarScale_50		= 50; // 50 %
+const int B4DI_BarScale_100		= 100; // 100%
+const int B4DI_BarScale_150		= 150; // 150%
 
 
 //========================================

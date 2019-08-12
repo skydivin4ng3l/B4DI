@@ -93,14 +93,36 @@ func void Bar_storeInitPosSize(var int bar){
 //========================================
 // [intern] Helper Scales depenting on Resolution
 //========================================
+var int B4DI_BarScale[5];
+func void B4DI_InitBarScale(){
+
+    B4DI_BarScale[0]= B4DI_BarScale_off;
+    //TODO replace Auto const Resolution based Scale
+    B4DI_BarScale[1]= B4DI_BarScale_auto;
+    B4DI_BarScale[2]= B4DI_BarScale_50;
+    B4DI_BarScale[3]= B4DI_BarScale_100;
+    B4DI_BarScale[4]= B4DI_BarScale_150;
+};
+
 func void Bar_dynamicScale(var int bar){
     if(!Hlp_IsValidHandle(bar)) { return; };
     var _bar b; b = get(bar);
+    
+
     var zCView vBack; vBack = View_Get(b.v0);
     var zCView vBar; vBar = View_Get(b.v1);
+    B4DI_InitBarScale();
+    var int scaleOption; scaleOption = STR_ToInt(MEM_GetGothOpt("B4DI", "B4DI_barScale"));
+    var int scaleFactor; //scaleFactor = B4DI_BarScale_off; //Default
+    MEM_Info( ConcatStrings( "Bar scaleOption = ", IntToString( scaleOption ) ) );
+    if (!scaleOption) {
+        return;
+    } else{
+        scaleFactor = MEM_ReadStatArr(B4DI_BarScale,scaleOption);
+        MEM_Info( ConcatStrings( "Bar Scalefactor = ", IntToString(scaleFactor) ) );
+    };
 
-    //TODO SCALE according system INI / Resolution
-    var int dynScalingFactor; dynScalingFactor = 300/100;
+    var int dynScalingFactor; dynScalingFactor = scaleFactor/100;
 
     var int barTop; barTop = vBack.vposy - vBar.vposy;
     var int barTopOffset; barTopOffset = barTop * dynScalingFactor - barTop;

@@ -233,6 +233,7 @@ func void View_Delete(var int hndl) {
 
 //========================================
 // Größe ändern
+//Skaliert einen View auf eine virtuelle Größe. Dabei bleibt die linke, obere Position des Views fest.
 //========================================
 func void ViewPtr_Resize(var int ptr, var int x, var int y) {
     var zCView v; v = _^(ptr);
