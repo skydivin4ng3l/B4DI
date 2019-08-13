@@ -122,16 +122,17 @@ func void Bar_dynamicScale(var int bar){
         MEM_Info( ConcatStrings( "Bar Scalefactor = ", IntToString(scaleFactor) ) );
     };
 
-    var int dynScalingFactor; dynScalingFactor = scaleFactor/100;
+    var int dynScalingFactor; dynScalingFactor = fracf( scaleFactor, 100 );
+    MEM_Info( ConcatStrings( "dynScalingFactor = ", toStringf(dynScalingFactor) ) );
 
-    var int barTop; barTop = vBack.vposy - vBar.vposy;
-    var int barTopOffset; barTopOffset = barTop * dynScalingFactor - barTop;
-    var int barLeft; barLeft =  vBack.vposx - vBar.vposx;
-    var int barLeftOffset; barLeftOffset = barLeft * dynScalingFactor - barLeft;
+    var int barTop; barTop = mkf( vBack.vposy - vBar.vposy );
+    var int barTopOffset;  barTopOffset = roundf( subf( mulf( barTop , dynScalingFactor ) ,barTop) ); 
+    var int barLeft; barLeft =  mkf( vBack.vposx - vBar.vposx );
+    var int barLeftOffset; barLeftOffset = roundf( subf( mulf(barLeft , dynScalingFactor) , barLeft) ); 
     
-    b.barW *= dynScalingFactor;
-    View_Resize(b.v0, vBack.vsizex * dynScalingFactor, vBack.vsizey * dynScalingFactor );
-    View_Resize(b.v1, vBar.vsizex * dynScalingFactor, vBar.vsizey * dynScalingFactor );
+    b.barW = roundf( mulf( mkf( b.barW ) , dynScalingFactor ) );
+    View_Resize(b.v0, roundf( mulf( mkf(vBack.vsizex) , dynScalingFactor) ), roundf( mulf( mkf(vBack.vsizey) , dynScalingFactor ) ) );
+    View_Resize(b.v1, roundf( mulf( mkf(vBar.vsizex) , dynScalingFactor) ), roundf( mulf( mkf(vBar.vsizey) , dynScalingFactor) ) );
     //TODO Adjust offset of BarTop and BarLeft caused by "Texture Stretching"
 
     View_MoveTo(b.v1, vBar.vposx- barLeftOffset , vBar.vposy-barTopOffset);
@@ -140,10 +141,12 @@ func void Bar_dynamicScale(var int bar){
     
     var int s0;s0=SB_New();
     SB_Use(s0);
+    SB("scaleFactor: "); SBi(scaleFactor);SB("  ");
+    SB("dynScalingFactor: "); SB(toStringf(dynScalingFactor)); SB(" / ");
     SB("BACK: ");   SBi(vBack.psizex); SB(" , "); SBi(vBack.psizey); SB(" ");
     SB("BAR: ");   SBi(vBar.psizex); SB(" , "); SBi(vBar.psizey); SB(" ");
-    SB("barW: "); SBi(b.barW);
-    Print_ExtPxl(50,Print_Screen[PS_Y] / 2, SB_ToString(), FONT_Screen, RGBA(255,0,0,200),50000);
+    SB("barW: "); SBi( Print_ToPixel( b.barW, PS_X ) );
+    Print_ExtPxl(50,Print_Screen[PS_Y] / 2, SB_ToString(), FONT_Screen, RGBA(255,0,0,200),2500);
     SB_Destroy();
 };
 
