@@ -22,6 +22,9 @@ func void INIT_GLOBAL()
 	Game_InitGerman();
 	LeGo_Init(LeGo_Cursor |LeGo_Bloodsplats | LeGo_Gamestate | LeGo_ConsoleCommands | LeGo_PrintS | LeGo_Bars | LeGo_Buffs );
 	B4DI_Init(B4DI_ALL);
+
+	MoreAlphaVobs(2048); //normal: 256
+    MoreAlphaPolys(16384); //normal: 2048
 };
 
 

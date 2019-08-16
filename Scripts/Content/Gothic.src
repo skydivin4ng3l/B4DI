@@ -1,8 +1,11 @@
 _INTERN\CONSTANTS.D
 _INTERN\CLASSES.D
 
+Basic_Scripts\Basic.src
 Ikarus\Ikarus_G2.src
+Ikarus\Ikarus_Scripts\Ikarus.src
 LeGo\Header_G2.src
+LeGo\LeGo_Scripts\LeGo.src
 
 B4DI\B4DI.src
 
