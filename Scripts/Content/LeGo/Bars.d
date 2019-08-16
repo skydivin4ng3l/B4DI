@@ -116,6 +116,31 @@ func void B4DI_InitBarScale(){
     B4DI_BarScale[5]= B4DI_BarScale_200;
 };
 
+//========================================
+// [Intern] Resizes bars in valid space
+//
+// if back reaches screen borders before scaling is finished
+//  it will be moved, middle and bar will be moved according to delta before resizing.
+//========================================
+func void Bar_ResizeCentered(var int bar, var int scalingFactor){ //float scalingFactor
+    if(!Hlp_IsValidHandle(bar)) { return; };
+    var _bar b; b = get(bar);
+    var zCView vBack; vBack = View_Get(b.v0);
+    var zCView vMiddle; vMiddle = View_Get(b.vMiddle);
+    var zCView vBar; vBar = View_Get(b.v1);
+
+    var int barTop; barTop = roundf( fracf( mulf( mkf( vBack.vposy - vBar.vposy ), scalingFactor ), mkf(2) ) );
+    var int barLeft; barLeft = roundf( fracf( mulf( mkf( vBack.vposx - vBar.vposx ), scalingFactor ), mkf(2) ) );
+
+    View_ResizeCenteredValidScreenSpace(b.v0, roundf( mulf( mkf(vBack.vsizex) , scalingFactor) ), roundf( mulf( mkf(vBack.vsizey) , scalingFactor ) ) );
+    //to keep the margin valid if scaled back touches screen border
+    View_MoveTo(b.vMiddle, vBack.vposx + barLeft, vBack.vposy + barTop );
+    View_MoveTo(b.v1, vBack.vposx + barLeft, vBack.vposy + barTop );
+        
+    View_Resize(b.vMiddle, roundf( mulf( mkf(vBar.vsizex) , scalingFactor) ), roundf( mulf( mkf(vBar.vsizey) , scalingFactor) ) );
+    View_Resize(b.v1, roundf( mulf( mkf(vBar.vsizex) , scalingFactor) ), roundf( mulf( mkf(vBar.vsizey) , scalingFactor) ) );
+};
+
 func void Bar_dynamicScale(var int bar){
     if(!Hlp_IsValidHandle(bar)) { return; };
     var _bar b; b = get(bar);
@@ -137,19 +162,21 @@ func void Bar_dynamicScale(var int bar){
     var int dynScalingFactor; dynScalingFactor = fracf( scaleFactor, 100 );
     MEM_Info( ConcatStrings( "dynScalingFactor = ", toStringf(dynScalingFactor) ) );
 
-    var int barTop; barTop = mkf( vBack.vposy - vBar.vposy );
-    var int barTopOffset;  barTopOffset = roundf( subf( mulf( barTop , dynScalingFactor ) ,barTop) ); 
-    var int barLeft; barLeft =  mkf( vBack.vposx - vBar.vposx );
-    var int barLeftOffset; barLeftOffset = roundf( subf( mulf(barLeft , dynScalingFactor) , barLeft) ); 
-    //save Presize For other than topleft alinement
-    var int pre_vBarPosX;  pre_vBarPosX = vBar.vposx;
-    var int pre_vBarPosY;  pre_vBarPosY = vBar.vposy;
-    var int pre_vBackPosX;  pre_vBarPosX = vBar.vposx;
-    var int pre_vBackPosY;  pre_vBarPosY = vBar.vposy;
+    //var int barTop; barTop = mkf( vBack.vposy - vBar.vposy );
+    //var int barTopOffset;  barTopOffset = roundf( subf( mulf( barTop , dynScalingFactor ) ,barTop) ); 
+    //var int barLeft; barLeft =  mkf( vBack.vposx - vBar.vposx );
+    //var int barLeftOffset; barLeftOffset = roundf( subf( mulf(barLeft , dynScalingFactor) , barLeft) ); 
+    ////save Presize For other than topleft alinement
+    //var int pre_vBarPosX;  pre_vBarPosX = vBar.vposx;
+    //var int pre_vBarPosY;  pre_vBarPosY = vBar.vposy;
+    //var int pre_vBackPosX;  pre_vBarPosX = vBar.vposx;
+    //var int pre_vBackPosY;  pre_vBarPosY = vBar.vposy;
 
 
 
     b.barW = roundf( mulf( mkf( b.barW ) , dynScalingFactor ) );
+    //TODO fix next function
+    //Bar_ResizeCentered(bar, dynScalingFactor);
     View_ResizeCentered(b.v0, roundf( mulf( mkf(vBack.vsizex) , dynScalingFactor) ), roundf( mulf( mkf(vBack.vsizey) , dynScalingFactor ) ) );
     View_ResizeCentered(b.vMiddle, roundf( mulf( mkf(vBar.vsizex) , dynScalingFactor) ), roundf( mulf( mkf(vBar.vsizey) , dynScalingFactor) ) );
     View_ResizeCentered(b.v1, roundf( mulf( mkf(vBar.vsizex) , dynScalingFactor) ), roundf( mulf( mkf(vBar.vsizey) , dynScalingFactor) ) );

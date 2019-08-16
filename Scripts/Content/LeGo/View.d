@@ -9,10 +9,63 @@
 instance zCView@ (zCView);
 
 //========================================
+// View Helper
+//========================================
+func int GetArrayPtr_coordinatesWithinScreen(var int left, var int top, var int right, var int bottom ){
+    if(left < 0 ) {
+        right = right-left;
+        if(right > PS_VMax ){
+            right = PS_VMax;
+        };
+        left = 0;
+    } else if(right > PS_VMax) {
+        var int xOverlaping; xOverlaping = right - PS_VMax;
+        left = left - xOverlaping;
+        if(left < 0){
+            left =0;
+        };
+        right = PS_VMax;
+    };
+    if(top < 0 ) {
+        bottom = bottom-top;
+        if(bottom > PS_VMax ){
+            bottom = PS_VMax;
+        };
+        top = 0;
+    } else if(bottom > PS_VMax) {
+        var int yOverlaping; yOverlaping = bottom - PS_VMax;
+        top = top - yOverlaping;
+        if(top < 0){
+            top =0;
+        };
+        bottom = PS_VMax;
+    };
+    var int ptr_coords; ptr_coords = MEM_ArrayCreate();
+    MEM_ArrayInsert(ptr_coords, left);
+    MEM_ArrayInsert(ptr_coords, top);
+    MEM_ArrayInsert(ptr_coords, right);
+    MEM_ArrayInsert(ptr_coords, bottom);
+
+    return ptr_coords;
+};
+
+//========================================
 // View erzeugen
 //========================================
 func void _ViewPtr_CreateIntoPtr(var int ptr, var int x1, var int y1, var int x2, var int y2) {
-    //TODO keep within the screen borders?
+    //keep within the screen borders
+    B4DI_debugSpy("x1",IntToString(x1));
+    B4DI_debugSpy("y1",IntToString(y1));
+    B4DI_debugSpy("x2",IntToString(x2));
+    B4DI_debugSpy("y2",IntToString(y2));
+    var int ptr_coords; ptr_coords = GetArrayPtr_coordinatesWithinScreen(x1,y1,x2,y2);
+    x1 = MEM_ArrayRead(ptr_coords, 0);
+    y1 = MEM_ArrayRead(ptr_coords, 1);
+    x2 = MEM_ArrayRead(ptr_coords, 2);
+    y2 = MEM_ArrayRead(ptr_coords, 3);
+    B4DI_debugSpy("ValidCoords",MEM_ArrayToString(ptr_coords));
+    MEM_ArrayFree(ptr_coords);
+
     CALL_IntParam(2);
     CALL_IntParam(y2);
     CALL_IntParam(x2);
@@ -306,9 +359,26 @@ func void ViewPtr_MoveTo(var int ptr, var int x, var int y) {
     ViewPtr_Move(ptr, -v.vposx, -v.vposy);
     ViewPtr_Move(ptr, x,  y);
 };
+
 func void View_MoveTo(var int hndl, var int x, var int y) {
     ViewPtr_MoveTo(getPtr(hndl), x, y);
 };
+
+func void ViewPtr_MoveToValidScreenSpace(var int ptr, var int x, var int y) {
+    var zCView v; v = _^(ptr);
+    ViewPtr_Move(ptr, -v.vposx, -v.vposy);
+    //prevent movement out of visible screen space
+    x = max(x,0);
+    x = min(x,PS_VMAX);
+    y = max(y,0);
+    y = min(y,PS_VMAX);
+    ViewPtr_Move(ptr, x,  y);
+};
+
+func void View_MoveToValidScreenSpace(var int hndl, var int x, var int y) {
+    ViewPtr_MoveToValidScreenSpace(getPtr(hndl), x, y);
+};
+
 
 //========================================
 // Bewegen (absolut)(pxl)
@@ -318,8 +388,19 @@ func void ViewPtr_MoveToPxl(var int ptr, var int x, var int y) {
     if(y != -1) { y = Print_ToVirtual(y, PS_Y); };
     ViewPtr_MoveTo(ptr, x, y);
 };
+
 func void View_MoveToPxl(var int hndl, var int x, var int y) {
     ViewPtr_MoveToPxl(getPtr(hndl), x, y);
+};
+
+func void ViewPtr_MoveToPxlValidScreen(var int ptr, var int x, var int y) {
+    x = Print_ToVirtual(x, PS_X);
+    y = Print_ToVirtual(y, PS_Y);
+    ViewPtr_MoveToValidScreenSpace(ptr, x, y);
+};
+
+func void View_MoveToPxlValidScreen(var int hndl, var int x, var int y) {
+    ViewPtr_MoveToPxlValidScreen(getPtr(hndl), x, y);
 };
 
 //========================================
@@ -329,26 +410,48 @@ func void ViewPtr_ResizeCentered(var int ptr, var int x, var int y) {
     var zCView v; v = _^(ptr);
     var int sizex_pre; sizex_pre = v.vsizex;
     var int sizey_pre; sizey_pre = v.vsizey;
-    //TODO fix smaller scale issue
+
     ViewPtr_Resize(ptr, x, y);
     //Calc the size difference caused by the resize all in virtual space
     var int posDifY; posDifY = (v.vsizey - sizey_pre)/2;
     B4DI_debugSpy("posDifY", IntToString(posDifY));
     //positive difference means View is now bigger than before
     //  therefore needs to be moved into the opposite direction
-    //if (posDifY>0){
-        posDifY *= -1;
-    //};
+    posDifY *= -1;
+    
     var int posDifX; posDifX = (v.vsizex - sizex_pre)/2;
     B4DI_debugSpy("posDifX", IntToString(posDifX));
-    //if (posDifX>0){
-        posDifX *= -1;
-    //};
+    posDifX *= -1;
+    
     ViewPtr_MoveTo(ptr, v.vposx+posDifX, v.vposy+posDifY);
 };
 
 func void View_ResizeCentered(var int hndl, var int x, var int y) {
     ViewPtr_ResizeCentered(getPtr(hndl),x,y);
+};
+
+func void ViewPtr_ResizeCenteredValidScreenSpace(var int ptr, var int x, var int y) {
+    var zCView v; v = _^(ptr);
+    var int sizex_pre; sizex_pre = v.vsizex;
+    var int sizey_pre; sizey_pre = v.vsizey;
+
+    ViewPtr_Resize(ptr, x, y);
+    //Calc the size difference caused by the resize all in virtual space
+    var int posDifY; posDifY = (v.vsizey - sizey_pre)/2;
+    B4DI_debugSpy("posDifY", IntToString(posDifY));
+    //positive difference means View is now bigger than before
+    //  therefore needs to be moved into the opposite direction
+    posDifY *= -1;
+    
+    var int posDifX; posDifX = (v.vsizex - sizex_pre)/2;
+    B4DI_debugSpy("posDifX", IntToString(posDifX));
+    posDifX *= -1;
+    
+    ViewPtr_MoveToValidScreenSpace(ptr, v.vposx+posDifX, v.vposy+posDifY);
+};
+
+func void View_ResizeCenteredValidScreenSpace(var int hndl, var int x, var int y) {
+    ViewPtr_ResizeCenteredValidScreenSpace(getPtr(hndl),x,y);
 };
 
 //========================================
