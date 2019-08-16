@@ -12,6 +12,7 @@ instance zCView@ (zCView);
 // View erzeugen
 //========================================
 func void _ViewPtr_CreateIntoPtr(var int ptr, var int x1, var int y1, var int x2, var int y2) {
+    //TODO keep within the screen borders?
     CALL_IntParam(2);
     CALL_IntParam(y2);
     CALL_IntParam(x2);
@@ -319,6 +320,35 @@ func void ViewPtr_MoveToPxl(var int ptr, var int x, var int y) {
 };
 func void View_MoveToPxl(var int hndl, var int x, var int y) {
     ViewPtr_MoveToPxl(getPtr(hndl), x, y);
+};
+
+//========================================
+// Change Size Centered
+//========================================
+func void ViewPtr_ResizeCentered(var int ptr, var int x, var int y) {
+    var zCView v; v = _^(ptr);
+    var int sizex_pre; sizex_pre = v.vsizex;
+    var int sizey_pre; sizey_pre = v.vsizey;
+    //TODO fix smaller scale issue
+    ViewPtr_Resize(ptr, x, y);
+    //Calc the size difference caused by the resize all in virtual space
+    var int posDifY; posDifY = (v.vsizey - sizey_pre)/2;
+    B4DI_debugSpy("posDifY", IntToString(posDifY));
+    //positive difference means View is now bigger than before
+    //  therefore needs to be moved into the opposite direction
+    //if (posDifY>0){
+        posDifY *= -1;
+    //};
+    var int posDifX; posDifX = (v.vsizex - sizex_pre)/2;
+    B4DI_debugSpy("posDifX", IntToString(posDifX));
+    //if (posDifX>0){
+        posDifX *= -1;
+    //};
+    ViewPtr_MoveTo(ptr, v.vposx+posDifX, v.vposy+posDifY);
+};
+
+func void View_ResizeCentered(var int hndl, var int x, var int y) {
+    ViewPtr_ResizeCentered(getPtr(hndl),x,y);
 };
 
 //========================================

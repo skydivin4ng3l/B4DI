@@ -4,12 +4,13 @@
 prototype B4DI_MyXpBar(Bar) {
 	x = Print_Screen[PS_X] / 2;
 	y = Print_Screen[PS_Y] -20;
-	barTop = 3; // 6 calculated 4 good
+	barTop = 3; // 6 Texture 4 good
 	barLeft = 8; // 11/12 Texture 
 	width = 192; // 256 texture
 	height = 24; // 32 texture
 	backTex = "Bar_Back.tga";
 	barTex = "Bar_XP.tga";
+	middleTex = "Bar_TempMax.tga";
 	value = 100;
 	valueMax = 100;
 };
@@ -21,10 +22,17 @@ instance B4DI_XpBar(B4DI_MyXpBar){
 	//y = 20+16;
 };
 
+instance B4DI_HpBar(GothicBar){
+	x = 135+20;
+	y = Print_Screen[PS_Y] -100;
+	barTop = 2;		// 2 is almost too small
+	barTex = "Bar_Health.tga";
+};
+
 
 ///// Hooks
 
-func void B4DI_xpBar_init() {
+func void B4DI_Bars_init() {
 	// call in init_Gobal
 	//FF_ApplyOnce(B4DI_xpBar_update);
 	HookDaedalusFuncS("B_GivePlayerXP", "B4DI_xpBar_update"); // B4DI_xpBar_update()
@@ -68,7 +76,6 @@ func int B4DI_xpBar_create(){
 		//var int text_ptr; text_ptr = Print_Ext(100,100, "New Bar Created", FONT_Screen, RGBA(255,0,0,200),1000);
 	//};
 
-	//TODO Put this back!!!!
 	B4DI_XpBar_calcXp(XpBar);
 
 	////---debug print
@@ -87,37 +94,31 @@ func int B4DI_xpBar_create(){
 	return XpBar;
 };
 
-func void B4DI_Bar_SetSizeCenteredPercent(var int hndl, var int x_percentage, var int y_percentage ) { 
-	//TODO: After dynamic scaling use it here
-	// Get the basic Settings for scaling from the original
-	Print_GetScreenSize();
- //   var int ptr; ptr = create(B4DI_XpBar);
- //   var bar bu; bu = MEM_PtrToInst(ptr);
- //   var int buhh; var int buwh;
- //   var int ah; var int aw;
- //   buhh = bu.height / 2;
- //   buwh = bu.width / 2;
- //   if(buhh*2 < bu.height) {ah = 1;} else {ah = 0;};
- //   if(buwh*2 < bu.width) {aw = 1;} else {aw = 0;};
+func int B4DI_hpBar_create(){
+	
+	var int hpBar;
+	HpBar = Bar_CreateCenterDynamic(B4DI_HpBar);
 
+
+	return HpBar;
+};
+
+func void B4DI_Bar_SetSizeCenteredPercent(var int hndl, var int x_percentage, var int y_percentage ) { 
+	Print_GetScreenSize();
 	//------------------
 	if(!Hlp_IsValidHandle(hndl)) { return; };
 	var _bar b; b = get(hndl);
 	var zCView v0_ptr; var zCView v1_ptr;
 	
-	
+	/// Debug
 	var int s0;s0=SB_New();
 	SB_Use(s0);
-	//SB("V0: ");	SBi(v0_ptr.vsizex); SB(" , "); SBi(v0_ptr.vsizey); SB(" ");
-	
-	//View_ResizePxl(b.v0, roundf(mulf(mkf(v0_ptr.psizex), percentageF)), roundf(mulf(mkf(v0_ptr.psizey), percentageF)) );
+	/// ^^
 
 	v1_ptr = View_Get(b.v1);
-
 	//save the size before the resize
-	var int sizex_pre; sizex_pre = Print_ToVirtual(b.val,PS_X);
-	//var int sizey_pre; sizey_pre = Print_ToVirtual((buhh-bu.barTop)*2+ah+1,PS_Y); //--Working
-	var int sizey_pre; sizey_pre = b.initialDynamicVSizes[IDS_V1_Y]; // Dynamic Test +1 is missing
+	var int sizex_pre; sizex_pre = Print_ToVirtual(b.val,PS_X);	
+	var int sizey_pre; sizey_pre = b.initialDynamicVSizes[IDS_V1_Y]; // Dynamic Test +1 is missing, but needed?
 
 	//scale on all axis
 	View_Resize(b.v1, sizex_pre * x_percentage / 100 , sizey_pre * y_percentage / 100 ); 
@@ -136,26 +137,24 @@ func void B4DI_Bar_SetSizeCenteredPercent(var int hndl, var int x_percentage, va
 	
 	// calculate the original pixel center -> virtualize it -> compensate with axis differance
 	var int compenstedTargetX; 
-	//compenstedTargetX = Print_ToVirtual(bu.x - buwh + bu.barLeft + aw, PS_X ) + posDifX; //---worked
-	//compenstedTargetX = Print_ToVirtual(bu.x, PS_X) - b.initialDynamicVSizes[IDS_V1_X]/2 + posDifX;
 	compenstedTargetX = b.initialVPositions[IP_V1_LEFT] + posDifX;
 
 	var int compenstedTargetY; 
-	//compenstedTargetY = Print_ToVirtual(bu.y - buhh + bu.barTop + ah +1, PS_Y) + posDifY; //---worked
-	//compenstedTargetY = Print_ToVirtual(bu.y, PS_Y) - sizey_pre / 2 + posDifY;	// +1 is missing
 	compenstedTargetY = b.initialVPositions[IP_V1_TOP] + posDifY;
 
-	
 	View_MoveTo(b.v1, compenstedTargetX, compenstedTargetY );
-
+	
+	//Debug
+	B4DI_debugSpy("Bar PositionX",IntToString(v1_ptr.vposx));
+	B4DI_debugSpy("Bar PositionY",IntToString(v1_ptr.vposy));
+	B4DI_debugSpy("Bar SizeX",IntToString(v1_ptr.vsizex));
+    B4DI_debugSpy("Bar SizeY",IntToString(v1_ptr.vsizey));
+    
 	SB("V1: ");	SBi(v1_ptr.psizex); SB(" , "); SBi(v1_ptr.psizey); SB(" ");
 	var int DebugText; DebugText = Print_Ext(1,1, SB_ToString(), FONT_Screen, RGBA(255,0,0,200),100);
 	var zCViewText DebugTextObject; DebugTextObject = Print_GetText(DebugText);
 	DebugTextObject.posy = Print_ToVirtual( Print_Screen[PS_Y]/2 , PS_X);  
 	SB_Destroy(); 
-
-	//free(ptr, B4DI_XpBar);
-
 };
 
 func void B4DI_Bar_SetSizeCenteredPercentY(var int hndl, var int y_percentage){
@@ -191,13 +190,21 @@ func void B4DI_Bar_pulse(var int bar) {
 
 };
 
+func void B4DI_hpBar_show(){
+	var int HpBar; HpBar = B4DI_hpBar_create();
+	B4DI_Bar_fadeOut(HpBar);
+
+};
+
 func void B4DI_xpBar_show(){
 	var int XpBar; XpBar = B4DI_xpBar_create();
 	B4DI_Bar_fadeOut(XpBar);
+	B4DI_hpBar_show();
 	//Bar_Show(XpBar);
 	//B4DI_Bar_pulse(XpBar);
 	
 };
+
 
 func void B4DI_xpBar_update() {
 	ContinueCall();

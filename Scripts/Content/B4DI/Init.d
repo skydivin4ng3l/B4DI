@@ -1,6 +1,6 @@
 func void B4DI_InitFeatures(){
 
-	B4DI_xpBar_init();
+	B4DI_Bars_init();
 	// Read INI Settings
     MEM_Info("Initializing entries in Gothic.ini.");
 

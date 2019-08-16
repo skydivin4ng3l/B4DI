@@ -80,6 +80,7 @@ const int B4DI_BarScale_auto	= 100; // will not be used?
 const int B4DI_BarScale_50		= 50; // 50 %
 const int B4DI_BarScale_100		= 100; // 100%
 const int B4DI_BarScale_150		= 150; // 150%
+const int B4DI_BarScale_200		= 200; // 200%
 
 
 //========================================

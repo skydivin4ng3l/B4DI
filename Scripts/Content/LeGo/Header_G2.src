@@ -2,6 +2,8 @@
 // LeGo //
 //////////
 
+B4DI_Auxiliary.d
+
 Misc.d
 EngineAdr_G2.d
 Timer.d

@@ -14,6 +14,7 @@ class Bar {
     var int height;
     var string backTex;
     var string barTex;
+    var string middleTex;
     var int value;
     var int valueMax;
 };
@@ -30,6 +31,7 @@ prototype GothicBar(Bar) {
     height = 20;
     backTex = "Bar_Back.tga";
     barTex = "Bar_Misc.tga";
+    middleTex = "Bar_TempMax.tga";
     value = 100;
     valueMax = 100;
 };
@@ -48,6 +50,7 @@ class _bar {
     var int barW;
     var int v0; // zCView(h)
     var int v1; // zCView(h)
+    var int vMiddle; // zCView(h)
     var int initialDynamicVSizes[4];
     var int initialVPositions[8];
 };
@@ -60,6 +63,9 @@ func void _bar_Delete(var _bar b) {
     };
     if(Hlp_IsValidHandle(b.v1)) {
         delete(b.v1);
+    };
+    if(Hlp_IsValidHandle(b.vMiddle)) {
+        delete(b.vMiddle);
     };
 }; 
 
@@ -87,21 +93,27 @@ func void Bar_storeInitPosSize(var int bar){
     b.initialVPositions[IP_V1_CENTER_Y] = v.vposy - v.vsizey>>1;
     b.initialDynamicVSizes[IDS_V1_X] = v.vsizex;
     b.initialDynamicVSizes[IDS_V1_Y] = v.vsizey;
+
+    B4DI_debugSpy("Bar PositionX",IntToString(v.vposx));
+    B4DI_debugSpy("Bar PositionY",IntToString(v.vposy));
+    B4DI_debugSpy("Bar SizeX",IntToString(v.vsizex));
+    B4DI_debugSpy("Bar SizeY",IntToString(v.vsizey));
     
 };
 
 //========================================
 // [intern] Helper Scales depenting on Resolution
 //========================================
-var int B4DI_BarScale[5];
+var int B4DI_BarScale[6];
 func void B4DI_InitBarScale(){
 
     B4DI_BarScale[0]= B4DI_BarScale_off;
-    //TODO replace Auto const Resolution based Scale
+    //TODO replace Auto const with Resolution based Scale
     B4DI_BarScale[1]= B4DI_BarScale_auto;
     B4DI_BarScale[2]= B4DI_BarScale_50;
     B4DI_BarScale[3]= B4DI_BarScale_100;
     B4DI_BarScale[4]= B4DI_BarScale_150;
+    B4DI_BarScale[5]= B4DI_BarScale_200;
 };
 
 func void Bar_dynamicScale(var int bar){
@@ -129,13 +141,24 @@ func void Bar_dynamicScale(var int bar){
     var int barTopOffset;  barTopOffset = roundf( subf( mulf( barTop , dynScalingFactor ) ,barTop) ); 
     var int barLeft; barLeft =  mkf( vBack.vposx - vBar.vposx );
     var int barLeftOffset; barLeftOffset = roundf( subf( mulf(barLeft , dynScalingFactor) , barLeft) ); 
-    
-    b.barW = roundf( mulf( mkf( b.barW ) , dynScalingFactor ) );
-    View_Resize(b.v0, roundf( mulf( mkf(vBack.vsizex) , dynScalingFactor) ), roundf( mulf( mkf(vBack.vsizey) , dynScalingFactor ) ) );
-    View_Resize(b.v1, roundf( mulf( mkf(vBar.vsizex) , dynScalingFactor) ), roundf( mulf( mkf(vBar.vsizey) , dynScalingFactor) ) );
-    //TODO Adjust offset of BarTop and BarLeft caused by "Texture Stretching"
+    //save Presize For other than topleft alinement
+    var int pre_vBarPosX;  pre_vBarPosX = vBar.vposx;
+    var int pre_vBarPosY;  pre_vBarPosY = vBar.vposy;
+    var int pre_vBackPosX;  pre_vBarPosX = vBar.vposx;
+    var int pre_vBackPosY;  pre_vBarPosY = vBar.vposy;
 
-    View_MoveTo(b.v1, vBar.vposx- barLeftOffset , vBar.vposy-barTopOffset);
+
+
+    b.barW = roundf( mulf( mkf( b.barW ) , dynScalingFactor ) );
+    View_ResizeCentered(b.v0, roundf( mulf( mkf(vBack.vsizex) , dynScalingFactor) ), roundf( mulf( mkf(vBack.vsizey) , dynScalingFactor ) ) );
+    View_ResizeCentered(b.vMiddle, roundf( mulf( mkf(vBar.vsizex) , dynScalingFactor) ), roundf( mulf( mkf(vBar.vsizey) , dynScalingFactor) ) );
+    View_ResizeCentered(b.v1, roundf( mulf( mkf(vBar.vsizex) , dynScalingFactor) ), roundf( mulf( mkf(vBar.vsizey) , dynScalingFactor) ) );
+    //TODO Adjust offset of BarTop and BarLeft caused by "Texture Stretching" with centered resize should no longer be needed
+    //TODO Implement different customizeable alignments
+
+    // Keep Left aligned
+    //compensate scaling difference of left and top offset
+    //should not be needed for centered//View_MoveTo(b.v1, vBar.vposx- barLeftOffset , vBar.vposy-barTopOffset);
 
     ////---debug print
     
@@ -213,20 +236,22 @@ func int Bar_Create(var int inst) {
     buwh -= bu.barLeft;
     b.barW = Print_ToVirtual(bu.width - bu.barLeft * 2 + aw, PS_X);
     b.v1 = View_CreatePxl(bu.x - buwh, bu.y - buhh, bu.x + buwh + aw, bu.y + buhh + ah);
+    b.vMiddle = View_CreatePxl(bu.x - buwh, bu.y - buhh, bu.x + buwh + aw, bu.y + buhh + ah);
     View_SetTexture(b.v0, bu.backTex);
     View_SetTexture(b.v1, bu.barTex);
     
     Bar_dynamicScale(bh);
     Bar_storeInitPosSize(bh);
-    
-    var zCView v; v = View_Get(b.v0);
+    //Redundant ->_ViewPtr_CreateIntoPtr
+    /*var zCView v; v = View_Get(b.v0);
     v.fxOpen = 0;
     v.fxClose = 0;
     v = View_Get(b.v1);
    
     v.fxOpen = 0;
-    v.fxClose = 0;
+    v.fxClose = 0;*/
     View_Open(b.v0);
+    View_Open(b.vMiddle);
     View_Open(b.v1);
     Bar_SetValue(bh, bu.value);
     free(ptr, inst);
@@ -240,27 +265,37 @@ func int Bar_CreateCenterDynamic(var int constructor_instance) {
     var int new_bar_hndl; new_bar_hndl = new(_bar@);
     var _bar bar; bar = get(new_bar_hndl);
     bar.valMax = bar_constr.valueMax;
-    //TODO change back to virtual
+    //TODO change to virtual? dynamic Resultionbased scale in Prototype?
     bar.v0 = View_CreateCenterPxl(bar_constr.x, bar_constr.y, bar_constr.width, bar_constr.height);
     bar.barW = bar_constr.width - bar_constr.barLeft *2;
+    bar.vMiddle = View_CreateCenterPxl(bar_constr.x, bar_constr.y, bar.barW, bar_constr.height- bar_constr.barTop *2);
     bar.v1 = View_CreateCenterPxl(bar_constr.x, bar_constr.y, bar.barW, bar_constr.height- bar_constr.barTop *2);
-    //TODO remove
+    //TODO remove?
     bar.barW = Print_ToVirtual(bar.barW, PS_X);
     //^^
     View_SetTexture(bar.v0, bar_constr.backTex);
+    View_SetTexture(bar.vMiddle, bar_constr.middleTex);
     View_SetTexture(bar.v1, bar_constr.barTex);
 
     Bar_dynamicScale(new_bar_hndl);
     Bar_storeInitPosSize(new_bar_hndl);
 
     var zCView v; v = View_Get(bar.v0);
+    //v.alphafunc = zRND_ALPHA_FUNC_ADD;
+    v = View_Get(bar.vMiddle);
+    //v.alphafunc = zRND_ALPHA_FUNC_ADD;
     v = View_Get(bar.v1);
+    //v.alphafunc = zRND_ALPHA_FUNC_ADD;
+
     View_Open(bar.v0);
+    View_Open(bar.vMiddle);
     View_Open(bar.v1);
     Bar_SetValue(new_bar_hndl, bar_constr.value);
+    
     free(ptr, constructor_instance);
     return new_bar_hndl;
 };
+
 
 //========================================
 // Bar löschen
