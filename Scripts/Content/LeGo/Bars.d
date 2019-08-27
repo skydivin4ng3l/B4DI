@@ -48,11 +48,13 @@ class _bar {
     var int valMax;
     var int val;
     var int barW;
-    var int v0; // zCView(h)
-    var int v1; // zCView(h)
-    var int vMiddle; // zCView(h)
-    var int initialDynamicVSizes[4];
+    var int v0;                         // zCView(h)
+    var int v1;                         // zCView(h)
+    var int vMiddle;                    // zCView(h)
+    var int initialDynamicVSizes[4];    
     var int initialVPositions[8];
+    var int isFadedOut;                   // Bool
+    var int anim8FadeOut;               // A8Head(h)
 };
 
 instance _bar@(_bar);
@@ -66,6 +68,9 @@ func void _bar_Delete(var _bar b) {
     };
     if(Hlp_IsValidHandle(b.vMiddle)) {
         delete(b.vMiddle);
+    };
+    if(Hlp_IsValidHandle(b.anim8FadeOut)) {
+        Anim8_Delete(b.anim8FadeOut);
     };
 }; 
 
@@ -117,7 +122,7 @@ func void B4DI_InitBarScale(){
 };
 
 //========================================
-// [Intern] Resizes bars in valid space
+// [Intern] Resizes bars in valid space (WIP)
 //
 // if back reaches screen borders before scaling is finished
 //  it will be moved, middle and bar will be moved according to delta before resizing.
@@ -141,6 +146,10 @@ func void Bar_ResizeCentered(var int bar, var int scalingFactor){ //float scalin
     View_Resize(b.v1, roundf( mulf( mkf(vBar.vsizex) , scalingFactor) ), roundf( mulf( mkf(vBar.vsizey) , scalingFactor) ) );
 };
 
+//========================================
+// [Intern] Resizes bars according of Menu value (gothic.ini)
+//
+//========================================
 func void Bar_dynamicScale(var int bar){
     if(!Hlp_IsValidHandle(bar)) { return; };
     var _bar b; b = get(bar);
@@ -199,7 +208,6 @@ func void Bar_dynamicScale(var int bar){
     Print_ExtPxl(50,Print_Screen[PS_Y] / 2, SB_ToString(), FONT_Screen, RGBA(255,0,0,200),2500);
     SB_Destroy();
 };
-
 
 //========================================
 // Höchstwert setzen
@@ -280,6 +288,7 @@ func int Bar_Create(var int inst) {
     View_Open(b.v0);
     View_Open(b.vMiddle);
     View_Open(b.v1);
+    b.isFadedOut = 0;
     Bar_SetValue(bh, bu.value);
     free(ptr, inst);
     return bh;
@@ -317,6 +326,7 @@ func int Bar_CreateCenterDynamic(var int constructor_instance) {
     View_Open(bar.v0);
     View_Open(bar.vMiddle);
     View_Open(bar.v1);
+    bar.isFadedOut = 0;
     Bar_SetValue(new_bar_hndl, bar_constr.value);
     
     free(ptr, constructor_instance);
@@ -340,6 +350,7 @@ func void Bar_Hide(var int bar) {
 	if(!Hlp_IsValidHandle(bar)) { return; };
 	var _bar b; b = get(bar);
 	View_Close(b.v0);
+    View_Close(b.vMiddle);
 	View_Close(b.v1);
 };
 
@@ -350,6 +361,7 @@ func void Bar_Show(var int bar) {
 	if(!Hlp_IsValidHandle(bar)) { return; };
 	var _bar b; b = get(bar);
 	View_Open(b.v0);
+    View_Open(b.vMiddle);
 	View_Open(b.v1);
 };
 
@@ -365,6 +377,7 @@ func void Bar_MoveTo(var int bar, var int x, var int y) {
 	x -= v.vposx;
 	y -= v.vposy;
 	View_Move(b.v0, x, y);
+    View_Move(b.vMiddle, x, y);
 	View_Move(b.v1, x, y);
 };
 
@@ -376,6 +389,8 @@ func void Bar_SetAlpha(var int bar, var int alpha) {
 	var _bar b; b = get(bar);
 	var zCView v0; v0 = View_Get(b.v0);
 	v0.alpha = alpha;
+    var zCView vMiddle; vMiddle = View_Get(b.vMiddle);
+    vMiddle.alpha = alpha;
 	var zCView v1; v1 = View_Get(b.v1);
 	v1.alpha = alpha;
 };
@@ -388,6 +403,13 @@ func void Bar_SetBackTexture(var int bar, var string backTex)
     if(!Hlp_IsValidHandle(bar)) { return; };
     var _bar b; b = get(bar);
     View_SetTexture(b.v0, backTex);
+};
+
+func void Bar_SetMiddleTexture(var int bar, var string middleTex)
+{
+    if(!Hlp_IsValidHandle(bar)) { return; };
+    var _bar b; b = get(bar);
+    View_SetTexture(b.vMiddle, middleTex);
 };
 
 func void Bar_SetBarTexture(var int bar, var string barTex)

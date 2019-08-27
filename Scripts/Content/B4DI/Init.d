@@ -1,6 +1,6 @@
-func void B4DI_InitFeatures(){
+func void B4DI_InitBarFeatures(){
 
-	B4DI_Bars_init();
+	B4DI_Bars_InitOnce();
 	// Read INI Settings
     MEM_Info("Initializing entries in Gothic.ini.");
 
@@ -22,7 +22,7 @@ func int B4DI_InitOnce() {
     
     // FEATURE: Dynamic Bars
     if (B4DI_Flags & B4DI_BARS) {
-        B4DI_InitFeatures();
+        B4DI_InitBarFeatures();
     };
 
     
@@ -32,7 +32,7 @@ func int B4DI_InitOnce() {
 };
 
 func void B4DI_InitAlways(){
-
+    B4DI_Bars_InitAlways();
 };
 
 func void B4DI_Init(var int flags) {

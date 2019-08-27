@@ -23,85 +23,26 @@ instance B4DI_XpBar(B4DI_MyXpBar){
 };
 
 instance B4DI_HpBar(GothicBar){
-	x = 135+20;
+	x = 128+90; //128 virtual should be margin left
 	y = Print_Screen[PS_Y] -100;
 	barTop = 2;		// 2 is almost too small
 	barTex = "Bar_Health.tga";
 };
 
+//global vars
+var int lastHeroHP;
+var int lastHeroMaxHP;
+////original Bars
+instance MEM_oBar_Hp(oCViewStatusBar);
+var int MEM_dBar_HP_handle;
+instance MEM_dBar_HP(_bar);
 
-///// Hooks
+//#################################################################
+//
+//  General Functions
+//
+//#################################################################
 
-func void B4DI_Bars_init() {
-	// call in init_Gobal
-	//FF_ApplyOnce(B4DI_xpBar_update);
-	HookDaedalusFuncS("B_GivePlayerXP", "B4DI_xpBar_update"); // B4DI_xpBar_update()
-	//MEM_Game.pause_screen as a TODO condition
-	//FMODE_NONE as not in combat TODO Remember for Healthbar
-	HookEngine(oCNpc__OpenScreen_Status, 7 , "B4DI_xpBar_show"); // B4DI_xpBar_show()
-};
-
-////// Support
-
-func void B4DI_XpBar_calcXp(var int XpBar){
-	// ------ XP Setup ------
-	var int level_last; var int exp_lastLvlUp;
-
-	level_last = hero.level-1;
-	if (level_last<0){
-		level_last =0;
-		exp_lastLvlUp=0;
-	}
-	else{
-		exp_lastLvlUp = (500*((level_last+2)/2)*(level_last+1));
-		//var int exp_next = (500*((hero.level+2)/2)*(hero.level+1));
-	};
-
-	//var int exp_neededFromThisLvlToNext = exp_next - exp_lastLvlUp;
-	Bar_SetMax(XpBar, hero.exp_next- exp_lastLvlUp);
-	Bar_SetValue(XpBar, hero.exp - exp_lastLvlUp);
-};
-
-func int B4DI_xpBar_create(){
-	////preventing overlapping animations but I fear that the frameFunction still continoue
-	//if(Hlp_IsValidHandle(a8_XpBar)) {
-	//	if (!Anim8_Empty(a8_XpBar)){
-	//		Anim8_Delete(a8_XpBar);
-	//		Bar_Delete(XpBar);
-	//	};
-	//};
-	var int XpBar;
-	//if(!Hlp_IsValidHandle(XpBar)) {
-		XpBar = Bar_CreateCenterDynamic(B4DI_XpBar);
-		//var int text_ptr; text_ptr = Print_Ext(100,100, "New Bar Created", FONT_Screen, RGBA(255,0,0,200),1000);
-	//};
-
-	B4DI_XpBar_calcXp(XpBar);
-
-	////---debug print
-	//var _bar b; b = get(XpBar);
-	//var zCView v0_ptr; var zCView v1_ptr;
-	//v0_ptr = View_Get(b.v0);
-	
-	//var int s0;s0=SB_New();
-	//SB_Use(s0);
-	//SB("V0: ");	SBi(v0_ptr.psizex); SB(" , "); SBi(v0_ptr.psizey); SB(" ");
-	//v1_ptr = View_Get(b.v1);
-	//SB("V1: ");	SBi(v1_ptr.psizex); SB(" , "); SBi(v1_ptr.psizey); SB(" ");
-	//Print_Ext(500,500, SB_ToString(), FONT_Screen, RGBA(255,0,0,200),5000);
-	//SB_Destroy();
-
-	return XpBar;
-};
-
-func int B4DI_hpBar_create(){
-	
-	var int hpBar;
-	HpBar = Bar_CreateCenterDynamic(B4DI_HpBar);
-
-
-	return HpBar;
-};
 
 func void B4DI_Bar_SetSizeCenteredPercent(var int hndl, var int x_percentage, var int y_percentage ) { 
 	Print_GetScreenSize();
@@ -169,13 +110,19 @@ func void B4DI_Bar_SetSizeCenteredPercentXY(var int hndl, var int xy_percentage)
 	B4DI_Bar_SetSizeCenteredPercent(hndl, xy_percentage, xy_percentage );
 };
 
-func void B4DI_Bar_fadeOut(var int bar) {
-	var int a8_XpBar; a8_XpBar = Anim8_NewExt(255, Bar_SetAlpha, bar, false);
-	Anim8_RemoveIfEmpty(a8_XpBar, true);
-	Anim8_RemoveDataIfEmpty(a8_XpBar, true);
+func void B4DI_Bar_fadeOut(var int bar_hndl, var int deleteBar) {
+	//var int a8_Bar_fadeOut; a8_Bar_fadeOut = Anim8_NewExt(255, Bar_SetAlpha, bar_hndl, false);
+	var _bar bar_inst; bar_inst = get(bar_hndl);
+	bar_inst.anim8FadeOut = Anim8_NewExt(255, Bar_SetAlpha, bar_hndl, false);
+	Anim8_RemoveIfEmpty(bar_inst.anim8FadeOut, true);
+	if (deleteBar) {
+		Anim8_RemoveDataIfEmpty(bar_inst.anim8FadeOut, true);
+	} else {
+		Anim8_RemoveDataIfEmpty(bar_inst.anim8FadeOut, false);
+	};
 	
-	Anim8 (a8_XpBar, 255,  5000, A8_Wait);
-	Anim8q(a8_XpBar,   0, 2000, A8_SlowEnd);
+	Anim8(bar_inst.anim8FadeOut, 255,  5000, A8_Wait);
+	Anim8q(bar_inst.anim8FadeOut,   0, 2000, A8_SlowEnd);
 
 };
 
@@ -190,16 +137,159 @@ func void B4DI_Bar_pulse(var int bar) {
 
 };
 
-func void B4DI_hpBar_show(){
-	var int HpBar; HpBar = B4DI_hpBar_create();
-	B4DI_Bar_fadeOut(HpBar);
+//#################################################################
+//
+//  HP Bar
+//
+//#################################################################
 
+func void B4DI_HpBar_calcHp() {
+	//var oCViewStatusBar bar_hp; bar_hp = MEM_PtrToInst (MEM_GAME.hpBar);
+	Bar_SetMax(MEM_dBar_HP_handle, hero.attribute[ATR_HITPOINTS_MAX]);
+	Bar_SetValue(MEM_dBar_HP_handle, hero.attribute[ATR_HITPOINTS]);
+	MEM_Info("B4DI_HpBar_calcHp");
+};
+
+
+func void B4DI_oHpBar_hide(){
+	MEM_oBar_Hp.zCView_alpha = 0; //backView
+	ViewPtr_SetAlpha(MEM_oBar_Hp.range_bar, 0); //middleView
+	ViewPtr_SetAlpha(MEM_oBar_Hp.value_bar, 0);	//barView
+};
+
+// returns the difference between 
+func int B4DI_heroHp_changed(){
+	var int heroHpDifference; heroHpDifference = hero.attribute[ATR_HITPOINTS]-lastHeroHP;
+	if (heroHpDifference) {
+		lastHeroHP = hero.attribute[ATR_HITPOINTS];
+		//B4DI_debugSpy( "B4DI_heroHp_changed: ", IntToString(heroHpDifference) );
+		return heroHpDifference;
+	} else {
+		return false;
+	};
+};
+
+func void B4DI_hpBar_hide(){
+	MEM_dBar_Hp.isFadedOut = 1;
+	B4DI_Bar_fadeOut(MEM_dBar_HP_handle, false);
+	MEM_Info("B4DI_hpBar_hide");
+
+};
+
+func void B4DI_hpBar_show(){
+	if(Hlp_IsValidHandle(MEM_dBar_Hp.anim8FadeOut) ){
+		Anim8_Delete(MEM_dBar_Hp.anim8FadeOut);
+	};
+	MEM_dBar_Hp.isFadedOut = 0;
+	Bar_SetAlpha(MEM_dBar_HP_handle, 255);
+	Bar_Show(MEM_dBar_HP_handle);
+	if(!Hlp_IsValidHandle(MEM_dBar_HP_handle)) {
+		MEM_Info("HANDLE BROCKEN FIX MEEEEEEEEEEEE");
+	};
+	MEM_Info("B4DI_hpBar_show");
+};
+
+func void B4DI_hpBar_update(){
+	var int heroHpChanged; heroHpChanged = B4DI_heroHp_changed();
+	if(heroHpChanged){
+		B4DI_HpBar_calcHp();
+	};
+	if ( (!Npc_IsInFightMode( hero, FMODE_NONE ) || heroHpChanged ) & MEM_dBar_Hp.isFadedOut ) {
+		B4DI_hpBar_show();
+	} else if(Npc_IsInFightMode(hero, FMODE_NONE) & !MEM_dBar_Hp.isFadedOut) {
+		B4DI_hpBar_hide();	
+	};
+	MEM_Info("B4DI_hpBar_update");
+
+};
+
+func void B4DI_hpBar_InitAlways(){
+	//original bars
+	MEM_oBar_Hp = MEM_PtrToInst (MEM_GAME.hpBar); //original
+	B4DI_oHpBar_hide();
+	// new dBars dynamic
+	if(!Hlp_IsValidHandle(MEM_dBar_HP_handle)){
+		MEM_dBar_HP_handle = Bar_CreateCenterDynamic(B4DI_HpBar);
+	};
+	MEM_dBar_Hp = get(MEM_dBar_HP_handle);
+	B4DI_HpBar_calcHp();
+	Bar_SetAlpha(MEM_dBar_HP_handle, 0);
+	MEM_dBar_Hp.isFadedOut = 1;
+
+	lastHeroHP = hero.attribute[ATR_HITPOINTS];
+	lastHeroMaxHP = hero.attribute[ATR_HITPOINTS_MAX];
+
+	FF_ApplyOnceExtGT(B4DI_hpBar_update,0,-1);
+
+	MEM_Info("B4DI_hpBar_InitAlways");
+};
+
+func void B4DI_hpBar_InitOnce(){
+
+	MEM_Info("B4DI_hpBar_InitOnce");
+};
+
+//#################################################################
+//
+//  XP Bar
+//
+//#################################################################
+
+func void B4DI_XpBar_calcXp(var int XpBar){
+	// ------ XP Setup ------
+	var int level_last; var int exp_lastLvlUp;
+
+	level_last = hero.level-1;
+	if (level_last<0){
+		level_last =0;
+		exp_lastLvlUp=0;
+	}
+	else{
+		exp_lastLvlUp = (500*((level_last+2)/2)*(level_last+1));
+		//var int exp_next = (500*((hero.level+2)/2)*(hero.level+1));
+	};
+
+	//var int exp_neededFromThisLvlToNext = exp_next - exp_lastLvlUp;
+	Bar_SetMax(XpBar, hero.exp_next- exp_lastLvlUp);
+	Bar_SetValue(XpBar, hero.exp - exp_lastLvlUp);
+};
+
+func int B4DI_xpBar_create(){
+	////preventing overlapping animations but I fear that the frameFunction still continoue
+	//if(Hlp_IsValidHandle(a8_XpBar)) {
+	//	if (!Anim8_Empty(a8_XpBar)){
+	//		Anim8_Delete(a8_XpBar);
+	//		Bar_Delete(XpBar);
+	//	};
+	//};
+	var int XpBar;
+	//if(!Hlp_IsValidHandle(XpBar)) {
+		XpBar = Bar_CreateCenterDynamic(B4DI_XpBar);
+		//var int text_ptr; text_ptr = Print_Ext(100,100, "New Bar Created", FONT_Screen, RGBA(255,0,0,200),1000);
+	//};
+
+	B4DI_XpBar_calcXp(XpBar);
+
+	////---debug print
+	//var _bar b; b = get(XpBar);
+	//var zCView v0_ptr; var zCView v1_ptr;
+	//v0_ptr = View_Get(b.v0);
+	
+	//var int s0;s0=SB_New();
+	//SB_Use(s0);
+	//SB("V0: ");	SBi(v0_ptr.psizex); SB(" , "); SBi(v0_ptr.psizey); SB(" ");
+	//v1_ptr = View_Get(b.v1);
+	//SB("V1: ");	SBi(v1_ptr.psizex); SB(" , "); SBi(v1_ptr.psizey); SB(" ");
+	//Print_Ext(500,500, SB_ToString(), FONT_Screen, RGBA(255,0,0,200),5000);
+	//SB_Destroy();
+
+	return XpBar;
 };
 
 func void B4DI_xpBar_show(){
 	var int XpBar; XpBar = B4DI_xpBar_create();
-	B4DI_Bar_fadeOut(XpBar);
-	B4DI_hpBar_show();
+	B4DI_Bar_fadeOut(XpBar, true);
+	//B4DI_hpBar_show();
 	//Bar_Show(XpBar);
 	//B4DI_Bar_pulse(XpBar);
 	
@@ -209,7 +299,28 @@ func void B4DI_xpBar_show(){
 func void B4DI_xpBar_update() {
 	ContinueCall();
 	var int XpBar; XpBar = B4DI_xpBar_create();
-	B4DI_Bar_fadeOut(XpBar);
 	B4DI_Bar_pulse(XpBar);
+	B4DI_Bar_fadeOut(XpBar, true);
 };
 
+//#################################################################
+//
+//  Initinalisation Function Hooks
+//
+//#################################################################
+
+// called in B4DI_InitOnce
+func void B4DI_Bars_InitOnce() {
+	//init globals
+	MEM_InitGlobalInst ();
+	B4DI_hpBar_InitOnce();
+	HookDaedalusFuncS("B_GivePlayerXP", "B4DI_xpBar_update"); // B4DI_xpBar_update()
+	//MEM_Game.pause_screen as a TODO condition
+	//FMODE_NONE as not in combat TODO Remember for Healthbar
+	HookEngine(oCNpc__OpenScreen_Status, 7 , "B4DI_xpBar_show"); // B4DI_xpBar_show()
+	MEM_Info("B4DI Bars ininitialised");
+};
+
+func void B4DI_Bars_InitAlways() {
+	B4DI_hpBar_InitAlways();
+};
