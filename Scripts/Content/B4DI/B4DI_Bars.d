@@ -111,7 +111,6 @@ func void B4DI_Bar_SetSizeCenteredPercentXY(var int hndl, var int xy_percentage)
 };
 
 func void B4DI_Bar_fadeOut(var int bar_hndl, var int deleteBar) {
-	//var int a8_Bar_fadeOut; a8_Bar_fadeOut = Anim8_NewExt(255, Bar_SetAlpha, bar_hndl, false);
 	var _bar bar_inst; bar_inst = get(bar_hndl);
 	bar_inst.anim8FadeOut = Anim8_NewExt(255, Bar_SetAlpha, bar_hndl, false);
 	Anim8_RemoveIfEmpty(bar_inst.anim8FadeOut, true);
@@ -137,6 +136,40 @@ func void B4DI_Bar_pulse(var int bar) {
 
 };
 
+func void B4DI_Bar_hide( var int bar_hndl){
+	if(!Hlp_IsValidHandle(bar_hndl)) {
+		MEM_Info("B4DI_Bar_hide failed");
+		return;
+	};
+	var _bar bar_inst; bar_inst = get(bar_hndl);
+	bar_inst.isFadedOut = 1;
+	B4DI_Bar_fadeOut(bar_hndl, false);
+	MEM_Info("B4DI_Bar_hide successful");
+
+};
+
+func void B4DI_Bar_show( var int bar_hndl){
+	if(!Hlp_IsValidHandle(bar_hndl)) {
+		MEM_Info("B4DI_Bar_show failed");
+		return;
+	};
+	var _bar bar_inst; bar_inst = get(bar_hndl);
+	if(Hlp_IsValidHandle(bar_inst.anim8FadeOut) ){
+		Anim8_Delete(bar_inst.anim8FadeOut);
+	};
+	bar_inst.isFadedOut = 0;
+	Bar_SetAlpha(bar_hndl, 255);
+	Bar_Show(bar_hndl);
+	MEM_Info("B4DI_Bar_show successful");
+};
+
+func void B4DI_originalBar_hide( var int obar_ptr){
+	var oCViewStatusBar bar_inst; bar_inst = MEM_PtrToInst(obar_ptr);
+	bar_inst.zCView_alpha = 0; //backView
+	ViewPtr_SetAlpha(bar_inst.range_bar, 0); //middleView
+	ViewPtr_SetAlpha(bar_inst.value_bar, 0);	//barView
+};
+
 //#################################################################
 //
 //  HP Bar
@@ -151,11 +184,11 @@ func void B4DI_HpBar_calcHp() {
 };
 
 
-func void B4DI_oHpBar_hide(){
+/*func void B4DI_oHpBar_hide(){
 	MEM_oBar_Hp.zCView_alpha = 0; //backView
 	ViewPtr_SetAlpha(MEM_oBar_Hp.range_bar, 0); //middleView
 	ViewPtr_SetAlpha(MEM_oBar_Hp.value_bar, 0);	//barView
-};
+};*/
 
 // returns the difference between 
 func int B4DI_heroHp_changed(){
@@ -169,7 +202,7 @@ func int B4DI_heroHp_changed(){
 	};
 };
 
-func void B4DI_hpBar_hide(){
+/*func void B4DI_hpBar_hide(){
 	MEM_dBar_Hp.isFadedOut = 1;
 	B4DI_Bar_fadeOut(MEM_dBar_HP_handle, false);
 	MEM_Info("B4DI_hpBar_hide");
@@ -187,7 +220,7 @@ func void B4DI_hpBar_show(){
 		MEM_Info("HANDLE BROCKEN FIX MEEEEEEEEEEEE");
 	};
 	MEM_Info("B4DI_hpBar_show");
-};
+};*/
 
 func void B4DI_hpBar_update(){
 	var int heroHpChanged; heroHpChanged = B4DI_heroHp_changed();
@@ -195,9 +228,11 @@ func void B4DI_hpBar_update(){
 		B4DI_HpBar_calcHp();
 	};
 	if ( (!Npc_IsInFightMode( hero, FMODE_NONE ) || heroHpChanged ) & MEM_dBar_Hp.isFadedOut ) {
-		B4DI_hpBar_show();
+		//B4DI_hpBar_show();
+		B4DI_Bar_show(MEM_dBar_HP_handle);
 	} else if(Npc_IsInFightMode(hero, FMODE_NONE) & !MEM_dBar_Hp.isFadedOut) {
-		B4DI_hpBar_hide();	
+		//B4DI_hpBar_hide();	
+		B4DI_Bar_hide(MEM_dBar_HP_handle);
 	};
 	MEM_Info("B4DI_hpBar_update");
 
@@ -206,7 +241,9 @@ func void B4DI_hpBar_update(){
 func void B4DI_hpBar_InitAlways(){
 	//original bars
 	MEM_oBar_Hp = MEM_PtrToInst (MEM_GAME.hpBar); //original
-	B4DI_oHpBar_hide();
+	//B4DI_oHpBar_hide();
+	//new version
+	B4DI_originalBar_hide(MEM_GAME.hpBar);
 	// new dBars dynamic
 	if(!Hlp_IsValidHandle(MEM_dBar_HP_handle)){
 		MEM_dBar_HP_handle = Bar_CreateCenterDynamic(B4DI_HpBar);
@@ -218,6 +255,9 @@ func void B4DI_hpBar_InitAlways(){
 
 	lastHeroHP = hero.attribute[ATR_HITPOINTS];
 	lastHeroMaxHP = hero.attribute[ATR_HITPOINTS_MAX];
+	//TODO: Update on option change of Barsize
+	//TODO: implement customizable Positions Left Right Top bottom,...
+	Bar_MoveLeftUpperTo(MEM_dBar_HP_handle, MEM_oBar_Hp.zCView_vposx, MEM_oBar_Hp.zCView_vposy );
 
 	FF_ApplyOnceExtGT(B4DI_hpBar_update,0,-1);
 

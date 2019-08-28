@@ -366,7 +366,7 @@ func void Bar_Show(var int bar) {
 };
 
 //========================================
-// Bar bewegen
+// Bar Center bewegen 
 //========================================
 func void Bar_MoveTo(var int bar, var int x, var int y) {
 	if(!Hlp_IsValidHandle(bar)) { return; };
@@ -379,6 +379,21 @@ func void Bar_MoveTo(var int bar, var int x, var int y) {
 	View_Move(b.v0, x, y);
     View_Move(b.vMiddle, x, y);
 	View_Move(b.v1, x, y);
+};
+
+//========================================
+// Bar Linke Obere Ecke bewegen 
+//========================================
+
+func void Bar_MoveLeftUpperTo(var int bar, var int x, var int y) {
+    if(!Hlp_IsValidHandle(bar)) { return; };
+    var _bar b; b = get(bar);
+    var zCView v; v = View_Get(b.v0);
+    x -= v.vposx;
+    y -= v.vposy;
+    View_Move(b.v0, x, y);
+    View_Move(b.vMiddle, x, y);
+    View_Move(b.v1, x, y);
 };
 
 //========================================
