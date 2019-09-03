@@ -43,19 +43,61 @@ instance MEM_dBar_HP(_bar);
 //  General Functions
 //
 //#################################################################
+//========================================
+// [intern] Helper Scales depenting on Resolution
+//========================================
+var int B4DI_BarScale[6];
+func void B4DI_InitBarScale(){
+    Print_GetScreenSize();
+    B4DI_BarScale[0]= B4DI_BarScale_off;
+    //TODO replace Auto const with Resolution based Scale
+    //B4DI_BarScale[1]= B4DI_BarScale_auto;
+    // auto scale inspired by systempack.ini
+    B4DI_BarScale[1]= roundf( mulf( mkf(100) ,fracf( Print_Screen[PS_Y] ,512 ) ) );
+    B4DI_BarScale[2]= B4DI_BarScale_50;
+    B4DI_BarScale[3]= B4DI_BarScale_100;
+    B4DI_BarScale[4]= B4DI_BarScale_150;
+    B4DI_BarScale[5]= B4DI_BarScale_200;
 
+    B4DI_debugSpy("B4DI_AutoScaleFactor: ", IntToString(roundf(mulf( 100 ,fracf( Print_Screen[PS_Y], 512) ) ) ) );
+    B4DI_debugSpy("B4DI_AutoScaleFactorArray: ", toStringf(B4DI_BarScale[1]));
+};
+
+//========================================
+// [Intern] Get Dynamic Scale according of Menu value (gothic.ini) asFloat
+//
+//========================================
+func int B4DI_Bars_getDynamicScaleOptionValuef(){
+    B4DI_InitBarScale();
+    var int scaleOption; scaleOption = STR_ToInt(MEM_GetGothOpt("B4DI", "B4DI_barScale"));
+    var int scalingFactor; //scalingFactor = B4DI_BarScale_auto; //Default
+    MEM_Info( ConcatStrings( "Bar scaleOption = ", IntToString( scaleOption ) ) );
+    if(!scaleOption) {
+        MEM_Error("Bar Scale Option not set using Default Auto instead!");
+        scalingFactor = MEM_ReadStatArr(B4DI_BarScale,1);
+        MEM_Info( ConcatStrings( "Bar Scalingfactor = ", IntToString(scalingFactor) ) );
+    } else{
+        scalingFactor = MEM_ReadStatArr(B4DI_BarScale,scaleOption);
+        MEM_Info( ConcatStrings( "Bar Scalingfactor = ", IntToString(scalingFactor) ) );
+    };
+
+    var int dynScalingFactor; dynScalingFactor = fracf( scalingFactor, 100 );
+    MEM_Info( ConcatStrings( "dynScalingFactor = ", toStringf(dynScalingFactor) ) );
+
+    return dynScalingFactor;
+};
 
 //========================================
 // [Intern] Resizes bars according of Menu value (gothic.ini)
 //========================================
-func void B4DI_Bar_dynamicScale(var int bar_hndl){
+func void B4DI_Bar_dynamicMenuBasedScale(var int bar_hndl){
     if(!Hlp_IsValidHandle(bar_hndl)) { return; };
     var _bar b; b = get(bar_hndl);
     
     var zCView vBack; vBack = View_Get(b.v0);
     var zCView vBar; vBar = View_Get(b.v1);
 
-    var int dynScalingFactor; dynScalingFactor = Bar_getDynamicScaleOptionValuef();
+    var int dynScalingFactor; dynScalingFactor = B4DI_Bars_getDynamicScaleOptionValuef();
 
     Bar_ResizeCenteredPercentFromInitial(bar_hndl, dynScalingFactor);
     //TODO Implement different customizeable alignments, maybe per set margin within the Resize process
@@ -81,7 +123,6 @@ func void B4DI_Bar_dynamicScale(var int bar_hndl){
 // [Intern] Resizes actual bar according to percentage reltaive to center
 //
 //========================================
-//TODO FIX Dynamic Scale influence with persitent bar
 func void B4DI_Bar_SetBarSizeCenteredPercent(var int hndl, var int x_percentage, var int y_percentage ) { 
 	Print_GetScreenSize();
 	//------------------
@@ -101,29 +142,7 @@ func void B4DI_Bar_SetBarSizeCenteredPercent(var int hndl, var int x_percentage,
 
 	//scale on all axis
 	View_ResizeCentered(b.v1, sizex_pre * x_percentage / 100 , sizey_pre * y_percentage / 100 ); 
-	/*View_Resize(b.v1, sizex_pre * x_percentage / 100 , sizey_pre * y_percentage / 100 ); 
-	
-	//Calc the size difference caused by the resize all in virtual space
-	var int posDifY; posDifY = (v1_ptr.vsizey - sizey_pre)/2;
-	//positive difference means View is now bigger than before
-	//  therefore needs to be moved into the opposite direction
-	if (posDifY>0){
-		posDifY *= -1;
-	};
-	var int posDifX; posDifX = (v1_ptr.vsizex - sizex_pre)/2;
-	if (posDifX>0){
-		posDifX *= -1;
-	};
-	
-	// calculate the original pixel center -> virtualize it -> compensate with axis differance
-	var int compenstedTargetX; 
-	compenstedTargetX = b.initialVPositions[IP_VBAR_LEFT] + posDifX;
-
-	var int compenstedTargetY; 
-	compenstedTargetY = b.initialVPositions[IP_VBAR_TOP] + posDifY;
-
-	View_MoveTo(b.v1, compenstedTargetX, compenstedTargetY );*/
-	
+		
 	//Debug
 	B4DI_debugSpy("Bar PositionX",IntToString(v1_ptr.vposx));
 	B4DI_debugSpy("Bar PositionY",IntToString(v1_ptr.vposy));
@@ -287,6 +306,7 @@ func void B4DI_hpBar_InitAlways(){
 	// new dBars dynamic
 	if(!Hlp_IsValidHandle(MEM_dBar_HP_handle)){
 		MEM_dBar_HP_handle = Bar_CreateCenterDynamic(B4DI_HpBar);
+		B4DI_Bar_dynamicMenuBasedScale(MEM_dBar_HP_handle);
 	};
 	MEM_dBar_Hp = get(MEM_dBar_HP_handle);
 	B4DI_HpBar_calcHp();
@@ -345,6 +365,7 @@ func int B4DI_xpBar_create(){
 	var int XpBar;
 	//if(!Hlp_IsValidHandle(XpBar)) {
 		XpBar = Bar_CreateCenterDynamic(B4DI_XpBar);
+		B4DI_Bar_dynamicMenuBasedScale(XpBar);
 		//var int text_ptr; text_ptr = Print_Ext(100,100, "New Bar Created", FONT_Screen, RGBA(255,0,0,200),1000);
 	//};
 
@@ -390,9 +411,9 @@ func void B4DI_xpBar_update() {
 //#################################################################
 func void B4DI_Bars_applySettings() {
 	B4DI_InitBarScale(); // for resolution dependant scaling
-	dynScalingFactor = Bar_getDynamicScaleOptionValuef();
+	dynScalingFactor = B4DI_Bars_getDynamicScaleOptionValuef();
 
-	Bar_dynamicScale(MEM_dBar_HP_handle);
+	B4DI_Bar_dynamicMenuBasedScale(MEM_dBar_HP_handle);
 	B4DI_HpBar_calcHp();
 
 	MEM_Info("B4DI_Bars_applySettings");

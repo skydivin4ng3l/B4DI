@@ -23,12 +23,11 @@ const int oCNpc__OpenScreen_Status 				= 7592320;		// 0x73D980 // HookLen: 7
 const int cGameManager__ApplySomeSettings_rtn 	= 4362866; 		//0x429272 // Hook len 6
 
 
-///// TODO Currently in LeGo userconst \\\\\
 
-//const int B4DI_BarScale_off = 100; // will not be used?
-//const int B4DI_BarScale_auto = 100; // will not be used?
-//const int B4DI_BarScale_50 = 50; // 50 %
-//const int B4DI_BarScale_100 = 100; // 100%
-//const int B4DI_BarScale_150 = 150; // 150%
-
-///// TODO Currently in LeGo userconst ^^^^^^
+// interpretations of ini Setting
+const int B4DI_BarScale_off		= 100; // will not be used?
+const int B4DI_BarScale_auto	= 100; // will not be used?
+const int B4DI_BarScale_50		= 50; // 50 %
+const int B4DI_BarScale_100		= 100; // 100%
+const int B4DI_BarScale_150		= 150; // 150%
+const int B4DI_BarScale_200		= 200; // 200%

@@ -107,26 +107,6 @@ func void Bar_storePosSize(var int bar_hndl){
 };
 
 //========================================
-// [intern] Helper Scales depenting on Resolution
-//========================================
-var int B4DI_BarScale[6];
-func void B4DI_InitBarScale(){
-    Print_GetScreenSize();
-    B4DI_BarScale[0]= B4DI_BarScale_off;
-    //TODO replace Auto const with Resolution based Scale
-    //B4DI_BarScale[1]= B4DI_BarScale_auto;
-    // auto scale inspired by systempack.ini
-    B4DI_BarScale[1]= roundf( mulf( mkf(100) ,fracf( Print_Screen[PS_Y] ,512 ) ) );
-    B4DI_BarScale[2]= B4DI_BarScale_50;
-    B4DI_BarScale[3]= B4DI_BarScale_100;
-    B4DI_BarScale[4]= B4DI_BarScale_150;
-    B4DI_BarScale[5]= B4DI_BarScale_200;
-
-    B4DI_debugSpy("B4DI_AutoScaleFactor: ", IntToString(roundf(mulf( 100 ,fracf( Print_Screen[PS_Y], 512) ) ) ) );
-    B4DI_debugSpy("B4DI_AutoScaleFactorArray: ", toStringf(B4DI_BarScale[1]));
-};
-
-//========================================
 // Höchstwert setzen
 //========================================
 func void Bar_SetMax(var int bar, var int max) {
@@ -212,64 +192,19 @@ func void Bar_ResizeCenteredPercentFromInitial(var int bar_hndl, var int abolute
     View_SetMargin(b.v1, b.v0, ALIGN_CENTER, barTopBottomMargin, barLeftRightMargin, barTopBottomMargin, barLeftRightMargin );
     Bar_SetValue(bar_hndl, b.val );
 };
+
 //========================================
-// [Intern] Get Dynamic Scale according of Menu value (gothic.ini) asFloat
+// Resizes bar according to Resolution height
 //
 //========================================
-func int Bar_getDynamicScaleOptionValuef(){
-    B4DI_InitBarScale();
-    var int scaleOption; scaleOption = STR_ToInt(MEM_GetGothOpt("B4DI", "B4DI_barScale"));
-    var int scalingFactor; //scalingFactor = B4DI_BarScale_auto; //Default
-    MEM_Info( ConcatStrings( "Bar scaleOption = ", IntToString( scaleOption ) ) );
-    if(!scaleOption) {
-        MEM_Error("Bar Scale Option not set using Default Auto instead!");
-        scalingFactor = MEM_ReadStatArr(B4DI_BarScale,1);
-        MEM_Info( ConcatStrings( "Bar Scalingfactor = ", IntToString(scalingFactor) ) );
-    } else{
-        scalingFactor = MEM_ReadStatArr(B4DI_BarScale,scaleOption);
-        MEM_Info( ConcatStrings( "Bar Scalingfactor = ", IntToString(scalingFactor) ) );
-    };
-
-    var int dynScalingFactor; dynScalingFactor = fracf( scalingFactor, 100 );
-    MEM_Info( ConcatStrings( "dynScalingFactor = ", toStringf(dynScalingFactor) ) );
-
-    return dynScalingFactor;
-};
-
-//========================================
-// [Intern] Resizes bars according of Menu value (gothic.ini)
-//
-//========================================
-func void Bar_dynamicScale(var int bar_hndl){
+func void Bar_dynamicResolutionBasedScale(var int bar_hndl){
     if(!Hlp_IsValidHandle(bar_hndl)) { return; };
-    var _bar b; b = get(bar_hndl);
     
-    var zCView vBack; vBack = View_Get(b.v0);
-    var zCView vBar; vBar = View_Get(b.v1);
+    Print_GetScreenSize();
 
-    var int dynScalingFactor; dynScalingFactor = Bar_getDynamicScaleOptionValuef();
+    var int dynScalingFactor; dynScalingFactor = fracf( Print_Screen[PS_Y] ,512 );
 
     Bar_ResizeCenteredPercentFromInitial(bar_hndl, dynScalingFactor);
-    //TODO Implement different customizeable alignments, maybe per set margin within the Resize process
-
-    // Keep Left aligned
-    //compensate scaling difference of left and top offset
-    //should not be needed for centered//View_MoveTo(b.v1, vBar.vposx- barLeftOffset , vBar.vposy-barTopOffset);
-
-    ////---debug print
-    
-    var int s0;s0=SB_New();
-    SB_Use(s0);
-    SB("scaleFactor: "); SBi(roundf(dynScalingFactor));SB("  ");
-    SB("dynScalingFactor: "); SB(toStringf(dynScalingFactor)); SB(" / ");
-    SB("BACK: ");   SBi(vBack.psizex); SB(" , "); SBi(vBack.psizey); SB(" ");
-    SB("BAR: ");   SBi(vBar.psizex); SB(" , "); SBi(vBar.psizey); SB(" ");
-    SB("barW: "); SBi( Print_ToPixel( b.barW, PS_X ) );
-    //Print_ExtPxl(50,Print_Screen[PS_Y] / 2, SB_ToString(), FONT_Screen, RGBA(255,0,0,200),2500);
-    var int DebugText; DebugText = Print_ExtPxl(50,Print_Screen[PS_Y] / 2, SB_ToString(), FONT_Screen, RGBA(255,0,0,200),2500);
-    var zCViewText DebugTextObject; DebugTextObject = Print_GetText(DebugText);
-    DebugTextObject.posy = Print_ToVirtual( Print_Screen[PS_Y]/2 , PS_X);
-    SB_Destroy();
 };
 
 //========================================
@@ -299,7 +234,6 @@ func int Bar_Create(var int inst) {
     
     Bar_storePosSize(bh);
     Bar_SetValue(bh, bu.value);
-    Bar_dynamicScale(bh);
     //Redundant ->_ViewPtr_CreateIntoPtr
     /*var zCView v; v = View_Get(b.v0);
     v.fxOpen = 0;
@@ -337,7 +271,6 @@ func int Bar_CreateCenterDynamic(var int constructor_instance) {
 
     Bar_storePosSize(new_bar_hndl);
     Bar_SetValue(new_bar_hndl, bar_constr.value);
-    Bar_dynamicScale(new_bar_hndl);
 
     var zCView v; v = View_Get(bar.v0);
     //v.alphafunc = zRND_ALPHA_FUNC_ADD;
