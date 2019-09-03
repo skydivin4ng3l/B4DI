@@ -32,6 +32,7 @@ instance B4DI_HpBar(GothicBar){
 //global vars
 var int lastHeroHP;
 var int lastHeroMaxHP;
+var int dynScalingFactor; //float
 ////original Bars
 instance MEM_oBar_Hp(oCViewStatusBar);
 var int MEM_dBar_HP_handle;
@@ -44,7 +45,44 @@ instance MEM_dBar_HP(_bar);
 //#################################################################
 
 
-func void B4DI_Bar_SetSizeCenteredPercent(var int hndl, var int x_percentage, var int y_percentage ) { 
+//========================================
+// [Intern] Resizes bars according of Menu value (gothic.ini)
+//========================================
+func void B4DI_Bar_dynamicScale(var int bar_hndl){
+    if(!Hlp_IsValidHandle(bar_hndl)) { return; };
+    var _bar b; b = get(bar_hndl);
+    
+    var zCView vBack; vBack = View_Get(b.v0);
+    var zCView vBar; vBar = View_Get(b.v1);
+
+    var int dynScalingFactor; dynScalingFactor = Bar_getDynamicScaleOptionValuef();
+
+    Bar_ResizeCenteredPercentFromInitial(bar_hndl, dynScalingFactor);
+    //TODO Implement different customizeable alignments, maybe per set margin within the Resize process
+
+    // Keep Left aligned
+    //compensate scaling difference of left and top offset
+    //should not be needed for centered//View_MoveTo(b.v1, vBar.vposx- barLeftOffset , vBar.vposy-barTopOffset);
+
+    ////---debug print
+    
+    var int s0;s0=SB_New();
+    SB_Use(s0);
+    SB("scaleFactor: "); SBi(roundf(dynScalingFactor));SB("  ");
+    SB("dynScalingFactor: "); SB(toStringf(dynScalingFactor)); SB(" / ");
+    SB("BACK: ");   SBi(vBack.psizex); SB(" , "); SBi(vBack.psizey); SB(" ");
+    SB("BAR: ");   SBi(vBar.psizex); SB(" , "); SBi(vBar.psizey); SB(" ");
+    SB("barW: "); SBi( Print_ToPixel( b.barW, PS_X ) );
+    Print_ExtPxl(50,Print_Screen[PS_Y] / 2, SB_ToString(), FONT_Screen, RGBA(255,0,0,200),2500);
+    SB_Destroy();
+};
+
+//========================================
+// [Intern] Resizes actual bar according to percentage reltaive to center
+//
+//========================================
+//TODO FIX Dynamic Scale influence with persitent bar
+func void B4DI_Bar_SetBarSizeCenteredPercent(var int hndl, var int x_percentage, var int y_percentage ) { 
 	Print_GetScreenSize();
 	//------------------
 	if(!Hlp_IsValidHandle(hndl)) { return; };
@@ -59,10 +97,11 @@ func void B4DI_Bar_SetSizeCenteredPercent(var int hndl, var int x_percentage, va
 	v1_ptr = View_Get(b.v1);
 	//save the size before the resize
 	var int sizex_pre; sizex_pre = Print_ToVirtual(b.val,PS_X);	
-	var int sizey_pre; sizey_pre = b.initialDynamicVSizes[IDS_V1_Y]; // Dynamic Test +1 is missing, but needed?
+	var int sizey_pre; sizey_pre = roundf( mulf( mkf(b.initialDynamicVSizes[IDS_VBAR_Y]), dynScalingFactor ) ) ; // Dynamic Test +1 is missing, but needed?
 
 	//scale on all axis
-	View_Resize(b.v1, sizex_pre * x_percentage / 100 , sizey_pre * y_percentage / 100 ); 
+	View_ResizeCentered(b.v1, sizex_pre * x_percentage / 100 , sizey_pre * y_percentage / 100 ); 
+	/*View_Resize(b.v1, sizex_pre * x_percentage / 100 , sizey_pre * y_percentage / 100 ); 
 	
 	//Calc the size difference caused by the resize all in virtual space
 	var int posDifY; posDifY = (v1_ptr.vsizey - sizey_pre)/2;
@@ -78,12 +117,12 @@ func void B4DI_Bar_SetSizeCenteredPercent(var int hndl, var int x_percentage, va
 	
 	// calculate the original pixel center -> virtualize it -> compensate with axis differance
 	var int compenstedTargetX; 
-	compenstedTargetX = b.initialVPositions[IP_V1_LEFT] + posDifX;
+	compenstedTargetX = b.initialVPositions[IP_VBAR_LEFT] + posDifX;
 
 	var int compenstedTargetY; 
-	compenstedTargetY = b.initialVPositions[IP_V1_TOP] + posDifY;
+	compenstedTargetY = b.initialVPositions[IP_VBAR_TOP] + posDifY;
 
-	View_MoveTo(b.v1, compenstedTargetX, compenstedTargetY );
+	View_MoveTo(b.v1, compenstedTargetX, compenstedTargetY );*/
 	
 	//Debug
 	B4DI_debugSpy("Bar PositionX",IntToString(v1_ptr.vposx));
@@ -98,16 +137,16 @@ func void B4DI_Bar_SetSizeCenteredPercent(var int hndl, var int x_percentage, va
 	SB_Destroy(); 
 };
 
-func void B4DI_Bar_SetSizeCenteredPercentY(var int hndl, var int y_percentage){
-	B4DI_Bar_SetSizeCenteredPercent(hndl, 100, y_percentage);
+func void B4DI_Bar_SetBarSizeCenteredPercentY(var int hndl, var int y_percentage){
+	B4DI_Bar_SetBarSizeCenteredPercent(hndl, 100, y_percentage);
 };
 
-func void B4DI_Bar_SetSizeCenteredPercentX(var int hndl, var int x_percentage){
-	B4DI_Bar_SetSizeCenteredPercent(hndl, x_percentage,100 );
+func void B4DI_Bar_SetBarSizeCenteredPercentX(var int hndl, var int x_percentage){
+	B4DI_Bar_SetBarSizeCenteredPercent(hndl, x_percentage,100 );
 };
 
-func void B4DI_Bar_SetSizeCenteredPercentXY(var int hndl, var int xy_percentage){
-	B4DI_Bar_SetSizeCenteredPercent(hndl, xy_percentage, xy_percentage );
+func void B4DI_Bar_SetBarSizeCenteredPercentXY(var int hndl, var int xy_percentage){
+	B4DI_Bar_SetBarSizeCenteredPercent(hndl, xy_percentage, xy_percentage );
 };
 
 func void B4DI_Bar_fadeOut(var int bar_hndl, var int deleteBar) {
@@ -126,7 +165,7 @@ func void B4DI_Bar_fadeOut(var int bar_hndl, var int deleteBar) {
 };
 
 func void B4DI_Bar_pulse(var int bar) {
-	var int a8_XpBar_pulse; a8_XpBar_pulse = Anim8_NewExt(100 , B4DI_Bar_SetSizeCenteredPercentXY, bar, false); //height input
+	var int a8_XpBar_pulse; a8_XpBar_pulse = Anim8_NewExt(100 , B4DI_Bar_SetBarSizeCenteredPercentXY, bar, false); //height input
 	Anim8_RemoveIfEmpty(a8_XpBar_pulse, true);
 	Anim8_RemoveDataIfEmpty(a8_XpBar_pulse, false);
 	
@@ -169,6 +208,7 @@ func void B4DI_originalBar_hide( var int obar_ptr){
 	ViewPtr_SetAlpha(bar_inst.range_bar, 0); //middleView
 	ViewPtr_SetAlpha(bar_inst.value_bar, 0);	//barView
 };
+
 
 //#################################################################
 //
@@ -345,6 +385,21 @@ func void B4DI_xpBar_update() {
 
 //#################################################################
 //
+//  Apply changed Settings to all Bars
+//
+//#################################################################
+func void B4DI_Bars_applySettings() {
+	B4DI_InitBarScale(); // for resolution dependant scaling
+	dynScalingFactor = Bar_getDynamicScaleOptionValuef();
+
+	Bar_dynamicScale(MEM_dBar_HP_handle);
+	B4DI_HpBar_calcHp();
+
+	MEM_Info("B4DI_Bars_applySettings");
+};
+
+//#################################################################
+//
 //  Initinalisation Function Hooks
 //
 //#################################################################
@@ -353,11 +408,13 @@ func void B4DI_xpBar_update() {
 func void B4DI_Bars_InitOnce() {
 	//init globals
 	MEM_InitGlobalInst ();
+	//FMODE_NONE as not in combat 
 	B4DI_hpBar_InitOnce();
-	HookDaedalusFuncS("B_GivePlayerXP", "B4DI_xpBar_update"); // B4DI_xpBar_update()
+	HookDaedalusFuncS("B_GivePlayerXP", "B4DI_xpBar_update"); 						// B4DI_xpBar_update()
 	//MEM_Game.pause_screen as a TODO condition
-	//FMODE_NONE as not in combat TODO Remember for Healthbar
-	HookEngine(oCNpc__OpenScreen_Status, 7 , "B4DI_xpBar_show"); // B4DI_xpBar_show()
+	HookEngine(cGameManager__ApplySomeSettings_rtn, 6, "B4DI_Bars_applySettings");  // B4DI_Bars_applySettings()
+	HookEngine(oCNpc__OpenScreen_Status, 7 , "B4DI_xpBar_show"); 					// B4DI_xpBar_show()
+
 	MEM_Info("B4DI Bars ininitialised");
 };
 

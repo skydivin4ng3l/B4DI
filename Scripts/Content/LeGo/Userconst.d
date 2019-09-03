@@ -59,20 +59,20 @@ const int PS_VMax = 8192;
 //========================================
 
 //Access for initialDynamicVSize Array
-const int IDS_V0_X = 0;
-const int IDS_V0_Y = 1;
-const int IDS_V1_X = 2;
-const int IDS_V1_Y = 3;
+const int IDS_VBACK_X = 0;
+const int IDS_VBACK_Y = 1;
+const int IDS_VBAR_X = 2;
+const int IDS_VBAR_Y = 3;
 
 //Access for initialVPosition Array
-const int IP_V0_CENTER_X	= 0;
-const int IP_V0_CENTER_Y	= 1;
-const int IP_V1_CENTER_X	= 2;
-const int IP_V1_CENTER_Y	= 3;
-const int IP_V0_LEFT		=4;
-const int IP_V0_TOP			=5;
-const int IP_V1_LEFT		=6;
-const int IP_V1_TOP			=7;
+const int IP_VBACK_CENTER_X	= 0;
+const int IP_VBACK_CENTER_Y	= 1;
+const int IP_VBAR_CENTER_X	= 2;
+const int IP_VBAR_CENTER_Y	= 3;
+const int IP_VBACK_LEFT		= 4;
+const int IP_VBACK_TOP		= 5;
+const int IP_VBAR_LEFT		= 6;
+const int IP_VBAR_TOP		= 7;
 
 // interpretations of ini Setting
 const int B4DI_BarScale_off		= 100; // will not be used?

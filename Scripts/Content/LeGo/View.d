@@ -544,10 +544,17 @@ func void ViewPtr_SetMargin(var int ptr, var int parent, var int align, var int 
         ViewPtr_Resize(ptr, v.vsizex - mL - mR, v.vsizey - mT - mB);
     };
 };
+func void View_SetMargin(var int child_hndl, var int parent_hndl, var int align, var int mT, var int mR, var int mB, var int mL ){
+    ViewPtr_SetMargin(getPtr(child_hndl), getPtr(parent_hndl), align, mT, mR, mB, mL);
+};
+
 func void ViewPtr_SetMarginPxl(var int ptr, var int parent, var int align, var int mT, var int mR, var int mB, var int mL) {
     ViewPtr_SetMargin(ptr, parent, align, Print_ToVirtual(mT, PS_Y), Print_ToVirtual(mR, PS_X), Print_ToVirtual(mB, PS_Y), Print_ToVirtual(mL, PS_X));
 };
 
+func void View_SetMarginPxl(var int child_hndl, var int parent_hndl, var int align, var int mT, var int mR, var int mB, var int mL ){
+    ViewPtr_SetMarginPxl(getPtr(child_hndl), getPtr(parent_hndl), align, mT, mR, mB, mL);
+};
 //========================================
 // Eine Viewliste an einen parent kleben
 //========================================

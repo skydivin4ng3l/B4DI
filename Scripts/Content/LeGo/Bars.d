@@ -75,29 +75,29 @@ func void _bar_Delete(var _bar b) {
 }; 
 
 //========================================
-// [intern] Helper store initial VPos and VSize
+// [intern] Helper store VPos and VSize as reference for scale/position based animations
 //========================================
 
-func void Bar_storeInitPosSize(var int bar){
-    if(!Hlp_IsValidHandle(bar)) { return; };
-    var _bar b; b = get(bar);
+func void Bar_storePosSize(var int bar_hndl){
+    if(!Hlp_IsValidHandle(bar_hndl)) { return; };
+    var _bar b; b = get(bar_hndl);
     var zCView v; v = View_Get(b.v0);
 
-    b.initialVPositions[IP_V0_LEFT] = v.vposx;
-    b.initialVPositions[IP_V0_TOP] = v.vposy;
-    b.initialVPositions[IP_V0_CENTER_X] = v.vposx - v.vsizex>>1; // >>1 durch 2
-    b.initialVPositions[IP_V0_CENTER_Y] = v.vposy - v.vsizey>>1;
-    b.initialDynamicVSizes[IDS_V0_X] = v.vsizex;
-    b.initialDynamicVSizes[IDS_V0_Y] = v.vsizey;
+    b.initialVPositions[IP_VBACK_LEFT] = v.vposx;
+    b.initialVPositions[IP_VBACK_TOP] = v.vposy;
+    b.initialVPositions[IP_VBACK_CENTER_X] = v.vposx - v.vsizex>>1; // >>1 durch 2
+    b.initialVPositions[IP_VBACK_CENTER_Y] = v.vposy - v.vsizey>>1;
+    b.initialDynamicVSizes[IDS_VBACK_X] = v.vsizex;
+    b.initialDynamicVSizes[IDS_VBACK_Y] = v.vsizey;
     
-    v = View_Get(b.v1);
+    v = View_Get(b.v1); //same as vmiddle
 
-    b.initialVPositions[IP_V1_LEFT] = v.vposx;
-    b.initialVPositions[IP_V1_TOP] = v.vposy;
-    b.initialVPositions[IP_V1_CENTER_X] = v.vposx - v.vsizex>>1; // >>1 durch 2
-    b.initialVPositions[IP_V1_CENTER_Y] = v.vposy - v.vsizey>>1;
-    b.initialDynamicVSizes[IDS_V1_X] = v.vsizex;
-    b.initialDynamicVSizes[IDS_V1_Y] = v.vsizey;
+    b.initialVPositions[IP_VBAR_LEFT] = v.vposx;
+    b.initialVPositions[IP_VBAR_TOP] = v.vposy;
+    b.initialVPositions[IP_VBAR_CENTER_X] = v.vposx - v.vsizex>>1; // >>1 durch 2
+    b.initialVPositions[IP_VBAR_CENTER_Y] = v.vposy - v.vsizey>>1;
+    b.initialDynamicVSizes[IDS_VBAR_X] = v.vsizex;
+    b.initialDynamicVSizes[IDS_VBAR_Y] = v.vsizey;
 
     B4DI_debugSpy("Bar PositionX",IntToString(v.vposx));
     B4DI_debugSpy("Bar PositionY",IntToString(v.vposy));
@@ -111,102 +111,19 @@ func void Bar_storeInitPosSize(var int bar){
 //========================================
 var int B4DI_BarScale[6];
 func void B4DI_InitBarScale(){
-
+    Print_GetScreenSize();
     B4DI_BarScale[0]= B4DI_BarScale_off;
     //TODO replace Auto const with Resolution based Scale
-    B4DI_BarScale[1]= B4DI_BarScale_auto;
+    //B4DI_BarScale[1]= B4DI_BarScale_auto;
+    // auto scale inspired by systempack.ini
+    B4DI_BarScale[1]= roundf( mulf( mkf(100) ,fracf( Print_Screen[PS_Y] ,512 ) ) );
     B4DI_BarScale[2]= B4DI_BarScale_50;
     B4DI_BarScale[3]= B4DI_BarScale_100;
     B4DI_BarScale[4]= B4DI_BarScale_150;
     B4DI_BarScale[5]= B4DI_BarScale_200;
-};
 
-//========================================
-// [Intern] Resizes bars in valid space (WIP)
-//
-// if back reaches screen borders before scaling is finished
-//  it will be moved, middle and bar will be moved according to delta before resizing.
-//========================================
-func void Bar_ResizeCentered(var int bar, var int scalingFactor){ //float scalingFactor
-    if(!Hlp_IsValidHandle(bar)) { return; };
-    var _bar b; b = get(bar);
-    var zCView vBack; vBack = View_Get(b.v0);
-    var zCView vMiddle; vMiddle = View_Get(b.vMiddle);
-    var zCView vBar; vBar = View_Get(b.v1);
-
-    var int barTop; barTop = roundf( fracf( mulf( mkf( vBack.vposy - vBar.vposy ), scalingFactor ), mkf(2) ) );
-    var int barLeft; barLeft = roundf( fracf( mulf( mkf( vBack.vposx - vBar.vposx ), scalingFactor ), mkf(2) ) );
-
-    View_ResizeCenteredValidScreenSpace(b.v0, roundf( mulf( mkf(vBack.vsizex) , scalingFactor) ), roundf( mulf( mkf(vBack.vsizey) , scalingFactor ) ) );
-    //to keep the margin valid if scaled back touches screen border
-    View_MoveTo(b.vMiddle, vBack.vposx + barLeft, vBack.vposy + barTop );
-    View_MoveTo(b.v1, vBack.vposx + barLeft, vBack.vposy + barTop );
-        
-    View_Resize(b.vMiddle, roundf( mulf( mkf(vBar.vsizex) , scalingFactor) ), roundf( mulf( mkf(vBar.vsizey) , scalingFactor) ) );
-    View_Resize(b.v1, roundf( mulf( mkf(vBar.vsizex) , scalingFactor) ), roundf( mulf( mkf(vBar.vsizey) , scalingFactor) ) );
-};
-
-//========================================
-// [Intern] Resizes bars according of Menu value (gothic.ini)
-//
-//========================================
-func void Bar_dynamicScale(var int bar){
-    if(!Hlp_IsValidHandle(bar)) { return; };
-    var _bar b; b = get(bar);
-    
-
-    var zCView vBack; vBack = View_Get(b.v0);
-    var zCView vBar; vBar = View_Get(b.v1);
-    B4DI_InitBarScale();
-    var int scaleOption; scaleOption = STR_ToInt(MEM_GetGothOpt("B4DI", "B4DI_barScale"));
-    var int scaleFactor; //scaleFactor = B4DI_BarScale_off; //Default
-    MEM_Info( ConcatStrings( "Bar scaleOption = ", IntToString( scaleOption ) ) );
-    if (!scaleOption) {
-        return;
-    } else{
-        scaleFactor = MEM_ReadStatArr(B4DI_BarScale,scaleOption);
-        MEM_Info( ConcatStrings( "Bar Scalefactor = ", IntToString(scaleFactor) ) );
-    };
-
-    var int dynScalingFactor; dynScalingFactor = fracf( scaleFactor, 100 );
-    MEM_Info( ConcatStrings( "dynScalingFactor = ", toStringf(dynScalingFactor) ) );
-
-    //var int barTop; barTop = mkf( vBack.vposy - vBar.vposy );
-    //var int barTopOffset;  barTopOffset = roundf( subf( mulf( barTop , dynScalingFactor ) ,barTop) ); 
-    //var int barLeft; barLeft =  mkf( vBack.vposx - vBar.vposx );
-    //var int barLeftOffset; barLeftOffset = roundf( subf( mulf(barLeft , dynScalingFactor) , barLeft) ); 
-    ////save Presize For other than topleft alinement
-    //var int pre_vBarPosX;  pre_vBarPosX = vBar.vposx;
-    //var int pre_vBarPosY;  pre_vBarPosY = vBar.vposy;
-    //var int pre_vBackPosX;  pre_vBarPosX = vBar.vposx;
-    //var int pre_vBackPosY;  pre_vBarPosY = vBar.vposy;
-
-
-
-    b.barW = roundf( mulf( mkf( b.barW ) , dynScalingFactor ) );
-    //TODO fix next function
-    //Bar_ResizeCentered(bar, dynScalingFactor);
-    View_ResizeCentered(b.v0, roundf( mulf( mkf(vBack.vsizex) , dynScalingFactor) ), roundf( mulf( mkf(vBack.vsizey) , dynScalingFactor ) ) );
-    View_ResizeCentered(b.vMiddle, roundf( mulf( mkf(vBar.vsizex) , dynScalingFactor) ), roundf( mulf( mkf(vBar.vsizey) , dynScalingFactor) ) );
-    View_ResizeCentered(b.v1, roundf( mulf( mkf(vBar.vsizex) , dynScalingFactor) ), roundf( mulf( mkf(vBar.vsizey) , dynScalingFactor) ) );
-    //TODO Adjust offset of BarTop and BarLeft caused by "Texture Stretching" with centered resize should no longer be needed
-    //TODO Implement different customizeable alignments
-
-    // Keep Left aligned
-    //compensate scaling difference of left and top offset
-    //should not be needed for centered//View_MoveTo(b.v1, vBar.vposx- barLeftOffset , vBar.vposy-barTopOffset);
-
-    ////---debug print
-    
-    var int s0;s0=SB_New();
-    SB_Use(s0);
-    SB("scaleFactor: "); SBi(scaleFactor);SB("  ");
-    SB("dynScalingFactor: "); SB(toStringf(dynScalingFactor)); SB(" / ");
-    SB("BACK: ");   SBi(vBack.psizex); SB(" , "); SBi(vBack.psizey); SB(" ");
-    SB("BAR: ");   SBi(vBar.psizex); SB(" , "); SBi(vBar.psizey); SB(" ");
-    SB("barW: "); SBi( Print_ToPixel( b.barW, PS_X ) );
-    Print_ExtPxl(50,Print_Screen[PS_Y] / 2, SB_ToString(), FONT_Screen, RGBA(255,0,0,200),2500);
-    SB_Destroy();
+    B4DI_debugSpy("B4DI_AutoScaleFactor: ", IntToString(roundf(mulf( 100 ,fracf( Print_Screen[PS_Y], 512) ) ) ) );
+    B4DI_debugSpy("B4DI_AutoScaleFactorArray: ", toStringf(B4DI_BarScale[1]));
 };
 
 //========================================
@@ -251,6 +168,111 @@ func void Bar_SetValue(var int bar, var int val) {
 };
 
 //========================================
+// [Intern] Resizes bars in valid space (untested)
+//
+// if back reaches screen borders before scaling is finished
+//  it will be moved, middle and bar will be moved according to delta before resizing.
+//========================================
+func void Bar_ResizeCenteredPercent(var int bar_hndl, var int relativScalingFactor){ //float relativScalingFactor
+    if(!Hlp_IsValidHandle(bar_hndl)) { return; };
+    var _bar b; b = get(bar_hndl);
+    var zCView vBack; vBack = View_Get(b.v0);
+    var zCView vMiddle; vMiddle = View_Get(b.vMiddle);
+    var zCView vBar; vBar = View_Get(b.v1);
+    
+    b.barW = roundf( mulf( mkf( b.barW ) , relativScalingFactor ) );
+
+    var int barTop; barTop = roundf(  mulf( mkf(  vBar.vposy - vBack.vposy ), relativScalingFactor ));
+    var int barLeft; barLeft = roundf(  mulf( mkf( vBar.vposx - vBack.vposx ), relativScalingFactor ) );
+
+    View_ResizeCenteredValidScreenSpace(b.v0, roundf( mulf( mkf(vBack.vsizex) , relativScalingFactor) ), roundf( mulf( mkf(vBack.vsizey) , relativScalingFactor ) ) );
+    //to keep the margin valid if scaled back touches screen border
+    View_MoveTo(b.vMiddle, vBack.vposx + barLeft, vBack.vposy + barTop );
+    View_MoveTo(b.v1, vBack.vposx + barLeft, vBack.vposy + barTop );
+        
+    View_Resize(b.vMiddle, roundf( mulf( mkf(vMiddle.vsizex) , relativScalingFactor) ), roundf( mulf( mkf(vMiddle.vsizey) , relativScalingFactor) ) );
+    View_Resize(b.v1, roundf( mulf( mkf(vBar.vsizex) , relativScalingFactor) ), roundf( mulf( mkf(vBar.vsizey) , relativScalingFactor) ) );
+    Bar_SetValue(bar_hndl, b.val);
+};
+
+func void Bar_ResizeCenteredPercentFromInitial(var int bar_hndl, var int aboluteScalingFactor){ //float aboluteScalingFactor
+    if(!Hlp_IsValidHandle(bar_hndl)) { return; };
+    var _bar b; b = get(bar_hndl);
+
+    b.barW = roundf( mulf( mkf( b.initialDynamicVSizes[IDS_VBAR_X] ) , aboluteScalingFactor ) );
+
+    View_ResizeCenteredValidScreenSpace(b.v0, roundf( mulf( mkf(b.initialDynamicVSizes[IDS_VBACK_X] ) , aboluteScalingFactor) ), roundf( mulf( mkf(b.initialDynamicVSizes[IDS_VBACK_Y]) , aboluteScalingFactor ) ) );
+
+    var int barTopBottomMargin;
+    barTopBottomMargin = roundf( mulf( mkf(b.initialVPositions[IP_VBAR_TOP] - b.initialVPositions[IP_VBACK_TOP]  ) , aboluteScalingFactor) );
+    var int barLeftRightMargin;
+    barLeftRightMargin = roundf( mulf( mkf(b.initialVPositions[IP_VBAR_LEFT] - b.initialVPositions[IP_VBACK_LEFT]  ) , aboluteScalingFactor) );
+
+    View_SetMargin(b.vMiddle, b.v0, ALIGN_CENTER, barTopBottomMargin, barLeftRightMargin, barTopBottomMargin, barLeftRightMargin ); 
+    View_SetMargin(b.v1, b.v0, ALIGN_CENTER, barTopBottomMargin, barLeftRightMargin, barTopBottomMargin, barLeftRightMargin );
+    Bar_SetValue(bar_hndl, b.val );
+};
+//========================================
+// [Intern] Get Dynamic Scale according of Menu value (gothic.ini) asFloat
+//
+//========================================
+func int Bar_getDynamicScaleOptionValuef(){
+    B4DI_InitBarScale();
+    var int scaleOption; scaleOption = STR_ToInt(MEM_GetGothOpt("B4DI", "B4DI_barScale"));
+    var int scalingFactor; //scalingFactor = B4DI_BarScale_auto; //Default
+    MEM_Info( ConcatStrings( "Bar scaleOption = ", IntToString( scaleOption ) ) );
+    if(!scaleOption) {
+        MEM_Error("Bar Scale Option not set using Default Auto instead!");
+        scalingFactor = MEM_ReadStatArr(B4DI_BarScale,1);
+        MEM_Info( ConcatStrings( "Bar Scalingfactor = ", IntToString(scalingFactor) ) );
+    } else{
+        scalingFactor = MEM_ReadStatArr(B4DI_BarScale,scaleOption);
+        MEM_Info( ConcatStrings( "Bar Scalingfactor = ", IntToString(scalingFactor) ) );
+    };
+
+    var int dynScalingFactor; dynScalingFactor = fracf( scalingFactor, 100 );
+    MEM_Info( ConcatStrings( "dynScalingFactor = ", toStringf(dynScalingFactor) ) );
+
+    return dynScalingFactor;
+};
+
+//========================================
+// [Intern] Resizes bars according of Menu value (gothic.ini)
+//
+//========================================
+func void Bar_dynamicScale(var int bar_hndl){
+    if(!Hlp_IsValidHandle(bar_hndl)) { return; };
+    var _bar b; b = get(bar_hndl);
+    
+    var zCView vBack; vBack = View_Get(b.v0);
+    var zCView vBar; vBar = View_Get(b.v1);
+
+    var int dynScalingFactor; dynScalingFactor = Bar_getDynamicScaleOptionValuef();
+
+    Bar_ResizeCenteredPercentFromInitial(bar_hndl, dynScalingFactor);
+    //TODO Implement different customizeable alignments, maybe per set margin within the Resize process
+
+    // Keep Left aligned
+    //compensate scaling difference of left and top offset
+    //should not be needed for centered//View_MoveTo(b.v1, vBar.vposx- barLeftOffset , vBar.vposy-barTopOffset);
+
+    ////---debug print
+    
+    var int s0;s0=SB_New();
+    SB_Use(s0);
+    SB("scaleFactor: "); SBi(roundf(dynScalingFactor));SB("  ");
+    SB("dynScalingFactor: "); SB(toStringf(dynScalingFactor)); SB(" / ");
+    SB("BACK: ");   SBi(vBack.psizex); SB(" , "); SBi(vBack.psizey); SB(" ");
+    SB("BAR: ");   SBi(vBar.psizex); SB(" , "); SBi(vBar.psizey); SB(" ");
+    SB("barW: "); SBi( Print_ToPixel( b.barW, PS_X ) );
+    //Print_ExtPxl(50,Print_Screen[PS_Y] / 2, SB_ToString(), FONT_Screen, RGBA(255,0,0,200),2500);
+    var int DebugText; DebugText = Print_ExtPxl(50,Print_Screen[PS_Y] / 2, SB_ToString(), FONT_Screen, RGBA(255,0,0,200),2500);
+    var zCViewText DebugTextObject; DebugTextObject = Print_GetText(DebugText);
+    DebugTextObject.posy = Print_ToVirtual( Print_Screen[PS_Y]/2 , PS_X);
+    SB_Destroy();
+};
+
+//========================================
 // Neue Bar erstellen
 //========================================
 func int Bar_Create(var int inst) {
@@ -275,8 +297,9 @@ func int Bar_Create(var int inst) {
     View_SetTexture(b.v0, bu.backTex);
     View_SetTexture(b.v1, bu.barTex);
     
+    Bar_storePosSize(bh);
+    Bar_SetValue(bh, bu.value);
     Bar_dynamicScale(bh);
-    Bar_storeInitPosSize(bh);
     //Redundant ->_ViewPtr_CreateIntoPtr
     /*var zCView v; v = View_Get(b.v0);
     v.fxOpen = 0;
@@ -289,7 +312,6 @@ func int Bar_Create(var int inst) {
     View_Open(b.vMiddle);
     View_Open(b.v1);
     b.isFadedOut = 0;
-    Bar_SetValue(bh, bu.value);
     free(ptr, inst);
     return bh;
 };
@@ -313,8 +335,9 @@ func int Bar_CreateCenterDynamic(var int constructor_instance) {
     View_SetTexture(bar.vMiddle, bar_constr.middleTex);
     View_SetTexture(bar.v1, bar_constr.barTex);
 
+    Bar_storePosSize(new_bar_hndl);
+    Bar_SetValue(new_bar_hndl, bar_constr.value);
     Bar_dynamicScale(new_bar_hndl);
-    Bar_storeInitPosSize(new_bar_hndl);
 
     var zCView v; v = View_Get(bar.v0);
     //v.alphafunc = zRND_ALPHA_FUNC_ADD;
@@ -327,7 +350,6 @@ func int Bar_CreateCenterDynamic(var int constructor_instance) {
     View_Open(bar.vMiddle);
     View_Open(bar.v1);
     bar.isFadedOut = 0;
-    Bar_SetValue(new_bar_hndl, bar_constr.value);
     
     free(ptr, constructor_instance);
     return new_bar_hndl;
@@ -344,7 +366,7 @@ func void Bar_Delete(var int bar) {
 };
 
 //========================================
-// Bar zeigen
+// Bar schließen
 //========================================
 func void Bar_Hide(var int bar) {
 	if(!Hlp_IsValidHandle(bar)) { return; };
@@ -355,7 +377,7 @@ func void Bar_Hide(var int bar) {
 };
 
 //========================================
-// Bar verstecken
+// Bar oeffnen
 //========================================
 func void Bar_Show(var int bar) {
 	if(!Hlp_IsValidHandle(bar)) { return; };

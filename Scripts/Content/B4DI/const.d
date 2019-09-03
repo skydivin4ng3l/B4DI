@@ -19,7 +19,8 @@ const int    B4DI_INITIALIZED        = 0;                    // Indicator whethe
 
 /// Hooks
 
-const int oCNpc__OpenScreen_Status = 7592320; // 0x73D980 // HookLen: 7
+const int oCNpc__OpenScreen_Status 				= 7592320;		// 0x73D980 // HookLen: 7
+const int cGameManager__ApplySomeSettings_rtn 	= 4362866; 		//0x429272 // Hook len 6
 
 
 ///// TODO Currently in LeGo userconst \\\\\
