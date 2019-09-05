@@ -33,10 +33,13 @@ instance B4DI_HpBar(GothicBar){
 var int lastHeroHP;
 var int lastHeroMaxHP;
 var int dynScalingFactor; //float
+var int isInventoryOpen; 
 ////original Bars
 instance MEM_oBar_Hp(oCViewStatusBar);
 var int MEM_dBar_HP_handle;
 instance MEM_dBar_HP(_bar);
+
+instance selectedInvItem(oCItem);
 
 //#################################################################
 //
@@ -50,17 +53,12 @@ var int B4DI_BarScale[6];
 func void B4DI_InitBarScale(){
     Print_GetScreenSize();
     B4DI_BarScale[0]= B4DI_BarScale_off;
-    //TODO replace Auto const with Resolution based Scale
-    //B4DI_BarScale[1]= B4DI_BarScale_auto;
     // auto scale inspired by systempack.ini
     B4DI_BarScale[1]= roundf( mulf( mkf(100) ,fracf( Print_Screen[PS_Y] ,512 ) ) );
     B4DI_BarScale[2]= B4DI_BarScale_50;
     B4DI_BarScale[3]= B4DI_BarScale_100;
     B4DI_BarScale[4]= B4DI_BarScale_150;
     B4DI_BarScale[5]= B4DI_BarScale_200;
-
-    B4DI_debugSpy("B4DI_AutoScaleFactor: ", IntToString(roundf(mulf( 100 ,fracf( Print_Screen[PS_Y], 512) ) ) ) );
-    B4DI_debugSpy("B4DI_AutoScaleFactorArray: ", toStringf(B4DI_BarScale[1]));
 };
 
 //========================================
@@ -228,6 +226,59 @@ func void B4DI_originalBar_hide( var int obar_ptr){
 	ViewPtr_SetAlpha(bar_inst.value_bar, 0);	//barView
 };
 
+func void B4DI_Bars_showItemPreview() {
+	var int index; var STRING type; var int value;
+
+	repeat(index, ITM_TEXT_MAX); 
+		type = MEM_ReadStringArray(selectedInvItem.TEXT,index);
+
+		if(type == NAME_Bonus_HP ) {
+			value = MEM_ReadIntArray(selectedInvItem.TEXT,index);
+			//TODO preview HP
+			MEM_Info("B4DI_Bars_showItemPreview HP");
+		};
+		if(type == NAME_Bonus_HpMax ) {
+			value = MEM_ReadIntArray(selectedInvItem.TEXT,index);
+			//TODO preview HPMax
+			MEM_Info("B4DI_Bars_showItemPreview HPMax");
+		};
+		if(type == NAME_Bonus_Mana ) {
+			value = MEM_ReadIntArray(selectedInvItem.TEXT,index);
+			//TODO preview mana
+			MEM_Info("B4DI_Bars_showItemPreview MANA");
+		};
+		if(type == NAME_Bonus_ManaMax ) {
+			value = MEM_ReadIntArray(selectedInvItem.TEXT,index);
+			//TODO preview manaMax
+			MEM_Info("B4DI_Bars_showItemPreview MANAMax");
+		};
+		if(type == NAME_Mana_needed ) {
+			value = MEM_ReadIntArray(selectedInvItem.TEXT,index);
+			//TODO preview manaNeeded
+			MEM_Info("B4DI_Bars_showItemPreview MANA Needed");
+		};
+
+	end;
+};
+
+//=====Inv_GetSelectedItem=====
+
+func int Inv_GetSelectedItem(){
+	var int hero_ptr; hero_ptr = MEM_InstToPtr(hero);
+	var oCNpc oCNPC_hero; oCNPC_hero = MEM_PtrToInst(hero_ptr);
+	var int itm_index; itm_index = oCNPC_hero.inventory2_oCItemContainer_selectedItem + 2; 		//anscheinend sind die ersten beiden items in der List nie belegt.
+	var zCListSort list; list = _^(oCNPC_hero.inventory2_oCItemContainer_contents);
+	if (List_HasLengthS(_@(list), itm_index))
+	{	
+		var int itm_ptr; itm_ptr = List_GetS(_@(list), itm_index);
+		return itm_ptr;
+	}
+	else
+	{
+		return 0;
+	};	
+};
+
 
 //#################################################################
 //
@@ -242,13 +293,6 @@ func void B4DI_HpBar_calcHp() {
 	MEM_Info("B4DI_HpBar_calcHp");
 };
 
-
-/*func void B4DI_oHpBar_hide(){
-	MEM_oBar_Hp.zCView_alpha = 0; //backView
-	ViewPtr_SetAlpha(MEM_oBar_Hp.range_bar, 0); //middleView
-	ViewPtr_SetAlpha(MEM_oBar_Hp.value_bar, 0);	//barView
-};*/
-
 // returns the difference between 
 func int B4DI_heroHp_changed(){
 	var int heroHpDifference; heroHpDifference = hero.attribute[ATR_HITPOINTS]-lastHeroHP;
@@ -261,47 +305,37 @@ func int B4DI_heroHp_changed(){
 	};
 };
 
-/*func void B4DI_hpBar_hide(){
-	MEM_dBar_Hp.isFadedOut = 1;
-	B4DI_Bar_fadeOut(MEM_dBar_HP_handle, false);
-	MEM_Info("B4DI_hpBar_hide");
-
-};
-
-func void B4DI_hpBar_show(){
-	if(Hlp_IsValidHandle(MEM_dBar_Hp.anim8FadeOut) ){
-		Anim8_Delete(MEM_dBar_Hp.anim8FadeOut);
-	};
-	MEM_dBar_Hp.isFadedOut = 0;
-	Bar_SetAlpha(MEM_dBar_HP_handle, 255);
-	Bar_Show(MEM_dBar_HP_handle);
-	if(!Hlp_IsValidHandle(MEM_dBar_HP_handle)) {
-		MEM_Info("HANDLE BROCKEN FIX MEEEEEEEEEEEE");
-	};
-	MEM_Info("B4DI_hpBar_show");
-};*/
-
 func void B4DI_hpBar_update(){
 	var int heroHpChanged; heroHpChanged = B4DI_heroHp_changed();
 	if(heroHpChanged){
 		B4DI_HpBar_calcHp();
 	};
-	if ( (!Npc_IsInFightMode( hero, FMODE_NONE ) || heroHpChanged ) & MEM_dBar_Hp.isFadedOut ) {
+	if(isInventoryOpen){
+		selectedInvItem = _^(Inv_GetSelectedItem());
+		//TODO Filter for bar influencing items What about mana? different types: timed, procentual, absolute
+		//TODO limit call to newly selected different item
+		if(selectedInvItem.mainflag == ITEM_KAT_POTIONS || selectedInvItem.mainflag == ITEM_KAT_FOOD){
+			MEM_Info(selectedInvItem.name);
+			B4DI_Bars_showItemPreview();
+		};
+		//TODO generate bar preview
+		//TODO Disable preview after inventory closed or update on item used or got dmg
+	};
+	if ( (!Npc_IsInFightMode( hero, FMODE_NONE ) || heroHpChanged || isInventoryOpen ) & MEM_dBar_Hp.isFadedOut ) {
 		//B4DI_hpBar_show();
 		B4DI_Bar_show(MEM_dBar_HP_handle);
-	} else if(Npc_IsInFightMode(hero, FMODE_NONE) & !MEM_dBar_Hp.isFadedOut) {
+	} else if(Npc_IsInFightMode(hero, FMODE_NONE) & !heroHpChanged & !isInventoryOpen & !MEM_dBar_Hp.isFadedOut) {
 		//B4DI_hpBar_hide();	
 		B4DI_Bar_hide(MEM_dBar_HP_handle);
 	};
-	MEM_Info("B4DI_hpBar_update");
+	//MEM_Info("B4DI_hpBar_update");
+	//B4DI_debugSpy("B4DI_ITEM_is: ", item.nameID);
 
 };
 
 func void B4DI_hpBar_InitAlways(){
 	//original bars
 	MEM_oBar_Hp = MEM_PtrToInst (MEM_GAME.hpBar); //original
-	//B4DI_oHpBar_hide();
-	//new version
 	B4DI_originalBar_hide(MEM_GAME.hpBar);
 	// new dBars dynamic
 	if(!Hlp_IsValidHandle(MEM_dBar_HP_handle)){
@@ -317,9 +351,10 @@ func void B4DI_hpBar_InitAlways(){
 	lastHeroMaxHP = hero.attribute[ATR_HITPOINTS_MAX];
 	//TODO: Update on option change of Barsize
 	//TODO: implement customizable Positions Left Right Top bottom,...
+	//TODO: implement a Screen margin
 	Bar_MoveLeftUpperTo(MEM_dBar_HP_handle, MEM_oBar_Hp.zCView_vposx, MEM_oBar_Hp.zCView_vposy );
 
-	FF_ApplyOnceExtGT(B4DI_hpBar_update,0,-1);
+	//FF_ApplyOnceExtGT(B4DI_hpBar_update,0,-1);
 
 	MEM_Info("B4DI_hpBar_InitAlways");
 };
@@ -334,7 +369,7 @@ func void B4DI_hpBar_InitOnce(){
 //  XP Bar
 //
 //#################################################################
-
+//TODO: change to persitent bar 
 func void B4DI_XpBar_calcXp(var int XpBar){
 	// ------ XP Setup ------
 	var int level_last; var int exp_lastLvlUp;
@@ -419,9 +454,168 @@ func void B4DI_Bars_applySettings() {
 	MEM_Info("B4DI_Bars_applySettings");
 };
 
+
 //#################################################################
 //
-//  Initinalisation Function Hooks
+//  Hooking Functions to Update bars
+//
+//#################################################################
+func void B4DI_inventory_opend(){
+	var C_NPC caller; caller = MEM_PtrToInst(ECX);
+	if (Npc_IsPlayer(caller)) {
+		isInventoryOpen = true;
+		//TODO: add FF to update bars according to used items
+		FF_ApplyOnceExtGT(B4DI_hpBar_update,0,-1);
+		MEM_Info("B4DI_inventory_opend");
+	};
+};
+
+func void B4DI_inventory_closed(){
+	var C_NPC caller; caller = MEM_PtrToInst(ECX);
+	if (Npc_IsPlayer(caller)) {
+		isInventoryOpen = false;
+		B4DI_hpBar_update(); // call again to make sure status get updated
+		//TODO: Remove FF to update bars according to used items
+		FF_Remove(B4DI_hpBar_update);
+		MEM_Info("B4DI_inventory_closed");
+	};
+};
+
+func void B4DI_update_fight_mode(){
+	//MEM_Info("B4DI_update_fight_mode");
+	if(isInventoryOpen){
+		isInventoryOpen = false;
+		FF_Remove(B4DI_hpBar_update);
+	};
+	B4DI_hpBar_update();
+};
+
+func void B4DI_drawWeapon(){
+	//MEM_Info("B4DI_drawWeapon");
+	var C_NPC caller; caller = MEM_PtrToInst(ECX);
+	if (Npc_IsPlayer(caller)) {
+		//B4DI_update_fight_mode();
+		B4DI_debugSpy("B4DI_drawWeapon called by: ", caller.name);
+	};
+};
+
+func void B4DI_oCNpc__SetWeaponMode(){
+	//MEM_Info("B4DI_drawWeapon");
+	var oCNpc caller; caller = MEM_PtrToInst(ECX);
+	if (Npc_IsPlayer(caller)) {
+		B4DI_debugSpy("B4DI_oCNpc__SetWeaponMode called by: ", caller.name);
+		B4DI_debugSpy("B4DI_oCNpc__SetWeaponMode fMode is: ", IntToString(caller.fmode));
+		B4DI_update_fight_mode();
+	};
+};
+
+func void B4DI_oCNpc__SetWeaponMode2(){
+	//MEM_Info("B4DI_drawWeapon");
+	var oCNpc caller; caller = MEM_PtrToInst(ECX);
+	if (Npc_IsPlayer(caller)) {
+		B4DI_debugSpy("B4DI_oCNpc__SetWeaponMode2 called by: ", caller.name);
+		B4DI_debugSpy("B4DI_oCNpc__SetWeaponMode2 fMode is: ", IntToString(caller.fmode));
+		B4DI_update_fight_mode();
+	};
+};
+
+func void B4DI_oCNpc__SetWeaponMode2__zSTRING(){
+	//MEM_Info("B4DI_drawWeapon");
+	var oCNpc caller; caller = MEM_PtrToInst(ECX);
+	if (Npc_IsPlayer(caller)) {
+		B4DI_debugSpy("B4DI_oCNpc__SetWeaponMode2__zSTRING called by: ", caller.name);
+		B4DI_debugSpy("B4DI_oCNpc__SetWeaponMode2__zSTRING fMode is: ", IntToString(caller.fmode));
+		B4DI_update_fight_mode();
+	};
+};
+
+func void B4DI_oCNpc__OnDamage_Hit(){
+	MEM_Info("B4DI_oCNpc__OnDamage_Hit");
+	var C_NPC caller; caller = MEM_PtrToInst(ECX);
+	if (Npc_IsPlayer(caller)) {
+		B4DI_update_fight_mode();
+		B4DI_debugSpy("B4DI_oCNpc__OnDamage_Hit called by: ", caller.name);
+	};
+};
+
+//func void B4DI_drawWeapon1(){
+//	B4DI_update_fight_mode();
+//	MEM_Info("B4DI_drawWeapon1");
+//};
+
+//func void B4DI_drawWeapon2(){
+//	B4DI_update_fight_mode();
+//	MEM_Info("B4DI_drawWeapon2");
+//};
+
+//func void B4DI_removeWeapon(){
+//	B4DI_update_fight_mode();
+//	MEM_Info("B4DI_removeWeapon");
+//};
+
+//func void B4DI_removeWeapon1(){
+//	B4DI_update_fight_mode();
+//	MEM_Info("B4DI_removeWeapon1");
+//};
+
+//func void B4DI_removeWeapon2(){
+//	B4DI_update_fight_mode();
+//	MEM_Info("B4DI_removeWeapon2");
+//};
+
+func void B4DI_openSpellbook(){
+	B4DI_update_fight_mode();
+	MEM_Info("B4DI_openSpellbook");
+};
+
+func void B4DI_closeSpellbook(){
+	B4DI_update_fight_mode();
+	MEM_Info("B4DI_closeSpellbook");
+};
+
+//func void B4DI_ChooseWeapon(){
+//	B4DI_update_fight_mode();
+//	MEM_Info("B4DI_ChooseWeapon");
+//};
+
+/*func void B4DI_oCViewDialogInventory_GetSelectedItem(){
+	MEM_Info("B4DI_oCViewDialogInventory_GetSelectedItem");
+	var oCItem selectedInvItem; selectedInvItem = MEM_PtrToInst(EAX);
+
+	B4DI_debugSpy("B4DI_ITEM_is: ", selectedInvItem.name);
+};
+
+func void B4DI_oCItemContainer_GetSelectedItem(){
+	MEM_Info("B4DI_oCItemContainer_GetSelectedItem");
+	//var oCItem selectedInvItem; selectedInvItem = MEM_PtrToInst(EAX);
+	//var oCItem selectedInvItem; selectedInvItem = CALL_RetValAsStructPtr();
+
+	//B4DI_debugSpy("B4DI_ITEM_is: ", selectedInvItem.name);
+};
+
+func void B4DI_oCNpcInventory_GetItem(){
+	MEM_Info("B4DI_oCNpcInventory_GetItem");
+	//var oCItem selectedInvItem; selectedInvItem = MEM_PtrToInst(EAX);
+	//var oCItem selectedInvItem; selectedInvItem = CALL_RetValAsStructPtr();
+
+	//B4DI_debugSpy("B4DI_ITEM_is: ", selectedInvItem.name);
+};
+
+func void B4DI_oCNpc_GetFromInv(){
+	MEM_Info("B4DI_oCNpc_GetFromInv");
+	var C_NPC caller; caller = MEM_PtrToInst(ECX);
+	if (Npc_IsPlayer(caller)) {
+		//var oCItem selectedInvItem; selectedInvItem = MEM_PtrToInst(EAX);
+		//var oCItem selectedInvItem; selectedInvItem = CALL_RetValAsStructPtr();
+		//B4DI_debugSpy("B4DI_ITEM_is: ", selectedInvItem.name);
+		MEM_Info("Called by Player");
+	};
+
+};*/
+
+//#################################################################
+//
+//  Initialisation Function Hooks
 //
 //#################################################################
 
@@ -436,9 +630,46 @@ func void B4DI_Bars_InitOnce() {
 	HookEngine(cGameManager__ApplySomeSettings_rtn, 6, "B4DI_Bars_applySettings");  // B4DI_Bars_applySettings()
 	HookEngine(oCNpc__OpenScreen_Status, 7 , "B4DI_xpBar_show"); 					// B4DI_xpBar_show()
 
+	HookEngine(oCNpc__OpenInventory, 6 , "B4DI_inventory_opend");					// B4DI_inventory_opend()
+	HookEngine(oCNpc__CloseInventory, 9 , "B4DI_inventory_closed");					// B4DI_inventory_closed()
+	//HookEngine(CGameManager__HandleCancelKey, 7 , "B4DI_inventory_closed");			// B4DI_inventory_closed()
+	//HookEngine(zCMenuItemInput__HasBeenCanceled, 6 , "B4DI_inventory_closed");			// B4DI_inventory_closed()
+	//HookEngine(oCItemContainer__Close, 7 , "B4DI_inventory_closed");			// B4DI_inventory_closed() //works
+	HookEngine(oCNpc__CloseDeadNpc, 5 , "B4DI_inventory_closed");			// B4DI_inventory_closed() // does the job the best
+	//HookEngine(oCGame__UpdateStatus, 8 , "B4DI_hpBar_update"); Cloud be an Option but does not cover draw/sheat weapons, option for focus bar update
+	// oCNpc::GetFocusNpc(void) alternative for focus bar
+
+	// B_AssessDamage for damage related show HPbar
+
+	//HookEngine(oCNpc__EV_DrawWeapon, 6, "B4DI_drawWeapon");	// direct draw PC, NPC
+	//HookEngine(oCNpc__EV_DrawWeapon1, 5, "B4DI_drawWeapon1"); 	// General Draw PC, NPC
+	//HookEngine(oCNpc__EV_DrawWeapon2, 6, "B4DI_drawWeapon2");		// Gernal Draw PC, NPC
+	HookEngine(oCNpc__OpenSpellBook, 10, "B4DI_openSpellbook");
+	HookEngine(oCNpc__CloseSpellBook, 6, "B4DI_closeSpellbook");
+	//HookEngine(oCNpc__EV_ChooseWeapon, 6, "B4DI_ChooseWeapon");
+
+	//HookEngine(oCNpc__EV_RemoveWeapon, 7, "B4DI_removeWeapon"); //will be called by: direct weapon sheath, NPCs
+	//HookEngine(oCNpc__EV_RemoveWeapon1, 7, "B4DI_removeWeapon1"); // General sheath PC
+	//HookEngine(oCNpc__EV_RemoveWeapon2, 6, "B4DI_removeWeapon2");	// General sheath PC
+
+	HookEngine(oCViewDialogInventory__GetSelectedItem, 6, "B4DI_oCViewDialogInventory_GetSelectedItem");
+	//HookEngine(oCItemContainer__GetSelectedItem, 5, "B4DI_oCItemContainer_GetSelectedItem");
+	//HookEngine(oCNpcInventory__GetItem, 6, "B4DI_oCNpcInventory_GetItem");
+	HookEngine(oCNpc__GetFromInv, 10, "B4DI_oCNpc_GetFromInv");
+
+	//HookEngine(oCNpc__SetWeaponMode, 5, "B4DI_oCNpc__SetWeaponMode");
+	//HookEngine(oCNpc__SetWeaponMode2, 6, "B4DI_oCNpc__SetWeaponMode2");
+	HookEngine(oCNpc__SetWeaponMode2__zSTRING, 7, "B4DI_oCNpc__SetWeaponMode2__zSTRING");
+
+	HookEngine(oCNpc__OnDamage_Hit, 7, "B4DI_oCNpc__OnDamage_Hit");
+	//HookEngine(oCNpc__UseItem, 7, "B4DI_oCNpc__UseItem");
+
+
 	MEM_Info("B4DI Bars ininitialised");
 };
 
 func void B4DI_Bars_InitAlways() {
+	isInventoryOpen = false;
+
 	B4DI_hpBar_InitAlways();
 };
