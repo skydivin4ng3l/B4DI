@@ -40,6 +40,7 @@ var int MEM_dBar_HP_handle;
 instance MEM_dBar_HP(_bar);
 
 instance selectedInvItem(oCItem);
+var string lastSelectedItemName;
 
 //#################################################################
 //
@@ -230,30 +231,30 @@ func void B4DI_Bars_showItemPreview() {
 	var int index; var STRING type; var int value;
 
 	repeat(index, ITM_TEXT_MAX); 
-		type = MEM_ReadStringArray(selectedInvItem.TEXT,index);
+		type = MEM_ReadStatStringArr(selectedInvItem.TEXT,index);
 
-		if(type == NAME_Bonus_HP ) {
-			value = MEM_ReadIntArray(selectedInvItem.TEXT,index);
+		if( !STR_Compare(type , NAME_Bonus_HP) ) {
+			value = MEM_ReadStatArr(selectedInvItem.COUNT,index);
 			//TODO preview HP
 			MEM_Info("B4DI_Bars_showItemPreview HP");
 		};
-		if(type == NAME_Bonus_HpMax ) {
-			value = MEM_ReadIntArray(selectedInvItem.TEXT,index);
+		if( !STR_Compare(type , NAME_Bonus_HpMax ) ) {
+			value = MEM_ReadStatArr(selectedInvItem.COUNT,index);
 			//TODO preview HPMax
 			MEM_Info("B4DI_Bars_showItemPreview HPMax");
 		};
-		if(type == NAME_Bonus_Mana ) {
-			value = MEM_ReadIntArray(selectedInvItem.TEXT,index);
+		if( !STR_Compare(type , NAME_Bonus_Mana ) ) {
+			value = MEM_ReadStatArr(selectedInvItem.COUNT,index);
 			//TODO preview mana
 			MEM_Info("B4DI_Bars_showItemPreview MANA");
 		};
-		if(type == NAME_Bonus_ManaMax ) {
-			value = MEM_ReadIntArray(selectedInvItem.TEXT,index);
+		if( !STR_Compare(type , NAME_Bonus_ManaMax ) ) {
+			value = MEM_ReadStatArr(selectedInvItem.COUNT,index);
 			//TODO preview manaMax
 			MEM_Info("B4DI_Bars_showItemPreview MANAMax");
 		};
-		if(type == NAME_Mana_needed ) {
-			value = MEM_ReadIntArray(selectedInvItem.TEXT,index);
+		if( !STR_Compare(type , NAME_Mana_needed ) ) {
+			value = MEM_ReadStatArr(selectedInvItem.COUNT,index);
 			//TODO preview manaNeeded
 			MEM_Info("B4DI_Bars_showItemPreview MANA Needed");
 		};
@@ -312,14 +313,19 @@ func void B4DI_hpBar_update(){
 	};
 	if(isInventoryOpen){
 		selectedInvItem = _^(Inv_GetSelectedItem());
-		//TODO Filter for bar influencing items What about mana? different types: timed, procentual, absolute
-		//TODO limit call to newly selected different item
-		if(selectedInvItem.mainflag == ITEM_KAT_POTIONS || selectedInvItem.mainflag == ITEM_KAT_FOOD){
-			MEM_Info(selectedInvItem.name);
-			B4DI_Bars_showItemPreview();
+		//show only preview for new items
+		if( STR_Compare(lastSelectedItemName, selectedInvItem.name ) ) { // NOT EQUAL
+			lastSelectedItemName = selectedInvItem.name;
+			//TODO Filter for bar influencing items What about mana? different types: timed, procentual, absolute
+			//TODO limit call to newly selected different item
+			if(selectedInvItem.mainflag == ITEM_KAT_POTIONS || selectedInvItem.mainflag == ITEM_KAT_FOOD){
+				MEM_Info(selectedInvItem.name);
+				B4DI_Bars_showItemPreview();
+			};
+			//TODO Disable preview after inventory closed and update on: item used | got dmg | switched Item
+		} else {
+			//TODO check for preview animation end, repeat
 		};
-		//TODO generate bar preview
-		//TODO Disable preview after inventory closed or update on item used or got dmg
 	};
 	if ( (!Npc_IsInFightMode( hero, FMODE_NONE ) || heroHpChanged || isInventoryOpen ) & MEM_dBar_Hp.isFadedOut ) {
 		//B4DI_hpBar_show();
@@ -464,7 +470,7 @@ func void B4DI_inventory_opend(){
 	var C_NPC caller; caller = MEM_PtrToInst(ECX);
 	if (Npc_IsPlayer(caller)) {
 		isInventoryOpen = true;
-		//TODO: add FF to update bars according to used items
+		lastSelectedItemName = "none";
 		FF_ApplyOnceExtGT(B4DI_hpBar_update,0,-1);
 		MEM_Info("B4DI_inventory_opend");
 	};
@@ -475,7 +481,7 @@ func void B4DI_inventory_closed(){
 	if (Npc_IsPlayer(caller)) {
 		isInventoryOpen = false;
 		B4DI_hpBar_update(); // call again to make sure status get updated
-		//TODO: Remove FF to update bars according to used items
+		lastSelectedItemName = "none";
 		FF_Remove(B4DI_hpBar_update);
 		MEM_Info("B4DI_inventory_closed");
 	};
@@ -499,14 +505,34 @@ func void B4DI_drawWeapon(){
 	};
 };
 
-func void B4DI_oCNpc__SetWeaponMode(){
-	//MEM_Info("B4DI_drawWeapon");
-	var oCNpc caller; caller = MEM_PtrToInst(ECX);
+func void B4DI_oCNpc__SetWeaponMode_custom_branch1(){
+	MEM_Info("B4DI_oCNpc__SetWeaponMode_custom_branch1");
+	/*var oCNpc caller; caller = MEM_PtrToInst(ECX);
 	if (Npc_IsPlayer(caller)) {
 		B4DI_debugSpy("B4DI_oCNpc__SetWeaponMode called by: ", caller.name);
 		B4DI_debugSpy("B4DI_oCNpc__SetWeaponMode fMode is: ", IntToString(caller.fmode));
+	};*/
 		B4DI_update_fight_mode();
-	};
+};
+
+func void B4DI_oCNpc__SetWeaponMode_custom_branch2(){
+	MEM_Info("B4DI_oCNpc__SetWeaponMode_custom_branch2");
+	/*var oCNpc caller; caller = MEM_PtrToInst(ECX);
+	if (Npc_IsPlayer(caller)) {
+		B4DI_debugSpy("B4DI_oCNpc__SetWeaponMode called by: ", caller.name);
+		B4DI_debugSpy("B4DI_oCNpc__SetWeaponMode fMode is: ", IntToString(caller.fmode));
+	};*/
+		B4DI_update_fight_mode();
+};
+
+func void B4DIoCNpc__SetWeaponMode_custom_branch3(){
+	MEM_Info("B4DIoCNpc__SetWeaponMode_custom_branch3");
+	/*var oCNpc caller; caller = MEM_PtrToInst(ECX);
+	if (Npc_IsPlayer(caller)) {
+		B4DI_debugSpy("B4DI_oCNpc__SetWeaponMode called by: ", caller.name);
+		B4DI_debugSpy("B4DI_oCNpc__SetWeaponMode fMode is: ", IntToString(caller.fmode));
+	};*/
+		B4DI_update_fight_mode();
 };
 
 func void B4DI_oCNpc__SetWeaponMode2(){
@@ -532,6 +558,7 @@ func void B4DI_oCNpc__SetWeaponMode2__zSTRING(){
 func void B4DI_oCNpc__OnDamage_Hit(){
 	MEM_Info("B4DI_oCNpc__OnDamage_Hit");
 	var C_NPC caller; caller = MEM_PtrToInst(ECX);
+	//TODO else part for Focusbar update?
 	if (Npc_IsPlayer(caller)) {
 		B4DI_update_fight_mode();
 		B4DI_debugSpy("B4DI_oCNpc__OnDamage_Hit called by: ", caller.name);
@@ -657,9 +684,12 @@ func void B4DI_Bars_InitOnce() {
 	//HookEngine(oCNpcInventory__GetItem, 6, "B4DI_oCNpcInventory_GetItem");
 	HookEngine(oCNpc__GetFromInv, 10, "B4DI_oCNpc_GetFromInv");
 
+	HookEngine(oCNpc__SetWeaponMode_custom_branch1, 5, "B4DI_oCNpc__SetWeaponMode_custom_branch1");
+	HookEngine(oCNpc__SetWeaponMode_custom_branch2, 5, "B4DI_oCNpc__SetWeaponMode_custom_branch2");
+	HookEngine(oCNpc__SetWeaponMode_custom_branch3, 5, "B4DI_oCNpc__SetWeaponMode_custom_branch3");
 	//HookEngine(oCNpc__SetWeaponMode, 5, "B4DI_oCNpc__SetWeaponMode");
 	//HookEngine(oCNpc__SetWeaponMode2, 6, "B4DI_oCNpc__SetWeaponMode2");
-	HookEngine(oCNpc__SetWeaponMode2__zSTRING, 7, "B4DI_oCNpc__SetWeaponMode2__zSTRING");
+	//HookEngine(oCNpc__SetWeaponMode2__zSTRING, 7, "B4DI_oCNpc__SetWeaponMode2__zSTRING");
 
 	HookEngine(oCNpc__OnDamage_Hit, 7, "B4DI_oCNpc__OnDamage_Hit");
 	//HookEngine(oCNpc__UseItem, 7, "B4DI_oCNpc__UseItem");

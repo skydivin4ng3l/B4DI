@@ -58,6 +58,10 @@ const int oCNpc__GetFromInv						= 7639424; 	//0x00749180	// HookLen:	10
 
 //virtual void __thiscall oCNpc::SetWeaponMode(int)     	0x00739940	0	5
 const int oCNpc__SetWeaponMode					= 7575872;     	//0x00739940	// HookLen:	5
+const int oCNpc__SetWeaponMode_custom_branch1	= 7575981;     	//0x007399AD	// HookLen:	5 //sheath all weapons directly and indirectly
+const int oCNpc__SetWeaponMode_custom_branch2	= 7576043;     	//0x007399EB	// HookLen:	5 //draw magic
+const int oCNpc__SetWeaponMode_custom_branch3	= 7576106;     	//0x00739A2A	// HookLen:	5 //broken hook or uncommon case
+
 //virtual void __thiscall oCNpc::SetWeaponMode2(int)    	0x00738E80	0	6
 const int oCNpc__SetWeaponMode2					= 7573120;    	//0x00738E80	// HookLen:	6
 //void __thiscall oCNpc::SetWeaponMode2(zSTRING const &)  	0x00738C60	0	7
