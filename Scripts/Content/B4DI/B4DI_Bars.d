@@ -38,6 +38,8 @@ var int isInventoryOpen;
 instance MEM_oBar_Hp(oCViewStatusBar);
 var int MEM_dBar_HP_handle;
 instance MEM_dBar_HP(_bar);
+var int MEM_preView_HP_handle;
+instance MEM_preView_HP(zCView);
 
 instance selectedInvItem(oCItem);
 var string lastSelectedItemName;
@@ -80,10 +82,10 @@ func int B4DI_Bars_getDynamicScaleOptionValuef(){
         MEM_Info( ConcatStrings( "Bar Scalingfactor = ", IntToString(scalingFactor) ) );
     };
 
-    var int dynScalingFactor; dynScalingFactor = fracf( scalingFactor, 100 );
-    MEM_Info( ConcatStrings( "dynScalingFactor = ", toStringf(dynScalingFactor) ) );
+    var int percScalingFactor; percScalingFactor = fracf( scalingFactor, 100 );
+    MEM_Info( ConcatStrings( "percScalingFactor = ", toStringf(percScalingFactor) ) );
 
-    return dynScalingFactor;
+    return percScalingFactor;
 };
 
 //========================================
@@ -96,7 +98,7 @@ func void B4DI_Bar_dynamicMenuBasedScale(var int bar_hndl){
     var zCView vBack; vBack = View_Get(b.v0);
     var zCView vBar; vBar = View_Get(b.v1);
 
-    var int dynScalingFactor; dynScalingFactor = B4DI_Bars_getDynamicScaleOptionValuef();
+    /*var int dynScalingFactor;*/ dynScalingFactor = B4DI_Bars_getDynamicScaleOptionValuef();
 
     Bar_ResizeCenteredPercentFromInitial(bar_hndl, dynScalingFactor);
     //TODO Implement different customizeable alignments, maybe per set margin within the Resize process
@@ -182,8 +184,8 @@ func void B4DI_Bar_fadeOut(var int bar_hndl, var int deleteBar) {
 
 };
 
-func void B4DI_Bar_pulse(var int bar) {
-	var int a8_XpBar_pulse; a8_XpBar_pulse = Anim8_NewExt(100 , B4DI_Bar_SetBarSizeCenteredPercentXY, bar, false); //height input
+func void B4DI_Bar_pulse_size(var int bar_hndl) {
+	var int a8_XpBar_pulse; a8_XpBar_pulse = Anim8_NewExt(100 , B4DI_Bar_SetBarSizeCenteredPercentXY, bar_hndl, false); //height input
 	Anim8_RemoveIfEmpty(a8_XpBar_pulse, true);
 	Anim8_RemoveDataIfEmpty(a8_XpBar_pulse, false);
 	
@@ -227,39 +229,124 @@ func void B4DI_originalBar_hide( var int obar_ptr){
 	ViewPtr_SetAlpha(bar_inst.value_bar, 0);	//barView
 };
 
+//#################################################################
+//
+//  Inventory related
+//
+//#################################################################
+//#################################################################
+//PreViews
+//#################################################################
+
+func void B4DI_Bar_calcPreView(var int bar_hndl, var int preview_hndl, var int value){
+	var _bar bar; bar = get(bar_hndl);
+	var zCview vBar; vBar = View_Get(bar.v1);
+	var zCView preview; preview = View_Get(preview_hndl);
+
+	View_DeleteText(preview_hndl);
+
+	var int preview_vsizex; preview_vsizex = (((value *1000) / bar.valMax) * bar.barW / 1000);
+	View_Resize(preview_hndl, preview_vsizex, vBar.vsizey);
+	View_MoveTo(preview_hndl, vBar.vposx + vBar.vsizex, vBar.vposy );
+		
+	//TODO handle overshoot
+	var string label;
+	var string label1;
+	var int s0;s0=SB_New(); SB_Use(s0);
+    SB("+");
+    var int diffValueToBarValMax; diffValueToBarValMax = bar.valMax - bar.val;
+    MEM_Info(IntToString(diffValueToBarValMax));
+	if(diffValueToBarValMax < value){    	
+    	SBi(value - diffValueToBarValMax ); SB("("); SBi(value); SB(")");
+    	label = cs2( "+", i2s( diffValueToBarValMax ));
+    	label1 = cs3( "(", i2s(value), ")" );
+    	label = cs2(label, label1);
+	} else {
+    	label = cs2( "+", i2s(value) );
+		SBi(value);
+	};
+	MEM_Info(cs4("bar.valMax: ",i2s(bar.valMax)," bar.val: ",i2s(bar.val)));
+	MEM_Info(cs4("diffValueToBarValMax: ",i2s(diffValueToBarValMax)," value: ",i2s(value)));
+	View_AddText(preview_hndl, preview.vsizex<<1, preview.vsizey<<1, label, TEXT_FONT_Inventory );
+    SB_Destroy();
+
+	MEM_Info("B4DI_Bar_calcPreView");
+	MEM_Info(cs8("vBar x: ",i2s(vBar.pposx)," y: ",i2s(vBar.pposy)," SizeX: ",i2s(vBar.psizex), " SizeY: ", i2s(vBar.psizey) ));
+	MEM_Info(cs8("preview x: ",i2s(preview.pposx)," y: ",i2s(preview.pposy)," SizeX: ",i2s(preview.psizex), " SizeY: ", i2s(preview.psizey) ));
+};
+
+func void B4DI_Bar_showPreview(var int bar_hndl, var int preview_hndl, var int value){
+	if(!Hlp_IsValidHandle(bar_hndl)) {
+		MEM_Info("tried to show Preview of a not initialized bar ");
+		return;
+	};
+	if(!Hlp_IsValidHandle(preview_hndl)){
+		return;
+	};
+	B4DI_Bar_calcPreView(bar_hndl, preview_hndl, value);
+	View_Open(preview_hndl);
+	View_SetAlpha(preview_hndl, 127);
+	View_Top(preview_hndl);
+	MEM_Info("B4DI_Bar_showPreview");
+};
+
+
+
+func void B4DI_Bar_InitPreViews( var int bar_hndl){
+	if(!Hlp_IsValidHandle(MEM_preView_HP_handle)){
+		if(!Hlp_IsValidHandle(bar_hndl)) {
+			MEM_Info("tried to init Preview of a not initialized bar ");
+			return;
+		};
+		var _bar bar; bar = get(bar_hndl);
+		var zCview vBar; vBar = View_Get(bar.v1);
+		MEM_preView_HP_handle = View_Create(vBar.vposx, vBar.vposy, vBar.vposx + vBar.vsizex, vBar.vposy + vBar.vsizey );
+	};
+	View_SetTexture(MEM_preView_HP_handle, "Bar_Health.tga" );
+	MEM_preView_HP = get(MEM_preView_HP_handle);
+	MEM_Info("B4DI_Bar_InitPreViews");
+};
+
 func void B4DI_Bars_showItemPreview() {
 	var int index; var STRING type; var int value;
+
+	B4DI_Bars_hideItemPreview(); // hide all previews to prevent old ones to persist if selected remains in valid category // Might not belong here 
 
 	repeat(index, ITM_TEXT_MAX); 
 		type = MEM_ReadStatStringArr(selectedInvItem.TEXT,index);
 
 		if( !STR_Compare(type , NAME_Bonus_HP) ) {
 			value = MEM_ReadStatArr(selectedInvItem.COUNT,index);
-			//TODO preview HP
 			MEM_Info("B4DI_Bars_showItemPreview HP");
+			//TODO preview HP
+			B4DI_Bar_showPreview(MEM_dBar_HP_handle, MEM_preView_HP_handle, value);
 		};
 		if( !STR_Compare(type , NAME_Bonus_HpMax ) ) {
 			value = MEM_ReadStatArr(selectedInvItem.COUNT,index);
-			//TODO preview HPMax
 			MEM_Info("B4DI_Bars_showItemPreview HPMax");
+			//TODO preview HPMax
 		};
 		if( !STR_Compare(type , NAME_Bonus_Mana ) ) {
 			value = MEM_ReadStatArr(selectedInvItem.COUNT,index);
-			//TODO preview mana
 			MEM_Info("B4DI_Bars_showItemPreview MANA");
+			//TODO preview mana
 		};
 		if( !STR_Compare(type , NAME_Bonus_ManaMax ) ) {
 			value = MEM_ReadStatArr(selectedInvItem.COUNT,index);
-			//TODO preview manaMax
 			MEM_Info("B4DI_Bars_showItemPreview MANAMax");
+			//TODO preview manaMax
 		};
 		if( !STR_Compare(type , NAME_Mana_needed ) ) {
 			value = MEM_ReadStatArr(selectedInvItem.COUNT,index);
-			//TODO preview manaNeeded
 			MEM_Info("B4DI_Bars_showItemPreview MANA Needed");
+			//TODO preview manaNeeded
 		};
 
 	end;
+};
+
+func void B4DI_Bars_hideItemPreview() {
+	View_Close(MEM_preView_HP_handle);
 };
 
 //=====Inv_GetSelectedItem=====
@@ -292,6 +379,11 @@ func void B4DI_HpBar_calcHp() {
 	Bar_SetMax(MEM_dBar_HP_handle, hero.attribute[ATR_HITPOINTS_MAX]);
 	Bar_SetValue(MEM_dBar_HP_handle, hero.attribute[ATR_HITPOINTS]);
 	MEM_Info("B4DI_HpBar_calcHp");
+	var _bar bar; bar = get(MEM_dBar_HP_handle);
+	MEM_Info(cs2("hero.attribute[ATR_HITPOINTS_MAX]: ",i2s(hero.attribute[ATR_HITPOINTS_MAX])));
+	MEM_Info(cs2(" hero.attribute[ATR_HITPOINTS]: ",i2s(hero.attribute[ATR_HITPOINTS])));
+	MEM_Info(cs2("bar.valMax: ",i2s(bar.valMax)));
+	MEM_Info(cs2(" bar.val: ",i2s(bar.val)));
 };
 
 // returns the difference between 
@@ -321,6 +413,8 @@ func void B4DI_hpBar_update(){
 			if(selectedInvItem.mainflag == ITEM_KAT_POTIONS || selectedInvItem.mainflag == ITEM_KAT_FOOD){
 				MEM_Info(selectedInvItem.name);
 				B4DI_Bars_showItemPreview();
+			} else {
+				B4DI_Bars_hideItemPreview();
 			};
 			//TODO Disable preview after inventory closed and update on: item used | got dmg | switched Item
 		} else {
@@ -338,6 +432,8 @@ func void B4DI_hpBar_update(){
 	//B4DI_debugSpy("B4DI_ITEM_is: ", item.nameID);
 
 };
+
+
 
 func void B4DI_hpBar_InitAlways(){
 	//original bars
@@ -359,6 +455,8 @@ func void B4DI_hpBar_InitAlways(){
 	//TODO: implement customizable Positions Left Right Top bottom,...
 	//TODO: implement a Screen margin
 	Bar_MoveLeftUpperTo(MEM_dBar_HP_handle, MEM_oBar_Hp.zCView_vposx, MEM_oBar_Hp.zCView_vposy );
+
+	B4DI_Bar_InitPreViews(MEM_dBar_HP_handle);
 
 	//FF_ApplyOnceExtGT(B4DI_hpBar_update,0,-1);
 
@@ -433,7 +531,7 @@ func void B4DI_xpBar_show(){
 	B4DI_Bar_fadeOut(XpBar, true);
 	//B4DI_hpBar_show();
 	//Bar_Show(XpBar);
-	//B4DI_Bar_pulse(XpBar);
+	//B4DI_Bar_pulse_size(XpBar);
 	
 };
 
@@ -441,7 +539,7 @@ func void B4DI_xpBar_show(){
 func void B4DI_xpBar_update() {
 	ContinueCall();
 	var int XpBar; XpBar = B4DI_xpBar_create();
-	B4DI_Bar_pulse(XpBar);
+	B4DI_Bar_pulse_size(XpBar);
 	B4DI_Bar_fadeOut(XpBar, true);
 };
 
@@ -482,6 +580,8 @@ func void B4DI_inventory_closed(){
 		isInventoryOpen = false;
 		B4DI_hpBar_update(); // call again to make sure status get updated
 		lastSelectedItemName = "none";
+		B4DI_Bars_hideItemPreview();
+
 		FF_Remove(B4DI_hpBar_update);
 		MEM_Info("B4DI_inventory_closed");
 	};

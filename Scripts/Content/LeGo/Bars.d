@@ -113,6 +113,7 @@ func void Bar_SetMax(var int bar, var int max) {
     if(!Hlp_IsValidHandle(bar)) { return; };
     var _bar b; b = get(bar);
     b.valMax = max;
+    //MEM_Info(cs2("Bar_SetMax: ",i2s(max)));
 };
 
 //========================================
@@ -122,15 +123,18 @@ func void Bar_SetPromille(var int bar, var int pro) {
     if(!Hlp_IsValidHandle(bar)) { return; };
     var _bar b; b = get(bar);
     if(pro > 1000) { pro = 1000; };
-    b.val = Print_ToPixel((pro * b.barW) / 1000, PS_X); //to keep both valMax | val in the same space
     View_Resize(b.v1, (pro * b.barW) / 1000, -1);
+    b.val = (pro / 10 * b.valMax) / 1000; //to keep both valMax | val in the same space
 };
 
 //========================================
 // Wert in 1/100
 //========================================
 func void Bar_SetPercent(var int bar, var int perc) {
+    if(!Hlp_IsValidHandle(bar)) { return; };
+    var _bar b; b = get(bar);
     Bar_SetPromille(bar, perc*10);
+    b.val = (perc * b.valMax) / 1000; 
 };
 
 //========================================
@@ -141,6 +145,7 @@ func void Bar_SetValue(var int bar, var int val) {
     var _bar b; b = get(bar);
     if(val) {
         Bar_SetPromille(bar, (val * 1000) / b.valMax);
+        b.val = val;
     }
     else {
         Bar_SetPromille(bar, 0);
