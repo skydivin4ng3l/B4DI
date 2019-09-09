@@ -10,6 +10,9 @@ Timer.d
 Userconst.d
 ItemHelper.d
 StringBuilder.d
+
+B4DI_Info.d
+
 Locals.d
 BinaryMachines.d
 _Hashtable.d
@@ -45,3 +48,5 @@ Int64.d
 Sprite.d
 Hashtable.d
 LeGo.d
+
+

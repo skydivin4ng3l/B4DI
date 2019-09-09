@@ -1,4 +1,6 @@
 const.d
 
+B4DI_BarPreview.d
+B4DI_extendedBar.d
 B4DI_Bars.d
 Init.d
