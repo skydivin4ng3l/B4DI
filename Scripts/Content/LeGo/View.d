@@ -181,8 +181,8 @@ func string View_GetTexture(var int hndl) {
 func void ViewPtr_SetAlpha(var int ptr, var int val) {
 	var zCView v; v = _^(ptr);
 	v.alpha = val;
-	if((v.alpha != 255) && (v.alphafunc == 1)) {
-        v.alphafunc = 2;
+	if((v.alpha != 255) && (v.alphafunc == zRND_ALPHA_FUNC_NONE)) {
+        v.alphafunc = zRND_ALPHA_FUNC_BLEND;
     };
 };
 
@@ -196,8 +196,8 @@ func void View_SetAlpha(var int hndl,var int val) {
 func void ViewPtr_SetAlphaAll(var int ptr, var int val) {
 	var zCView v; v = _^(ptr);
 	v.alpha = val;
-	if((v.alpha != 255) && (v.alphafunc == 1)) {
-        v.alphafunc = 2;
+	if((v.alpha != 255) && (v.alphafunc == zRND_ALPHA_FUNC_NONE)) {
+        v.alphafunc = zRND_ALPHA_FUNC_BLEND;
     };
 	if (v.textLines_next) { 
 		var int list; list = v.textLines_next;
@@ -369,9 +369,9 @@ func void ViewPtr_MoveToValidScreenSpace(var int ptr, var int x, var int y) {
     ViewPtr_Move(ptr, -v.vposx, -v.vposy);
     //prevent movement out of visible screen space
     x = max(x,0);
-    x = min(x,PS_VMAX);
+    x = min(x,PS_VMAX-v.vsizex);
     y = max(y,0);
-    y = min(y,PS_VMAX);
+    y = min(y,PS_VMAX-v.vsizey);
     ViewPtr_Move(ptr, x,  y);
 };
 
@@ -613,7 +613,7 @@ func void ViewPtr_AlignText(var int ptr, var int margin) {
 
     var int width;
 
-    if(margin == 0) {
+    if(margin == 0) { //center of text on right edge aligned?
         while(lp);
             l = _^(lp);
             vt = _^(l.data);
