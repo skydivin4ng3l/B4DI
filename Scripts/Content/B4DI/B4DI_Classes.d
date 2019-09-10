@@ -109,7 +109,7 @@ var int MEM_dBar_HP_handle;
 instance MEM_dBar_HP(_bar);
 
 var int MEM_dBar_MANA_handle;
-instance MEM_dBar_MANA(_extenedBar);
+instance MEM_dBar_MANA(_extendedBar);
 
 var int MEM_preView_HP_handle;
 instance MEM_preView_HP(zCView);

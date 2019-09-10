@@ -7,7 +7,7 @@
 //  General Functions
 //
 //#################################################################
-//========================================
+/*//========================================
 // [intern] Helper Scales depenting on Resolution
 //========================================
 var int B4DI_BarScale[6];
@@ -20,9 +20,9 @@ func void B4DI_InitBarScale(){
     B4DI_BarScale[3]= B4DI_BarScale_100;
     B4DI_BarScale[4]= B4DI_BarScale_150;
     B4DI_BarScale[5]= B4DI_BarScale_200;
-};
+};*/
 
-//========================================
+/*//========================================
 // [Intern] Get Dynamic Scale according of Menu value (gothic.ini) asFloat
 //
 //========================================
@@ -44,7 +44,7 @@ func int B4DI_Bars_getDynamicScaleOptionValuef(){
     MEM_Info( ConcatStrings( "percScalingFactor = ", toStringf(percScalingFactor) ) );
 
     return percScalingFactor;
-};
+};*/
 
 ////========================================
 //// [Intern] Resizes bars according of Menu value (gothic.ini)
@@ -167,6 +167,21 @@ func void B4DI_Bar_hide( var int bar_hndl){
 
 };
 
+func string B4DI_Bar_getLabel(var int bar_hndl, var int current_value, var int max_value) {
+	if(SB_Get()) {
+		B4DI_preserve_current_StringBuilder = SB_Get();
+	};
+	var int sbuilder; sbuilder=SB_New();
+	SB_Use(sbuilder);
+	SBi(current_value);
+	//if()
+	 SB(" / "); SBi(max_value);
+	var string label; label = SB_ToString();
+	SB_Destroy();
+	SB_Use(B4DI_preserve_current_StringBuilder);
+	return label;
+};
+
 //TODO Depricated
 func void B4DI_Bar_show( var int bar_hndl){
 	if(!Hlp_IsValidHandle(bar_hndl)) {
@@ -182,7 +197,7 @@ func void B4DI_Bar_show( var int bar_hndl){
 	Bar_Show(bar_hndl);
 	//TODO make optional
 	View_DeleteText(MEM_dBar_Hp.vMiddle);
-	View_AddText(MEM_dBar_Hp.vMiddle, 0, 0, B4DI_Bar_getLabel(hero.attribute[ATR_HITPOINTS], hero.attribute[ATR_HITPOINTS_MAX]), TEXT_FONT_Inventory);
+	View_AddText(MEM_dBar_Hp.vMiddle, 0, 0, B4DI_Bar_getLabel(MEM_dBar_HP_handle, hero.attribute[ATR_HITPOINTS], hero.attribute[ATR_HITPOINTS_MAX]), TEXT_FONT_Inventory);
 
 	MEM_Info("B4DI_Bar_show successful");
 };
@@ -346,21 +361,6 @@ func int Inv_GetSelectedItem(){
 	};	
 };
 
-func string B4DI_Bar_getLabel(var int bar_hndl, var int var int current_value, var int max_value) {
-	if(SB_Get()) {
-		B4DI_preserve_current_StringBuilder = SB_Get();
-	};
-	var int sbuilder; sbuilder=SB_New();
-	SB_Use(sbuilder);
-	SBi(current_value);
-	//if()
-	 SB(" / "); SBi(max_value);
-	var string label; label = SB_ToString();
-	SB_Destroy();
-	SB_Use(B4DI_preserve_current_StringBuilder);
-	return label;
-};
-
 
 //#################################################################
 //
@@ -461,7 +461,7 @@ func void B4DI_manaBar_InitAlways(){
 	//TODO: Update on option change of Barsize
 	//TODO: implement customizable Positions Left Right Top bottom,...
 	//TODO: implement a Screen margin
-	Bar_MoveLeftUpperToValidScreenSpace(MEM_dBar_MANA_handle, MEM_oBar_Mana.zCView_vposx, MEM_oBar_Mana.zCView_vposy );
+	Bar_MoveLeftUpperToValidScreenSpace(MEM_dBar_MANA.bar, MEM_oBar_Mana.zCView_vposx, MEM_oBar_Mana.zCView_vposy );
 
 	//FF_ApplyOnceExtGT(B4DI_Bars_update,0,-1);
 

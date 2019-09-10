@@ -1,31 +1,6 @@
 /***********************************\
                 BARPREVIW
 \***********************************/
-/*//========================================
-// [intern] Klasse für PermMem
-//========================================
-class _barPreview {
-    
-    var int vPreView;                    // zCView(h)
-    var int vOverShoot;                 // zCView(h)
-    var int val;
-    var int anim8Pulse;               // A8Head(h)
-    var int eBar_parent;               // _extentedBar(h)
-};
-
-instance _barPreview@(_barPreview);
-
-func void _barPreview_Delete(var _barPreview bp) {
-    if(Hlp_IsValidHandle(bp.vPreView)) {
-        delete(bp.vPreView);
-    };
-    if(Hlp_IsValidHandle(bp.vOverShoot)) {
-        delete(bp.vOverShoot);
-    };
-    if(Hlp_IsValidHandle(bp.anim8Pulse)) {
-        Anim8_Delete(bp.anim8Pulse);
-    };
-}; */
 
 func int B4DI_BarPreview_Create( var int eBar_hndl){
     if(!Hlp_IsValidHandle(eBar_hndl)) {

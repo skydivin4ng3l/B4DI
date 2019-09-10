@@ -2,31 +2,6 @@
          B4DI extended BARS
 \***********************************/
 
-/*//========================================
-// [intern] Klasse für PermMem
-//========================================
-class _extendedBar {
-    
-    var int bar;                    // _bar(h)
-    var int barPreview;               // _barPreview(h)
-    var int isFadedOut;                   // Bool
-    var int anim8FadeOut;               // A8Head(h)
-};
-
-instance _extendedBar@(_extendedBar);
-
-func void _extendedBar_Delete(var _extendedBar eBar) {
-    if(Hlp_IsValidHandle(eBar.bar)) {
-        delete(eBar.bar);
-    };
-    if(Hlp_IsValidHandle(eBar.bar)) {
-        delete(eBar.barPreview);
-    };
-    if(Hlp_IsValidHandle(eBar.anim8FadeOut)) {
-        Anim8_Delete(eBar.anim8FadeOut);
-    };
-};*/
-
 //========================================
 // [Intern] Resizes actual bar according to percentage reltaive to center
 //
@@ -37,8 +12,7 @@ func void B4DI_Bar_SetBarSizeCenteredPercent(var int bar_hndl, var int x_percent
     //------------------
     if(!Hlp_IsValidHandle(bar_hndl)) { return; };
     var _bar b; b = get(bar_hndl);
-
-    vBar = View_Get(b.v1);
+    var zCView vBar; vBar = View_Get(b.v1);
     //save the size before the resize
     var int sizex_pre; sizex_pre = Print_ToVirtual(b.val,PS_X); 
     var int sizey_pre; sizey_pre = roundf( mulf( mkf(b.initialDynamicVSizes[IDS_VBAR_Y]), dynScalingFactor ) ) ; // Dynamic Test +1 is missing, but needed?
@@ -52,6 +26,45 @@ func void B4DI_Bar_SetBarSizeCenteredPercent(var int bar_hndl, var int x_percent
     B4DI_debugSpy("Bar SizeX",IntToString(vBar.vsizex));
     B4DI_debugSpy("Bar SizeY",IntToString(vBar.vsizey));
 
+};
+
+//========================================
+// [intern] Helper Scales depenting on Resolution
+//========================================
+var int B4DI_BarScale[6];
+func void B4DI_InitBarScale(){
+    Print_GetScreenSize();
+    B4DI_BarScale[0]= B4DI_BarScale_off;
+    // auto scale inspired by systempack.ini
+    B4DI_BarScale[1]= roundf( mulf( mkf(100) ,fracf( Print_Screen[PS_Y] ,512 ) ) );
+    B4DI_BarScale[2]= B4DI_BarScale_50;
+    B4DI_BarScale[3]= B4DI_BarScale_100;
+    B4DI_BarScale[4]= B4DI_BarScale_150;
+    B4DI_BarScale[5]= B4DI_BarScale_200;
+};
+
+//========================================
+// [Intern] Get Dynamic Scale according of Menu value (gothic.ini) asFloat
+//
+//========================================
+func int B4DI_Bars_getDynamicScaleOptionValuef(){
+    B4DI_InitBarScale();
+    var int scaleOption; scaleOption = STR_ToInt(MEM_GetGothOpt("B4DI", "B4DI_barScale"));
+    var int scalingFactor; //scalingFactor = B4DI_BarScale_auto; //Default
+    MEM_Info( ConcatStrings( "Bar scaleOption = ", IntToString( scaleOption ) ) );
+    if(!scaleOption) {
+        MEM_Error("Bar Scale Option not set using Default Auto instead!");
+        scalingFactor = MEM_ReadStatArr(B4DI_BarScale,1);
+        MEM_Info( ConcatStrings( "Bar Scalingfactor = ", IntToString(scalingFactor) ) );
+    } else{
+        scalingFactor = MEM_ReadStatArr(B4DI_BarScale,scaleOption);
+        MEM_Info( ConcatStrings( "Bar Scalingfactor = ", IntToString(scalingFactor) ) );
+    };
+
+    var int percScalingFactor; percScalingFactor = fracf( scalingFactor, 100 );
+    MEM_Info( ConcatStrings( "percScalingFactor = ", toStringf(percScalingFactor) ) );
+
+    return percScalingFactor;
 };
 
 //========================================
@@ -137,7 +150,7 @@ func void B4DI_eBar_fadeOut(var int eBar_hndl, var int deleteBar) {
 func string B4DI_eBar_generateLabelTextSimple(var int ebar_hndl) {
     if(!Hlp_IsValidHandle(ebar_hndl)) {
         MEM_Info("B4DI_eBar_generateLabelTextSimple failed");
-        return;
+        return "";
     };
     if(SB_Get()) {
         B4DI_preserve_current_StringBuilder = SB_Get();
@@ -190,7 +203,7 @@ func void B4DI_eBar_show( var int eBar_hndl){
         Anim8_Delete(eBar_inst.anim8FadeOut);
     };
     eBar_inst.isFadedOut = 0;
-    eBar_SetAlpha(eBar_hndl, 255);
+    B4DI_eBar_SetAlpha(eBar_hndl, 255);
     Bar_Show(eBar_inst.bar);
     var _bar bar; bar = get(eBar_inst.bar);
     //TODO make optional 
@@ -203,7 +216,7 @@ func void B4DI_eBar_show( var int eBar_hndl){
 
 func void B4DI_eBar_HidePreview(var int eBar_hndl){
     if(!Hlp_IsValidHandle(eBar_hndl)) { return; };
-    var int eBar; eBar = get(eBar_hndl);
+    var _extendedBar eBar; eBar = get(eBar_hndl);
     B4DI_BarPreview_hide(eBar.barPreview);
 
     MEM_Info("B4DI_eBar_HidePreview successful");
@@ -211,7 +224,7 @@ func void B4DI_eBar_HidePreview(var int eBar_hndl){
 
 func void B4DI_eBar_ShowPreview(var int eBar_hndl, var int value) {
     if(!Hlp_IsValidHandle(eBar_hndl)) { return; };
-    var int eBar; eBar = get(eBar_hndl);
+    var _extendedBar eBar; eBar = get(eBar_hndl);
 
     B4DI_BarPreview_CalcPosScale(eBar.barPreview, value);
 
@@ -222,7 +235,7 @@ func void B4DI_Bar_SetValues(var int bar_hndl, var int index_value, var int inde
     if(!Hlp_IsValidHandle(bar_hndl)) { return; };
 
     Bar_SetMax(bar_hndl, MEM_ReadStatArr(hero.attribute, index_valueMax) );
-    Bar_SetValue(bar_hndl, MEM_ReadStatArr(hero.attribute, index_valueM) );
+    Bar_SetValue(bar_hndl, MEM_ReadStatArr(hero.attribute, index_value) );
     
     MEM_Info("B4DI_Bar_SetValues");
     //var _bar bar; bar = get(bar_hndl);
