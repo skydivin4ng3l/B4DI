@@ -1,11 +1,8 @@
 /***********************************\
          B4DI extended BARS
 \***********************************/
-//========================================
-// [intern] Global Vars
-//========================================
-var int dynScalingFactor; //float
-//========================================
+
+/*//========================================
 // [intern] Klasse für PermMem
 //========================================
 class _extendedBar {
@@ -18,29 +15,30 @@ class _extendedBar {
 
 instance _extendedBar@(_extendedBar);
 
-func void _barPreview_Delete(var _extendedBar eb) {
-    if(Hlp_IsValidHandle(eb.bar)) {
-        delete(eb.bar);
+func void _extendedBar_Delete(var _extendedBar eBar) {
+    if(Hlp_IsValidHandle(eBar.bar)) {
+        delete(eBar.bar);
     };
-    if(Hlp_IsValidHandle(eb.bar)) {
-        delete(eb.barPreview);
+    if(Hlp_IsValidHandle(eBar.bar)) {
+        delete(eBar.barPreview);
     };
-    if(Hlp_IsValidHandle(eb.anim8FadeOut)) {
-        Anim8_Delete(eb.anim8FadeOut);
+    if(Hlp_IsValidHandle(eBar.anim8FadeOut)) {
+        Anim8_Delete(eBar.anim8FadeOut);
     };
-};
+};*/
 
 //========================================
 // [Intern] Resizes actual bar according to percentage reltaive to center
 //
 //========================================
+//TODO Rework to eBar
 func void B4DI_Bar_SetBarSizeCenteredPercent(var int bar_hndl, var int x_percentage, var int y_percentage ) { 
     Print_GetScreenSize();
     //------------------
     if(!Hlp_IsValidHandle(bar_hndl)) { return; };
     var _bar b; b = get(bar_hndl);
 
-    v1_ptr = View_Get(b.v1);
+    vBar = View_Get(b.v1);
     //save the size before the resize
     var int sizex_pre; sizex_pre = Print_ToVirtual(b.val,PS_X); 
     var int sizey_pre; sizey_pre = roundf( mulf( mkf(b.initialDynamicVSizes[IDS_VBAR_Y]), dynScalingFactor ) ) ; // Dynamic Test +1 is missing, but needed?
@@ -49,22 +47,54 @@ func void B4DI_Bar_SetBarSizeCenteredPercent(var int bar_hndl, var int x_percent
     View_ResizeCentered(b.v1, sizex_pre * x_percentage / 100 , sizey_pre * y_percentage / 100 ); 
         
     //Debug
-    B4DI_debugSpy("Bar PositionX",IntToString(v1_ptr.vposx));
-    B4DI_debugSpy("Bar PositionY",IntToString(v1_ptr.vposy));
-    B4DI_debugSpy("Bar SizeX",IntToString(v1_ptr.vsizex));
-    B4DI_debugSpy("Bar SizeY",IntToString(v1_ptr.vsizey));
+    B4DI_debugSpy("Bar PositionX",IntToString(vBar.vposx));
+    B4DI_debugSpy("Bar PositionY",IntToString(vBar.vposy));
+    B4DI_debugSpy("Bar SizeX",IntToString(vBar.vsizex));
+    B4DI_debugSpy("Bar SizeY",IntToString(vBar.vsizey));
 
 };
 
+//========================================
+// [Intern] Resizes bars according of Menu value (gothic.ini)
+//========================================
+func void B4DI_Bar_dynamicMenuBasedScale(var int bar_hndl){
+    if(!Hlp_IsValidHandle(bar_hndl)) { return; };
+    var _bar b; b = get(bar_hndl);
+    
+    var zCView vBack; vBack = View_Get(b.v0);
+    var zCView vBar; vBar = View_Get(b.v1);
 
-func int B4DI_eBar_Create(var int _bar_constructor_instance) {
+    /*var int dynScalingFactor;*/ dynScalingFactor = B4DI_Bars_getDynamicScaleOptionValuef();
+
+    Bar_ResizeCenteredPercentFromInitial(bar_hndl, dynScalingFactor);
+    //TODO Implement different customizeable alignments, maybe per set margin within the Resize process
+
+    // Keep Left aligned
+    //compensate scaling difference of left and top offset
+    //should not be needed for centered//View_MoveTo(b.v1, vBar.vposx- barLeftOffset , vBar.vposy-barTopOffset);
+
+    ////---debug print
+    
+    var int s0;s0=SB_New();
+    SB_Use(s0);
+    SB("scaleFactor: "); SBi(roundf(dynScalingFactor));SB("  ");
+    SB("dynScalingFactor: "); SB(toStringf(dynScalingFactor)); SB(" / ");
+    SB("BACK: ");   SBi(vBack.psizex); SB(" , "); SBi(vBack.psizey); SB(" ");
+    SB("BAR: ");   SBi(vBar.psizex); SB(" , "); SBi(vBar.psizey); SB(" ");
+    SB("barW: "); SBi( Print_ToPixel( b.barW, PS_X ) );
+    Print_ExtPxl(50,Print_Screen[PS_Y] / 2, SB_ToString(), FONT_Screen, RGBA(255,0,0,200),2500);
+    SB_Destroy();
+};
+
+
+func int B4DI_eBar_Create(var int Bar_constructor_instance) {
     var int new_eBar_hndl; new_eBar_hndl = new(_extendedBar@);
     var _extendedBar eBar; eBar = get(new_eBar_hndl);
     
-    eBar.bar = Bar_CreateCenterDynamic(_bar_constructor_instance);
+    eBar.bar = Bar_CreateCenterDynamic(Bar_constructor_instance);
     B4DI_Bar_dynamicMenuBasedScale(eBar.bar);
 
-    eBar.barPreview = B4DI_BarPreview_Create(eBar.bar);
+    /*eBar.barPreview = */B4DI_BarPreview_Create(new_eBar_hndl);
 
     Bar_SetAlpha(eBar.bar, 0);
     eBar.isFadedOut = 1;
@@ -72,10 +102,27 @@ func int B4DI_eBar_Create(var int _bar_constructor_instance) {
     return new_eBar_hndl;
 };
 
+//========================================
+// Bar Alpha
+//========================================
+func void B4DI_eBar_SetAlpha(var int eBar_hndl, var int alpha) {
+    if(!Hlp_IsValidHandle(eBar_hndl)) { return; };
+    var _extendedBar eBar; eBar = get(eBar_hndl);
+    var _bar bar; bar = get(eBar.bar);
+
+    var zCView v0; v0 = View_Get(bar.v0);
+    v0.alpha = alpha;
+    //var zCView vMiddle; vMiddle = View_Get(bar.vMiddle);
+    //vMiddle.alpha = alpha;
+    View_SetAlphaAll(bar.vMiddle, alpha);
+    var zCView v1; v1 = View_Get(bar.v1);
+    v1.alpha = alpha;
+};
+
 func void B4DI_eBar_fadeOut(var int eBar_hndl, var int deleteBar) {
     var _extendedBar eBar_inst; eBar_inst = get(eBar_hndl);
     var _bar bar_inst; bar_inst = get(eBar_inst.bar);
-    eBar_inst.anim8FadeOut = Anim8_NewExt(255, Bar_SetAlpha, eBar_inst.bar, false);
+    eBar_inst.anim8FadeOut = Anim8_NewExt(255, B4DI_eBar_SetAlpha, eBar_hndl, false);
     Anim8_RemoveIfEmpty(eBar_inst.anim8FadeOut, true);
     if (deleteBar) {
         Anim8_RemoveDataIfEmpty(eBar_inst.anim8FadeOut, true);
@@ -85,12 +132,11 @@ func void B4DI_eBar_fadeOut(var int eBar_hndl, var int deleteBar) {
     
     Anim8(eBar_inst.anim8FadeOut, 255,  5000, A8_Wait);
     Anim8q(eBar_inst.anim8FadeOut,   0, 2000, A8_SlowEnd);
-
 };
 
-func string B4DI_eBar_generateLabelSimple(var int ebar_hndl) {
+func string B4DI_eBar_generateLabelTextSimple(var int ebar_hndl) {
     if(!Hlp_IsValidHandle(ebar_hndl)) {
-        MEM_Info("B4DI_eBar_generateLabelSimple failed");
+        MEM_Info("B4DI_eBar_generateLabelTextSimple failed");
         return;
     };
     if(SB_Get()) {
@@ -144,16 +190,33 @@ func void B4DI_eBar_show( var int eBar_hndl){
         Anim8_Delete(eBar_inst.anim8FadeOut);
     };
     eBar_inst.isFadedOut = 0;
-    Bar_SetAlpha(eBar_inst.bar, 255);
+    eBar_SetAlpha(eBar_hndl, 255);
     Bar_Show(eBar_inst.bar);
     var _bar bar; bar = get(eBar_inst.bar);
-    //TODO make optional
-    View_DeleteText(bar.vMiddle);
-    View_AddText(bar.vMiddle, 0, 0, B4DI_eBar_generateLabelSimple(eBar_hndl), TEXT_FONT_Inventory);
+    //TODO make optional 
+    View_DeleteText(bar.vMiddle); //experimental use of middle
+
+    View_AddText(bar.vMiddle, 0, 0, B4DI_eBar_generateLabelTextSimple(eBar_hndl), TEXT_FONT_Inventory);
 
     MEM_Info("B4DI_eBar_show successful");
 };
 
+func void B4DI_eBar_HidePreview(var int eBar_hndl){
+    if(!Hlp_IsValidHandle(eBar_hndl)) { return; };
+    var int eBar; eBar = get(eBar_hndl);
+    B4DI_BarPreview_hide(eBar.barPreview);
+
+    MEM_Info("B4DI_eBar_HidePreview successful");
+};
+
+func void B4DI_eBar_ShowPreview(var int eBar_hndl, var int value) {
+    if(!Hlp_IsValidHandle(eBar_hndl)) { return; };
+    var int eBar; eBar = get(eBar_hndl);
+
+    B4DI_BarPreview_CalcPosScale(eBar.barPreview, value);
+
+    MEM_Info("B4DI_eBar_ShowPreview successful");
+};
 
 func void B4DI_Bar_SetValues(var int bar_hndl, var int index_value, var int index_valueMax) {
     if(!Hlp_IsValidHandle(bar_hndl)) { return; };
@@ -169,6 +232,4 @@ func void B4DI_Bar_SetValues(var int bar_hndl, var int index_value, var int inde
     //MEM_Info(cs2(" bar.val: ",i2s(bar.val)));
 };
 
-//TODO B4DI_eBar_calcPreView maybe in preview?
 
-//TODO B4DI_eBar_showPreview

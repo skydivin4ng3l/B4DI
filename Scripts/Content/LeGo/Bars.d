@@ -349,11 +349,28 @@ func void Bar_MoveLeftUpperTo(var int bar, var int x, var int y) {
     if(!Hlp_IsValidHandle(bar)) { return; };
     var _bar b; b = get(bar);
     var zCView v; v = View_Get(b.v0);
-    x -= v.vposx;
-    y -= v.vposy;
-    View_Move(b.v0, x, y);
-    View_Move(b.vMiddle, x, y);
-    View_Move(b.v1, x, y);
+    View_MoveTo(b.v0, x, y);
+    View_MoveTo(b.vMiddle, x, y);
+    View_MoveTo(b.v1, x, y);
+};
+
+//========================================
+// Bar Linke Obere Ecke bewegen innerhalb Valid Screenspace
+//========================================
+
+func void Bar_MoveLeftUpperToValidScreenSpace(var int bar, var int x, var int y) {
+    if(!Hlp_IsValidHandle(bar)) { return; };
+    var _bar b; b = get(bar);
+    var zCView vBack; vBack = View_Get(b.v0);
+    var zCView vBar; vBar = View_Get(b.v1);
+    var int barTop; barTop = vBar.vposy - vBack.vposy ;
+    var int barLeft; barLeft = vBar.vposx - vBack.vposx;
+
+    View_MoveToValidScreenSpace(b.v0, x, y);
+    //to keep the margin valid if movement would surpass screen border
+    View_MoveTo(b.vMiddle, vBack.vposx + barLeft, vBack.vposy + barTop );
+    View_MoveTo(b.v1, vBack.vposx + barLeft, vBack.vposy + barTop );
+    
 };
 
 //========================================

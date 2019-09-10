@@ -17,6 +17,12 @@ const int    B4DI_ALL                = (1<<2) - 1;           // Initialize all f
 
 const int    B4DI_INITIALIZED        = 0;                    // Indicator whether B4DI was initialized
 
+//========================================
+// _barPreview Options
+//========================================
+
+const int B4DI_BARPREVIEW_HAS_OWN_LABEL = 1;
+
 /// Hooks
 
 const int oCNpc__OpenScreen_Status 				= 7592320;		// 0x73D980 // HookLen: 7

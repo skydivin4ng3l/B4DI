@@ -2,54 +2,6 @@
 /// TODO move all changes in LeGo Classes here or at least seperate additions from vanilla LeGo
 
 
-
-prototype B4DI_MyXpBar(Bar) {
-	x = Print_Screen[PS_X] / 2;
-	y = Print_Screen[PS_Y] -20;
-	barTop = 3; // 6 Texture 4 good
-	barLeft = 8; // 11/12 Texture 
-	width = 192; // 256 texture
-	height = 24; // 32 texture
-	backTex = "Bar_Back.tga";
-	barTex = "Bar_XP.tga";
-	middleTex = "Bar_TempMax.tga";
-	value = 100;
-	valueMax = 100;
-};
-
-//////
-
-instance B4DI_XpBar(B4DI_MyXpBar){
-	//x = 10+128;
-	//y = 20+16;
-};
-
-instance B4DI_HpBar(GothicBar){
-	x = 128+90; //128 virtual should be margin left
-	y = Print_Screen[PS_Y] -100;
-	barTop = 2;		// 2 is almost too small
-	barTex = "Bar_Health.tga";
-};
-
-//global vars
-var int lastHeroHP;
-var int lastHeroMaxHP;
-//var int dynScalingFactor; //float
-var int isInventoryOpen; 
-////original Bars
-instance MEM_oBar_Hp(oCViewStatusBar);
-var int MEM_dBar_HP_handle;
-instance MEM_dBar_HP(_bar);
-
-var int MEM_dBar_MANA_handle;
-instance MEM_dBar_MANA(_extenedBar);
-
-var int MEM_preView_HP_handle;
-instance MEM_preView_HP(zCView);
-
-instance selectedInvItem(oCItem);
-var string lastSelectedItemName;
-
 //#################################################################
 //
 //  General Functions
@@ -94,37 +46,37 @@ func int B4DI_Bars_getDynamicScaleOptionValuef(){
     return percScalingFactor;
 };
 
-//========================================
-// [Intern] Resizes bars according of Menu value (gothic.ini)
-//========================================
-func void B4DI_Bar_dynamicMenuBasedScale(var int bar_hndl){
-    if(!Hlp_IsValidHandle(bar_hndl)) { return; };
-    var _bar b; b = get(bar_hndl);
+////========================================
+//// [Intern] Resizes bars according of Menu value (gothic.ini)
+////========================================
+//func void B4DI_Bar_dynamicMenuBasedScale(var int bar_hndl){
+//    if(!Hlp_IsValidHandle(bar_hndl)) { return; };
+//    var _bar b; b = get(bar_hndl);
     
-    var zCView vBack; vBack = View_Get(b.v0);
-    var zCView vBar; vBar = View_Get(b.v1);
+//    var zCView vBack; vBack = View_Get(b.v0);
+//    var zCView vBar; vBar = View_Get(b.v1);
 
-    /*var int dynScalingFactor;*/ dynScalingFactor = B4DI_Bars_getDynamicScaleOptionValuef();
+//    /*var int dynScalingFactor;*/ dynScalingFactor = B4DI_Bars_getDynamicScaleOptionValuef();
 
-    Bar_ResizeCenteredPercentFromInitial(bar_hndl, dynScalingFactor);
-    //TODO Implement different customizeable alignments, maybe per set margin within the Resize process
+//    Bar_ResizeCenteredPercentFromInitial(bar_hndl, dynScalingFactor);
+//    //TODO Implement different customizeable alignments, maybe per set margin within the Resize process
 
-    // Keep Left aligned
-    //compensate scaling difference of left and top offset
-    //should not be needed for centered//View_MoveTo(b.v1, vBar.vposx- barLeftOffset , vBar.vposy-barTopOffset);
+//    // Keep Left aligned
+//    //compensate scaling difference of left and top offset
+//    //should not be needed for centered//View_MoveTo(b.v1, vBar.vposx- barLeftOffset , vBar.vposy-barTopOffset);
 
-    ////---debug print
+//    ////---debug print
     
-    var int s0;s0=SB_New();
-    SB_Use(s0);
-    SB("scaleFactor: "); SBi(roundf(dynScalingFactor));SB("  ");
-    SB("dynScalingFactor: "); SB(toStringf(dynScalingFactor)); SB(" / ");
-    SB("BACK: ");   SBi(vBack.psizex); SB(" , "); SBi(vBack.psizey); SB(" ");
-    SB("BAR: ");   SBi(vBar.psizex); SB(" , "); SBi(vBar.psizey); SB(" ");
-    SB("barW: "); SBi( Print_ToPixel( b.barW, PS_X ) );
-    Print_ExtPxl(50,Print_Screen[PS_Y] / 2, SB_ToString(), FONT_Screen, RGBA(255,0,0,200),2500);
-    SB_Destroy();
-};
+//    var int s0;s0=SB_New();
+//    SB_Use(s0);
+//    SB("scaleFactor: "); SBi(roundf(dynScalingFactor));SB("  ");
+//    SB("dynScalingFactor: "); SB(toStringf(dynScalingFactor)); SB(" / ");
+//    SB("BACK: ");   SBi(vBack.psizex); SB(" , "); SBi(vBack.psizey); SB(" ");
+//    SB("BAR: ");   SBi(vBar.psizex); SB(" , "); SBi(vBar.psizey); SB(" ");
+//    SB("barW: "); SBi( Print_ToPixel( b.barW, PS_X ) );
+//    Print_ExtPxl(50,Print_Screen[PS_Y] / 2, SB_ToString(), FONT_Screen, RGBA(255,0,0,200),2500);
+//    SB_Destroy();
+//};
 
 ////========================================
 //// [Intern] Resizes actual bar according to percentage reltaive to center
@@ -215,6 +167,7 @@ func void B4DI_Bar_hide( var int bar_hndl){
 
 };
 
+//TODO Depricated
 func void B4DI_Bar_show( var int bar_hndl){
 	if(!Hlp_IsValidHandle(bar_hndl)) {
 		MEM_Info("B4DI_Bar_show failed");
@@ -249,7 +202,7 @@ func void B4DI_originalBar_hide( var int obar_ptr){
 //#################################################################
 //PreViews
 //#################################################################
-
+//depricated
 func void B4DI_Bar_calcPreView(var int bar_hndl, var int preview_hndl, var int value){
 	var _bar bar; bar = get(bar_hndl);
 	var zCview vBar; vBar = View_Get(bar.v1);
@@ -282,6 +235,7 @@ func void B4DI_Bar_calcPreView(var int bar_hndl, var int preview_hndl, var int v
 
 	B4DI_Info2("bar.valMax: ", bar.valMax, " bar.val: ", bar.val );
 	MEM_Info(cs2("label: ",SB_ToString() ) );
+
 	View_AddText(preview_hndl, preview.vsizex>>1, preview.vsizey>>1, SB_ToString(), TEXT_FONT_Inventory );
     SB_Destroy();
 
@@ -290,6 +244,7 @@ func void B4DI_Bar_calcPreView(var int bar_hndl, var int preview_hndl, var int v
 	MEM_Info(cs8("preview x: ",i2s(preview.pposx)," y: ",i2s(preview.pposy)," SizeX: ",i2s(preview.psizex), " SizeY: ", i2s(preview.psizey) ));
 };
 
+// Deprecated
 func void B4DI_Bar_showPreview(var int bar_hndl, var int preview_hndl, var int value){
 	if(!Hlp_IsValidHandle(bar_hndl)) {
 		MEM_Info("tried to show Preview of a not initialized bar ");
@@ -306,7 +261,7 @@ func void B4DI_Bar_showPreview(var int bar_hndl, var int preview_hndl, var int v
 };
 
 
-
+// Deprecated
 func void B4DI_Bar_InitPreView( var int bar_hndl){
 	if(!Hlp_IsValidHandle(MEM_preView_HP_handle)){
 		if(!Hlp_IsValidHandle(bar_hndl)) {
@@ -323,9 +278,14 @@ func void B4DI_Bar_InitPreView( var int bar_hndl){
 };
 
 func void B4DI_Bars_hideItemPreview() {
+	//TODO Update
 	View_Close(MEM_preView_HP_handle);
+
+	B4DI_eBar_HidePreview(MEM_dBar_HP_handle);
+
 	MEM_Info("B4DI_Bars_hideItemPreview");
 };
+
 
 func void B4DI_Bars_showItemPreview() {
 	var int index; var STRING type; var int value;
@@ -351,6 +311,7 @@ func void B4DI_Bars_showItemPreview() {
 			value = MEM_ReadStatArr(selectedInvItem.COUNT,index);
 			MEM_Info("B4DI_Bars_showItemPreview MANA");
 			//TODO preview mana
+			B4DI_eBar_ShowPreview(MEM_dBar_HP_handle, value);
 		};
 		if( STR_Compare(type , NAME_Bonus_ManaMax ) == STR_EQUAL  ) {
 			value = MEM_ReadStatArr(selectedInvItem.COUNT,index);
@@ -406,7 +367,7 @@ func string B4DI_Bar_getLabel(var int bar_hndl, var int var int current_value, v
 //  HP Bar
 //
 //#################################################################
-
+//TODO Rework
 func void B4DI_HpBar_Refresh() {
 	//var oCViewStatusBar bar_hp; bar_hp = MEM_PtrToInst (MEM_GAME.hpBar);
 	Bar_SetMax(MEM_dBar_HP_handle, hero.attribute[ATR_HITPOINTS_MAX]);
@@ -451,7 +412,7 @@ func void B4DI_hpBar_InitAlways(){
 	//TODO: Update on option change of Barsize
 	//TODO: implement customizable Positions Left Right Top bottom,...
 	//TODO: implement a Screen margin
-	Bar_MoveLeftUpperTo(MEM_dBar_HP_handle, MEM_oBar_Hp.zCView_vposx, MEM_oBar_Hp.zCView_vposy );
+	Bar_MoveLeftUpperToValidScreenSpace(MEM_dBar_HP_handle, MEM_oBar_Hp.zCView_vposx, MEM_oBar_Hp.zCView_vposy );
 
 	B4DI_Bar_InitPreView(MEM_dBar_HP_handle);
 
@@ -500,7 +461,7 @@ func void B4DI_manaBar_InitAlways(){
 	//TODO: Update on option change of Barsize
 	//TODO: implement customizable Positions Left Right Top bottom,...
 	//TODO: implement a Screen margin
-	Bar_MoveLeftUpperTo(MEM_dBar_MANA_handle, MEM_oBar_Mana.zCView_vposx, MEM_oBar_Mana.zCView_vposy );
+	Bar_MoveLeftUpperToValidScreenSpace(MEM_dBar_MANA_handle, MEM_oBar_Mana.zCView_vposx, MEM_oBar_Mana.zCView_vposy );
 
 	//FF_ApplyOnceExtGT(B4DI_Bars_update,0,-1);
 
@@ -621,12 +582,12 @@ func void B4DI_Bars_update(){
 	};
 	if ( (!Npc_IsInFightMode( hero, FMODE_NONE ) || heroHpChanged || heroManaChanged || isInventoryOpen ) & MEM_dBar_Hp.isFadedOut ) {
 		//B4DI_hpBar_show();
-		B4DI_Bar_show(MEM_dBar_HP_handle);
-		B4DI_Bar_show(MEM_dBar_MANA_handle);
+		B4DI_Bar_show(MEM_dBar_HP_handle); //TODO Update
+		B4DI_eBar_show(MEM_dBar_MANA_handle);
 	} else if(Npc_IsInFightMode(hero, FMODE_NONE) & !heroHpChanged & !heroManaChanged & !isInventoryOpen & !MEM_dBar_Hp.isFadedOut) {
 		//B4DI_hpBar_hide();	
-		B4DI_Bar_hide(MEM_dBar_HP_handle);
-		B4DI_Bar_hide(MEM_dBar_MANA_handle);
+		B4DI_Bar_hide(MEM_dBar_HP_handle);	//TODO Update
+		B4DI_eBar_show(MEM_dBar_MANA_handle);
 	};
 	//MEM_Info("B4DI_Bars_update");
 	//B4DI_debugSpy("B4DI_ITEM_is: ", item.nameID);
@@ -645,6 +606,9 @@ func void B4DI_Bars_applySettings() {
 
 	B4DI_Bar_dynamicMenuBasedScale(MEM_dBar_HP_handle);
 	B4DI_HpBar_Refresh();
+
+	B4DI_Bar_dynamicMenuBasedScale(MEM_dBar_MANA.bar);
+	B4DI_ManaBar_Refresh();
 
 	MEM_Info("B4DI_Bars_applySettings");
 };

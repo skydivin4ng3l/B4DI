@@ -1,6 +1,8 @@
-const.d
+B4DI_const.d
+B4DI_Classes.d
+B4DI_Globals.d
 
 B4DI_BarPreview.d
 B4DI_extendedBar.d
 B4DI_Bars.d
-Init.d
+B4DI_Init.d
