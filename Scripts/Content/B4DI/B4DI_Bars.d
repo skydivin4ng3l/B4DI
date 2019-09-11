@@ -580,6 +580,7 @@ func void B4DI_Bars_update(){
 		//Inventory got closed
 		B4DI_Bars_hideItemPreview(); //maybe redundant?!
 	};
+	//TODO option on when to show/hide manaBar
 	if ( (!Npc_IsInFightMode( hero, FMODE_NONE ) || heroHpChanged || heroManaChanged || isInventoryOpen ) & MEM_dBar_Hp.isFadedOut ) {
 		//B4DI_hpBar_show();
 		B4DI_Bar_show(MEM_dBar_HP_handle); //TODO Update
@@ -587,7 +588,7 @@ func void B4DI_Bars_update(){
 	} else if(Npc_IsInFightMode(hero, FMODE_NONE) & !heroHpChanged & !heroManaChanged & !isInventoryOpen & !MEM_dBar_Hp.isFadedOut) {
 		//B4DI_hpBar_hide();	
 		B4DI_Bar_hide(MEM_dBar_HP_handle);	//TODO Update
-		B4DI_eBar_show(MEM_dBar_MANA_handle);
+		B4DI_eBar_hide(MEM_dBar_MANA_handle);
 	};
 	//MEM_Info("B4DI_Bars_update");
 	//B4DI_debugSpy("B4DI_ITEM_is: ", item.nameID);
