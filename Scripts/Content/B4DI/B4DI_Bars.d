@@ -148,7 +148,8 @@ func void B4DI_Bars_hideItemPreview() {
 	//TODO Update
 	View_Close(MEM_preView_HP_handle);
 
-	B4DI_eBar_HidePreview(MEM_dBar_MANA_handle);
+	B4DI_eBar_HidePreview(MEM_eBar_HP_handle);
+	B4DI_eBar_HidePreview(MEM_eBar_MANA_handle);
 	areItemPreviewsHidden = true;
 	MEM_Info("B4DI_Bars_hideItemPreview");
 };
@@ -168,6 +169,7 @@ func void B4DI_Bars_showItemPreview() {
 			MEM_Info("B4DI_Bars_showItemPreview HP");
 			//TODO preview HP
 			B4DI_Bar_showPreview(MEM_dBar_HP_handle, MEM_preView_HP_handle, value);
+			B4DI_eBar_ShowPreview(MEM_eBar_HP_handle, value);
 		};
 		if( STR_Compare(type , NAME_Bonus_HpMax ) == STR_EQUAL ) {
 			value = MEM_ReadStatArr(selectedInvItem.COUNT,index);
@@ -178,7 +180,7 @@ func void B4DI_Bars_showItemPreview() {
 			value = MEM_ReadStatArr(selectedInvItem.COUNT,index);
 			MEM_Info("B4DI_Bars_showItemPreview MANA");
 			//TODO preview mana
-			B4DI_eBar_ShowPreview(MEM_dBar_MANA_handle, value);
+			B4DI_eBar_ShowPreview(MEM_eBar_MANA_handle, value);
 		};
 		if( STR_Compare(type , NAME_Bonus_ManaMax ) == STR_EQUAL  ) {
 			value = MEM_ReadStatArr(selectedInvItem.COUNT,index);
@@ -239,6 +241,8 @@ func void B4DI_HpBar_Refresh() {
 	MEM_Info(cs2(" hero.attribute[ATR_HITPOINTS]: ",i2s(hero.attribute[ATR_HITPOINTS])));
 	MEM_Info(cs2("bar.valMax: ",i2s(bar.valMax)));
 	MEM_Info(cs2(" bar.val: ",i2s(bar.val)));
+
+	B4DI_eBar_Refresh(MEM_eBar_HP_handle, ATR_HITPOINTS, ATR_HITPOINTS_MAX);
 };
 
 // returns the difference between 
@@ -258,11 +262,14 @@ func void B4DI_hpBar_InitAlways(){
 	MEM_oBar_Hp = MEM_PtrToInst (MEM_GAME.hpBar); //original
 	//B4DI_originalBar_hide(MEM_GAME.hpBar);
 	// new dBars dynamic
-	if(!Hlp_IsValidHandle(MEM_dBar_HP_handle)){
+	if(!Hlp_IsValidHandle(MEM_dBar_HP_handle) & !Hlp_IsValidHandle(MEM_eBar_HP_handle) ){
 		MEM_dBar_HP_handle = Bar_CreateCenterDynamic(B4DI_HpBar);
 		B4DI_Bar_dynamicMenuBasedScale(MEM_dBar_HP_handle);
+
+		MEM_eBar_HP_handle = B4DI_eBar_Create(B4DI_HpBar);
 	};
 	MEM_dBar_Hp = get(MEM_dBar_HP_handle);
+	MEM_eBar_Hp = get(MEM_eBar_HP_handle);
 	B4DI_HpBar_Refresh();
 	Bar_SetAlpha(MEM_dBar_HP_handle, 0);
 	MEM_dBar_Hp.isFadedOut = 1;
@@ -274,6 +281,7 @@ func void B4DI_hpBar_InitAlways(){
 	//TODO: implement a Screen margin
 	//Bar_MoveLeftUpperToValidScreenSpace(MEM_dBar_HP_handle, MEM_oBar_Hp.zCView_vposx, MEM_oBar_Hp.zCView_vposy );
 	Bar_MoveLeftUpperToValidScreenSpace(MEM_dBar_HP_handle, MEM_oBar_Hp.zCView_vposx, MEM_oBar_Hp.zCView_vposy-200 );
+	Bar_MoveLeftUpperToValidScreenSpace(MEM_eBar_HP.bar, MEM_oBar_Hp.zCView_vposx, MEM_oBar_Hp.zCView_vposy-500 );
 
 	B4DI_Bar_InitPreView(MEM_dBar_HP_handle);
 
@@ -303,7 +311,7 @@ func int B4DI_heroMana_changed(){
 };
 
 func void B4DI_manaBar_Refresh(){
-	B4DI_eBar_Refresh(MEM_dBar_MANA_handle, ATR_MANA, ATR_MANA_MAX);
+	B4DI_eBar_Refresh(MEM_eBar_MANA_handle, ATR_MANA, ATR_MANA_MAX);
 };
 
 func void B4DI_manaBar_InitAlways(){
@@ -311,10 +319,10 @@ func void B4DI_manaBar_InitAlways(){
 	MEM_oBar_Mana = MEM_PtrToInst (MEM_GAME.manaBar); //original
 	B4DI_originalBar_hide(MEM_GAME.manaBar);
 	// new dBars dynamic
-	if(!Hlp_IsValidHandle(MEM_dBar_MANA_handle)){
-		MEM_dBar_MANA_handle = B4DI_eBar_Create(B4DI_ManaBar);
+	if(!Hlp_IsValidHandle(MEM_eBar_MANA_handle)){
+		MEM_eBar_MANA_handle = B4DI_eBar_Create(B4DI_ManaBar);
 	};
-	MEM_dBar_MANA = get(MEM_dBar_MANA_handle);
+	MEM_eBar_MANA = get(MEM_eBar_MANA_handle);
 	B4DI_manaBar_Refresh();
 
 	lastHeroMANA = hero.attribute[ATR_MANA];
@@ -322,7 +330,7 @@ func void B4DI_manaBar_InitAlways(){
 	//TODO: Update on option change of Barsize
 	//TODO: implement customizable Positions Left Right Top bottom,...
 	//TODO: implement a Screen margin
-	Bar_MoveLeftUpperToValidScreenSpace(MEM_dBar_MANA.bar, MEM_oBar_Mana.zCView_vposx, MEM_oBar_Mana.zCView_vposy );
+	Bar_MoveLeftUpperToValidScreenSpace(MEM_eBar_MANA.bar, MEM_oBar_Mana.zCView_vposx, MEM_oBar_Mana.zCView_vposy );
 
 	//FF_ApplyOnceExtGT(B4DI_Bars_update,0,-1);
 
@@ -414,14 +422,16 @@ func void B4DI_Bars_update(){
 		B4DI_manaBar_Refresh();
 	};
 	//TODO option on when to show/hide manaBar
-	if ( (!Npc_IsInFightMode( hero, FMODE_NONE ) || heroHpChanged || heroManaChanged || isInventoryOpen ) & MEM_dBar_Hp.isFadedOut ) {
+	if ( (!Npc_IsInFightMode( hero, FMODE_NONE ) || heroHpChanged || heroManaChanged || isInventoryOpen ) & MEM_dBar_Hp.isFadedOut & MEM_eBar_Hp.isFadedOut ) {
 		//B4DI_hpBar_show();
 		B4DI_Bar_show(MEM_dBar_HP_handle); //TODO Update
-		B4DI_eBar_show(MEM_dBar_MANA_handle);
-	} else if(Npc_IsInFightMode(hero, FMODE_NONE) & !heroHpChanged & !heroManaChanged & !isInventoryOpen & !MEM_dBar_Hp.isFadedOut) {
+		B4DI_eBar_show(MEM_eBar_MANA_handle);
+		B4DI_eBar_show(MEM_eBar_HP_handle);
+	} else if(Npc_IsInFightMode(hero, FMODE_NONE) & !heroHpChanged & !heroManaChanged & !isInventoryOpen & !MEM_dBar_Hp.isFadedOut & !MEM_eBar_Hp.isFadedOut) {
 		//B4DI_hpBar_hide();	
 		B4DI_Bar_hide(MEM_dBar_HP_handle);	//TODO Update
-		B4DI_eBar_hide(MEM_dBar_MANA_handle);
+		B4DI_eBar_hide(MEM_eBar_MANA_handle);
+		B4DI_eBar_hide(MEM_eBar_HP_handle);
 	};
 	if(isInventoryOpen){
 		selectedInvItem = _^(Inv_GetSelectedItem());
@@ -462,9 +472,10 @@ func void B4DI_Bars_applySettings() {
 	dynScalingFactor = B4DI_Bars_getDynamicScaleOptionValuef();
 
 	B4DI_Bar_dynamicMenuBasedScale(MEM_dBar_HP_handle);
+	B4DI_Bar_dynamicMenuBasedScale(MEM_eBar_HP.bar);
 	B4DI_HpBar_Refresh();
 
-	B4DI_Bar_dynamicMenuBasedScale(MEM_dBar_MANA.bar);
+	B4DI_Bar_dynamicMenuBasedScale(MEM_eBar_MANA.bar);
 	B4DI_manaBar_Refresh();
 
 	MEM_Info("B4DI_Bars_applySettings");

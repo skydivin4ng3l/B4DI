@@ -110,8 +110,11 @@ instance MEM_oBar_Mana(oCViewStatusBar);
 var int MEM_dBar_HP_handle;
 instance MEM_dBar_HP(_bar);
 
-var int MEM_dBar_MANA_handle;
-instance MEM_dBar_MANA(_extendedBar);
+var int MEM_eBar_HP_handle;
+instance MEM_eBar_HP(_extendedBar);
+
+var int MEM_eBar_MANA_handle;
+instance MEM_eBar_MANA(_extendedBar);
 
 var int MEM_preView_HP_handle;
 instance MEM_preView_HP(zCView);
