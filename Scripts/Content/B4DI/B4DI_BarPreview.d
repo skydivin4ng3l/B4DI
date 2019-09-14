@@ -14,16 +14,18 @@ func int B4DI_BarPreview_Create( var int eBar_hndl){
     var int new_bp_hndl; new_bp_hndl = new(_barPreview@);
     var _barPreview bp; bp = get(new_bp_hndl);
     
-    bp.vPreView = View_Create(vBar.vposx, vBar.vposy, vBar.vposx + vBar.vsizex, vBar.vposy + vBar.vsizey );
-    bp.vOverShoot = View_Create(vBar.vposx, vBar.vposy, vBar.vposx + vBar.vsizex, vBar.vposy + vBar.vsizey );
+    bp.vPreView = View_Create(vBar.vposx + vBar.vsizex, vBar.vposy, vBar.vposx + vBar.vsizex * 2, vBar.vposy + vBar.vsizey );
+    bp.vOverShoot = View_Create(vBar.vposx + vBar.vsizex, vBar.vposy, vBar.vposx + vBar.vsizex * 2, vBar.vposy + vBar.vsizey );
     //TODO maybe different texture for previews?
     View_SetTexture(bp.vPreView, ViewPtr_GetTexture( MEM_InstToPtr(vBar) ) );
     View_SetTexture(bp.vOverShoot, ViewPtr_GetTexture( MEM_InstToPtr(vBar) ) );
 
     bp.val = 0;
+    bp.isFadedOutPreview = 1;
+    bp.isFadedOutOvershoot = 1;
     bp.eBar_parent = eBar_hndl;
 
-    eBar.barPreview = new_bp_hndl; //unsure about this here
+    /*eBar.barPreview = new_bp_hndl; *///unsure about this here
     return new_bp_hndl;
 };
 
@@ -44,6 +46,7 @@ func void B4DI_BarPreview_Show( var int barPreview_hndl) {
     var _barPreview bp; bp = get(barPreview_hndl);
     //TODO: cancle animanitions
     //TODO: Start animanitions
+    bp.isFadedOutPreview = 0;
     View_Open(bp.vPreView);
     View_SetAlpha(bp.vPreView, 127);
     View_Top(bp.vPreView);
@@ -57,9 +60,22 @@ func void B4DI_BarPreview_ShowOverShoot( var int barPreview_hndl) {
     var _barPreview bp; bp = get(barPreview_hndl);
     //TODO: cancle animanitions
     //TODO: Start animanitions
+    bp.isFadedOutOvershoot = 0;
     View_Open(bp.vOverShoot);
     View_SetAlpha(bp.vOverShoot, 80);
     View_Top(bp.vOverShoot);  
+};
+
+func void B4DI_BarPreview_hideOverShoot( var int barPreview_hndl) {
+    if(!Hlp_IsValidHandle(barPreview_hndl)) {
+        MEM_Warn("B4DI_BarPreview_hideOverShoot failed ");
+        return;
+    };
+    var _barPreview bp; bp = get(barPreview_hndl);
+    //TODO: cancle animanitions
+    bp.isFadedOutOvershoot = 1;
+    View_Close(bp.vOverShoot);
+    MEM_Info("B4DI_BarPreview_hideOverShoot");
 };
 
 func void B4DI_BarPreview_hide( var int barPreview_hndl) {
@@ -67,10 +83,12 @@ func void B4DI_BarPreview_hide( var int barPreview_hndl) {
         MEM_Warn("B4DI_BarPreview_hide failed ");
         return;
     };
-    //TODO: cancle animanitions
     var _barPreview bp; bp = get(barPreview_hndl);
+    //TODO: cancle animanitions
+    bp.val = 0;
+    bp.isFadedOutPreview = 1;
     View_Close(bp.vPreView);
-    View_Close(bp.vOverShoot);
+    B4DI_BarPreview_hideOverShoot(barPreview_hndl);
     MEM_Info("B4DI_Bars_hideItemPreview");
 };
 
@@ -84,6 +102,8 @@ func void B4DI_BarPreview_CalcPosScale( var int barPreview_hndl, var int value) 
     var _bar bar; bar = get(eBar.bar);
     var zCview vBar; vBar = View_Get(bar.v1);
     var zCView preview; preview = View_Get(bp.vPreView);
+
+    bp.val = value;
 
     if(B4DI_BARPREVIEW_HAS_OWN_LABEL){
         var int s0;s0=SB_New(); SB_Use(s0);
@@ -114,7 +134,7 @@ func void B4DI_BarPreview_CalcPosScale( var int barPreview_hndl, var int value) 
     } else {
         preview_vsizex = (((value *1000) / bar.valMax) * bar.barW / 1000);
 
-        View_Close(bp.vOverShoot);
+        B4DI_BarPreview_hideOverShoot(barPreview_hndl);
 
         View_Resize(bp.vPreView, preview_vsizex, vBar.vsizey);
         View_MoveTo(bp.vPreView, vBar.vposx + vBar.vsizex, vBar.vposy );

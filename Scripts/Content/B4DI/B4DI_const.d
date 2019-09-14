@@ -75,6 +75,10 @@ const int oCNpc__SetWeaponMode2__zSTRING		= 7572576;  	//0x00738C60	// HookLen:	
 
 //void __thiscall oCNpc::OnDamage_Hit(oCNpc::oSDamageDescriptor &)    	0x00666610	0	7
 const int oCNpc__OnDamage_Hit    				= 6710800;				//0x00666610	// HookLen:	7
+//void __thiscall oCNpc::OnDamage_Hit custom (oCNpc::oSDamageDescriptor &)    	0x66CAC7 	0	5
+const int oCNpc__OnDamage_Hit_custom			= 6736583;				//0x66CAC7	// HookLen:	5
+//void __thiscall oCNpc::OnDamage_Hit custom (oCNpc::oSDamageDescriptor &)    	066CF25  	0	6
+const int oCNpc__OnDamage_Hit_return			= 6737701;				//0x066CF25 	// HookLen:	6
 
 //int __thiscall oCNpc::UseItem(oCItem *) 	0x0073BC10	0	7
 

@@ -39,6 +39,8 @@ class _barPreview {
     var int val;
     var int anim8Pulse;               // A8Head(h)
     var int eBar_parent;               // _extentedBar(h)
+    var int isFadedOutPreview;                 // Boolean
+    var int isFadedOutOvershoot;                 // Boolean
 };
 
 instance _barPreview@(_barPreview);

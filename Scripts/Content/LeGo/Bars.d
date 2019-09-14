@@ -124,7 +124,7 @@ func void Bar_SetPromille(var int bar, var int pro) {
     var _bar b; b = get(bar);
     if(pro > 1000) { pro = 1000; };
     View_Resize(b.v1, (pro * b.barW) / 1000, -1);
-    b.val = (pro / 10 * b.valMax) / 1000; //to keep both valMax | val in the same space
+    b.val = (pro * b.valMax) / 1000; //to keep both valMax | val in the same space
 };
 
 //========================================
@@ -134,7 +134,7 @@ func void Bar_SetPercent(var int bar, var int perc) {
     if(!Hlp_IsValidHandle(bar)) { return; };
     var _bar b; b = get(bar);
     Bar_SetPromille(bar, perc*10);
-    b.val = (perc * b.valMax) / 1000; 
+    b.val = (perc * 1000 * b.valMax) / 1000; 
 };
 
 //========================================
@@ -267,7 +267,7 @@ func int Bar_CreateCenterDynamic(var int constructor_instance) {
     bar.barW = bar_constr.width - bar_constr.barLeft *2;
     bar.vMiddle = View_CreateCenterPxl(bar_constr.x, bar_constr.y, bar.barW, bar_constr.height- bar_constr.barTop *2);
     bar.v1 = View_CreateCenterPxl(bar_constr.x, bar_constr.y, bar.barW, bar_constr.height- bar_constr.barTop *2);
-    //TODO remove?
+    //TODO remove? vMiddle is Range
     bar.barW = Print_ToVirtual(bar.barW, PS_X);
     //^^
     View_SetTexture(bar.v0, bar_constr.backTex);
@@ -280,13 +280,13 @@ func int Bar_CreateCenterDynamic(var int constructor_instance) {
     var zCView v; v = View_Get(bar.v0);
     //v.alphafunc = zRND_ALPHA_FUNC_ADD;
     v = View_Get(bar.vMiddle);
-    //v.alphafunc = zRND_ALPHA_FUNC_ADD;
+    v.alphafunc = zRND_ALPHA_FUNC_SUB;
     v = View_Get(bar.v1);
     //v.alphafunc = zRND_ALPHA_FUNC_ADD;
 
     View_Open(bar.v0);
-    View_Open(bar.vMiddle);
     View_Open(bar.v1);
+    View_Open(bar.vMiddle); //this order that vMiddle can hold text label, therefore alphafunc
     bar.isFadedOut = 0;
     
     free(ptr, constructor_instance);
@@ -321,8 +321,8 @@ func void Bar_Show(var int bar) {
 	if(!Hlp_IsValidHandle(bar)) { return; };
 	var _bar b; b = get(bar);
 	View_Open(b.v0);
-    View_Open(b.vMiddle);
 	View_Open(b.v1);
+    View_Open(b.vMiddle); //Label reasons
 };
 
 //========================================
@@ -379,12 +379,15 @@ func void Bar_MoveLeftUpperToValidScreenSpace(var int bar, var int x, var int y)
 func void Bar_SetAlpha(var int bar, var int alpha) {
 	if(!Hlp_IsValidHandle(bar)) { return; };
 	var _bar b; b = get(bar);
-	var zCView v0; v0 = View_Get(b.v0);
-	v0.alpha = alpha;
-    var zCView vMiddle; vMiddle = View_Get(b.vMiddle);
-    vMiddle.alpha = alpha;
-	var zCView v1; v1 = View_Get(b.v1);
-	v1.alpha = alpha;
+	//var zCView v0; v0 = View_Get(b.v0);
+	//v0.alpha = alpha;
+    View_SetAlpha(b.v0, alpha);
+    //var zCView vMiddle; vMiddle = View_Get(b.vMiddle);
+    //vMiddle.alpha = alpha;
+    View_SetAlphaAll(b.vMiddle, alpha);
+	//var zCView v1; v1 = View_Get(b.v1);
+	//v1.alpha = alpha;
+    View_SetAlpha(b.v1, alpha);
 };
 
 //========================================

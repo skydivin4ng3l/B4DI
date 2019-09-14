@@ -11,4 +11,8 @@ var int lastHeroHP;
 var int lastHeroMaxHP;
 var int lastHeroMANA;
 var int lastHeroMaxMANA;
+
 var int isInventoryOpen; 
+var int areItemPreviewsHidden;
+
+var int heroGotHit;

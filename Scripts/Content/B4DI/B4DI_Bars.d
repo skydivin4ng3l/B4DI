@@ -7,125 +7,6 @@
 //  General Functions
 //
 //#################################################################
-/*//========================================
-// [intern] Helper Scales depenting on Resolution
-//========================================
-var int B4DI_BarScale[6];
-func void B4DI_InitBarScale(){
-    Print_GetScreenSize();
-    B4DI_BarScale[0]= B4DI_BarScale_off;
-    // auto scale inspired by systempack.ini
-    B4DI_BarScale[1]= roundf( mulf( mkf(100) ,fracf( Print_Screen[PS_Y] ,512 ) ) );
-    B4DI_BarScale[2]= B4DI_BarScale_50;
-    B4DI_BarScale[3]= B4DI_BarScale_100;
-    B4DI_BarScale[4]= B4DI_BarScale_150;
-    B4DI_BarScale[5]= B4DI_BarScale_200;
-};*/
-
-/*//========================================
-// [Intern] Get Dynamic Scale according of Menu value (gothic.ini) asFloat
-//
-//========================================
-func int B4DI_Bars_getDynamicScaleOptionValuef(){
-    B4DI_InitBarScale();
-    var int scaleOption; scaleOption = STR_ToInt(MEM_GetGothOpt("B4DI", "B4DI_barScale"));
-    var int scalingFactor; //scalingFactor = B4DI_BarScale_auto; //Default
-    MEM_Info( ConcatStrings( "Bar scaleOption = ", IntToString( scaleOption ) ) );
-    if(!scaleOption) {
-        MEM_Error("Bar Scale Option not set using Default Auto instead!");
-        scalingFactor = MEM_ReadStatArr(B4DI_BarScale,1);
-        MEM_Info( ConcatStrings( "Bar Scalingfactor = ", IntToString(scalingFactor) ) );
-    } else{
-        scalingFactor = MEM_ReadStatArr(B4DI_BarScale,scaleOption);
-        MEM_Info( ConcatStrings( "Bar Scalingfactor = ", IntToString(scalingFactor) ) );
-    };
-
-    var int percScalingFactor; percScalingFactor = fracf( scalingFactor, 100 );
-    MEM_Info( ConcatStrings( "percScalingFactor = ", toStringf(percScalingFactor) ) );
-
-    return percScalingFactor;
-};*/
-
-////========================================
-//// [Intern] Resizes bars according of Menu value (gothic.ini)
-////========================================
-//func void B4DI_Bar_dynamicMenuBasedScale(var int bar_hndl){
-//    if(!Hlp_IsValidHandle(bar_hndl)) { return; };
-//    var _bar b; b = get(bar_hndl);
-    
-//    var zCView vBack; vBack = View_Get(b.v0);
-//    var zCView vBar; vBar = View_Get(b.v1);
-
-//    /*var int dynScalingFactor;*/ dynScalingFactor = B4DI_Bars_getDynamicScaleOptionValuef();
-
-//    Bar_ResizeCenteredPercentFromInitial(bar_hndl, dynScalingFactor);
-//    //TODO Implement different customizeable alignments, maybe per set margin within the Resize process
-
-//    // Keep Left aligned
-//    //compensate scaling difference of left and top offset
-//    //should not be needed for centered//View_MoveTo(b.v1, vBar.vposx- barLeftOffset , vBar.vposy-barTopOffset);
-
-//    ////---debug print
-    
-//    var int s0;s0=SB_New();
-//    SB_Use(s0);
-//    SB("scaleFactor: "); SBi(roundf(dynScalingFactor));SB("  ");
-//    SB("dynScalingFactor: "); SB(toStringf(dynScalingFactor)); SB(" / ");
-//    SB("BACK: ");   SBi(vBack.psizex); SB(" , "); SBi(vBack.psizey); SB(" ");
-//    SB("BAR: ");   SBi(vBar.psizex); SB(" , "); SBi(vBar.psizey); SB(" ");
-//    SB("barW: "); SBi( Print_ToPixel( b.barW, PS_X ) );
-//    Print_ExtPxl(50,Print_Screen[PS_Y] / 2, SB_ToString(), FONT_Screen, RGBA(255,0,0,200),2500);
-//    SB_Destroy();
-//};
-
-////========================================
-//// [Intern] Resizes actual bar according to percentage reltaive to center
-////
-////========================================
-//func void B4DI_Bar_SetBarSizeCenteredPercent(var int hndl, var int x_percentage, var int y_percentage ) { 
-//	Print_GetScreenSize();
-//	//------------------
-//	if(!Hlp_IsValidHandle(hndl)) { return; };
-//	var _bar b; b = get(hndl);
-//	var zCView v0_ptr; var zCView v1_ptr;
-	
-//	/// Debug
-//	var int s0;s0=SB_New();
-//	SB_Use(s0);
-//	/// ^^
-
-//	v1_ptr = View_Get(b.v1);
-//	//save the size before the resize
-//	var int sizex_pre; sizex_pre = Print_ToVirtual(b.val,PS_X);	
-//	var int sizey_pre; sizey_pre = roundf( mulf( mkf(b.initialDynamicVSizes[IDS_VBAR_Y]), dynScalingFactor ) ) ; // Dynamic Test +1 is missing, but needed?
-
-//	//scale on all axis
-//	View_ResizeCentered(b.v1, sizex_pre * x_percentage / 100 , sizey_pre * y_percentage / 100 ); 
-		
-//	//Debug
-//	B4DI_debugSpy("Bar PositionX",IntToString(v1_ptr.vposx));
-//	B4DI_debugSpy("Bar PositionY",IntToString(v1_ptr.vposy));
-//	B4DI_debugSpy("Bar SizeX",IntToString(v1_ptr.vsizex));
-//    B4DI_debugSpy("Bar SizeY",IntToString(v1_ptr.vsizey));
-    
-//	SB("V1: ");	SBi(v1_ptr.psizex); SB(" , "); SBi(v1_ptr.psizey); SB(" ");
-//	var int DebugText; DebugText = Print_Ext(1,1, SB_ToString(), FONT_Screen, RGBA(255,0,0,200),100);
-//	var zCViewText DebugTextObject; DebugTextObject = Print_GetText(DebugText);
-//	DebugTextObject.posy = Print_ToVirtual( Print_Screen[PS_Y]/2 , PS_X);  
-//	SB_Destroy(); 
-//};
-
-func void B4DI_Bar_SetBarSizeCenteredPercentY(var int hndl, var int y_percentage){
-	B4DI_Bar_SetBarSizeCenteredPercent(hndl, 100, y_percentage);
-};
-
-func void B4DI_Bar_SetBarSizeCenteredPercentX(var int hndl, var int x_percentage){
-	B4DI_Bar_SetBarSizeCenteredPercent(hndl, x_percentage,100 );
-};
-
-func void B4DI_Bar_SetBarSizeCenteredPercentXY(var int hndl, var int xy_percentage){
-	B4DI_Bar_SetBarSizeCenteredPercent(hndl, xy_percentage, xy_percentage );
-};
 
 //TODO Depricated
 func void B4DI_Bar_fadeOut(var int bar_hndl, var int deleteBar) {
@@ -167,21 +48,6 @@ func void B4DI_Bar_hide( var int bar_hndl){
 
 };
 
-func string B4DI_Bar_getLabel(var int bar_hndl, var int current_value, var int max_value) {
-	if(SB_Get()) {
-		B4DI_preserve_current_StringBuilder = SB_Get();
-	};
-	var int sbuilder; sbuilder=SB_New();
-	SB_Use(sbuilder);
-	SBi(current_value);
-	//if()
-	 SB(" / "); SBi(max_value);
-	var string label; label = SB_ToString();
-	SB_Destroy();
-	SB_Use(B4DI_preserve_current_StringBuilder);
-	return label;
-};
-
 //TODO Depricated
 func void B4DI_Bar_show( var int bar_hndl){
 	if(!Hlp_IsValidHandle(bar_hndl)) {
@@ -195,10 +61,7 @@ func void B4DI_Bar_show( var int bar_hndl){
 	bar_inst.isFadedOut = 0;
 	Bar_SetAlpha(bar_hndl, 255);
 	Bar_Show(bar_hndl);
-	//TODO make optional
-	View_DeleteText(MEM_dBar_Hp.vMiddle);
-	View_AddText(MEM_dBar_Hp.vMiddle, 0, 0, B4DI_Bar_getLabel(MEM_dBar_HP_handle, hero.attribute[ATR_HITPOINTS], hero.attribute[ATR_HITPOINTS_MAX]), TEXT_FONT_Inventory);
-
+	
 	MEM_Info("B4DI_Bar_show successful");
 };
 
@@ -240,23 +103,10 @@ func void B4DI_Bar_calcPreView(var int bar_hndl, var int preview_hndl, var int v
 		SBi(value);
 	};
 	
-	MEM_Info(cs4("1: ",i2s(1)," 2: ",i2s(2) ) );
-
-	var string print; 
-	var string print_helper; 
-	print = cs2("1: ", i2s(1) );
-	print = cs3(print ," 2: ", i2s(2) );
-	MEM_Info(print);
-
-	B4DI_Info2("bar.valMax: ", bar.valMax, " bar.val: ", bar.val );
-	MEM_Info(cs2("label: ",SB_ToString() ) );
-
 	View_AddText(preview_hndl, preview.vsizex>>1, preview.vsizey>>1, SB_ToString(), TEXT_FONT_Inventory );
     SB_Destroy();
 
 	MEM_Info("B4DI_Bar_calcPreView");
-	MEM_Info(cs8("vBar x: ",i2s(vBar.pposx)," y: ",i2s(vBar.pposy)," SizeX: ",i2s(vBar.psizex), " SizeY: ", i2s(vBar.psizey) ));
-	MEM_Info(cs8("preview x: ",i2s(preview.pposx)," y: ",i2s(preview.pposy)," SizeX: ",i2s(preview.psizex), " SizeY: ", i2s(preview.psizey) ));
 };
 
 // Deprecated
@@ -268,10 +118,12 @@ func void B4DI_Bar_showPreview(var int bar_hndl, var int preview_hndl, var int v
 	if(!Hlp_IsValidHandle(preview_hndl)){
 		return;
 	};
+	//B4DI_HpBar_Refresh();
 	B4DI_Bar_calcPreView(bar_hndl, preview_hndl, value);
 	View_Open(preview_hndl);
 	View_SetAlpha(preview_hndl, 127);
 	View_Top(preview_hndl);
+	areItemPreviewsHidden = false;
 	MEM_Info("B4DI_Bar_showPreview");
 };
 
@@ -296,8 +148,8 @@ func void B4DI_Bars_hideItemPreview() {
 	//TODO Update
 	View_Close(MEM_preView_HP_handle);
 
-	B4DI_eBar_HidePreview(MEM_dBar_HP_handle);
-
+	B4DI_eBar_HidePreview(MEM_dBar_MANA_handle);
+	areItemPreviewsHidden = true;
 	MEM_Info("B4DI_Bars_hideItemPreview");
 };
 
@@ -326,7 +178,7 @@ func void B4DI_Bars_showItemPreview() {
 			value = MEM_ReadStatArr(selectedInvItem.COUNT,index);
 			MEM_Info("B4DI_Bars_showItemPreview MANA");
 			//TODO preview mana
-			B4DI_eBar_ShowPreview(MEM_dBar_HP_handle, value);
+			B4DI_eBar_ShowPreview(MEM_dBar_MANA_handle, value);
 		};
 		if( STR_Compare(type , NAME_Bonus_ManaMax ) == STR_EQUAL  ) {
 			value = MEM_ReadStatArr(selectedInvItem.COUNT,index);
@@ -373,6 +225,14 @@ func void B4DI_HpBar_Refresh() {
 	Bar_SetMax(MEM_dBar_HP_handle, hero.attribute[ATR_HITPOINTS_MAX]);
 	Bar_SetValue(MEM_dBar_HP_handle, hero.attribute[ATR_HITPOINTS]);
 	
+	//TODO make optional
+	View_DeleteText(MEM_dBar_Hp.vMiddle);
+	View_AddText(MEM_dBar_Hp.vMiddle, 0, 0, B4DI_Bar_generateLabel(MEM_dBar_HP_handle, hero.attribute[ATR_HITPOINTS], hero.attribute[ATR_HITPOINTS_MAX]), TEXT_FONT_Inventory);
+	if(MEM_dBar_Hp.isFadedOut) {
+		Bar_SetAlpha(MEM_dBar_HP_handle, 0);
+	};
+
+
 	MEM_Info("B4DI_HpBar_Refresh");
 	var _bar bar; bar = get(MEM_dBar_HP_handle);
 	MEM_Info(cs2("hero.attribute[ATR_HITPOINTS_MAX]: ",i2s(hero.attribute[ATR_HITPOINTS_MAX])));
@@ -396,7 +256,7 @@ func int B4DI_heroHp_changed(){
 func void B4DI_hpBar_InitAlways(){
 	//original bars
 	MEM_oBar_Hp = MEM_PtrToInst (MEM_GAME.hpBar); //original
-	B4DI_originalBar_hide(MEM_GAME.hpBar);
+	//B4DI_originalBar_hide(MEM_GAME.hpBar);
 	// new dBars dynamic
 	if(!Hlp_IsValidHandle(MEM_dBar_HP_handle)){
 		MEM_dBar_HP_handle = Bar_CreateCenterDynamic(B4DI_HpBar);
@@ -412,7 +272,8 @@ func void B4DI_hpBar_InitAlways(){
 	//TODO: Update on option change of Barsize
 	//TODO: implement customizable Positions Left Right Top bottom,...
 	//TODO: implement a Screen margin
-	Bar_MoveLeftUpperToValidScreenSpace(MEM_dBar_HP_handle, MEM_oBar_Hp.zCView_vposx, MEM_oBar_Hp.zCView_vposy );
+	//Bar_MoveLeftUpperToValidScreenSpace(MEM_dBar_HP_handle, MEM_oBar_Hp.zCView_vposx, MEM_oBar_Hp.zCView_vposy );
+	Bar_MoveLeftUpperToValidScreenSpace(MEM_dBar_HP_handle, MEM_oBar_Hp.zCView_vposx, MEM_oBar_Hp.zCView_vposy-200 );
 
 	B4DI_Bar_InitPreView(MEM_dBar_HP_handle);
 
@@ -441,8 +302,8 @@ func int B4DI_heroMana_changed(){
 	};
 };
 
-func void B4DI_ManaBar_Refresh(){
-	B4DI_Bar_SetValues(MEM_dBar_MANA.bar, ATR_MANA, ATR_MANA_MAX);
+func void B4DI_manaBar_Refresh(){
+	B4DI_eBar_Refresh(MEM_dBar_MANA_handle, ATR_MANA, ATR_MANA_MAX);
 };
 
 func void B4DI_manaBar_InitAlways(){
@@ -454,7 +315,7 @@ func void B4DI_manaBar_InitAlways(){
 		MEM_dBar_MANA_handle = B4DI_eBar_Create(B4DI_ManaBar);
 	};
 	MEM_dBar_MANA = get(MEM_dBar_MANA_handle);
-	B4DI_ManaBar_Refresh();
+	B4DI_manaBar_Refresh();
 
 	lastHeroMANA = hero.attribute[ATR_MANA];
 	lastHeroMaxMANA = hero.attribute[ATR_MANA_MAX];
@@ -466,6 +327,12 @@ func void B4DI_manaBar_InitAlways(){
 	//FF_ApplyOnceExtGT(B4DI_Bars_update,0,-1);
 
 	MEM_Info("B4DI_manaBar_InitAlways");
+};
+
+func void B4DI_manaBar_InitOnce(){
+	HookDaedalusFuncS("Spell_ProcessMana", "B4DI_manaBar_hooking_Spell_ProcessMana" ); //B4DI_manaBar_hooking_Spell_ProcessMana( var int manaInvested)
+	HookDaedalusFuncS("Spell_ProcessMana_Release", "B4DI_manaBar_hooking_Spell_ProcessMana_Release"); //B4DI_manaBar_hooking_Spell_ProcessMana_Release( var int manaInvested)
+	MEM_Info("B4DI_manaBar_InitOnce");
 };
 
 //#################################################################
@@ -510,19 +377,6 @@ func int B4DI_xpBar_create(){
 
 	B4DI_XpBar_calcXp(XpBar);
 
-	////---debug print
-	//var _bar b; b = get(XpBar);
-	//var zCView v0_ptr; var zCView v1_ptr;
-	//v0_ptr = View_Get(b.v0);
-	
-	//var int s0;s0=SB_New();
-	//SB_Use(s0);
-	//SB("V0: ");	SBi(v0_ptr.psizex); SB(" , "); SBi(v0_ptr.psizey); SB(" ");
-	//v1_ptr = View_Get(b.v1);
-	//SB("V1: ");	SBi(v1_ptr.psizex); SB(" , "); SBi(v1_ptr.psizey); SB(" ");
-	//Print_Ext(500,500, SB_ToString(), FONT_Screen, RGBA(255,0,0,200),5000);
-	//SB_Destroy();
-
 	return XpBar;
 };
 
@@ -536,7 +390,8 @@ func void B4DI_xpBar_show(){
 };
 
 
-func void B4DI_xpBar_update() {
+func void B4DI_xpBar_update(var int add_xp) {
+	PassArgumentI(add_xp);
 	ContinueCall();
 	var int XpBar; XpBar = B4DI_xpBar_create();
 	B4DI_Bar_pulse_size(XpBar);
@@ -556,15 +411,24 @@ func void B4DI_Bars_update(){
 	};
 	var int heroManaChanged; heroManaChanged = B4DI_heroMana_changed();
 	if(heroManaChanged){
-		B4DI_ManaBar_Refresh();
+		B4DI_manaBar_Refresh();
+	};
+	//TODO option on when to show/hide manaBar
+	if ( (!Npc_IsInFightMode( hero, FMODE_NONE ) || heroHpChanged || heroManaChanged || isInventoryOpen ) & MEM_dBar_Hp.isFadedOut ) {
+		//B4DI_hpBar_show();
+		B4DI_Bar_show(MEM_dBar_HP_handle); //TODO Update
+		B4DI_eBar_show(MEM_dBar_MANA_handle);
+	} else if(Npc_IsInFightMode(hero, FMODE_NONE) & !heroHpChanged & !heroManaChanged & !isInventoryOpen & !MEM_dBar_Hp.isFadedOut) {
+		//B4DI_hpBar_hide();	
+		B4DI_Bar_hide(MEM_dBar_HP_handle);	//TODO Update
+		B4DI_eBar_hide(MEM_dBar_MANA_handle);
 	};
 	if(isInventoryOpen){
 		selectedInvItem = _^(Inv_GetSelectedItem());
 		//show only preview for new items // description instead of name cause potions are not destinguishable by name, which is "potion" for all
-		if( (STR_Compare(lastSelectedItemName, selectedInvItem.description ) != STR_EQUAL) || (heroHpChanged != false ) || (heroManaChanged != false ) ) { // NOT EQUAL
+		if( (STR_Compare(lastSelectedItemName, selectedInvItem.description ) != STR_EQUAL) || (heroHpChanged != false ) || (heroManaChanged != false ) ) { 
 			lastSelectedItemName = selectedInvItem.description;
-			//TODO Filter for bar influencing items What about mana? different types: timed, procentual, absolute
-			//TODO limit call to newly selected different item
+			//TODO Filter for bar influencing items What about different types: timed, procentual, absolute
 			//TODO pack into preView_Update Function
 			if(selectedInvItem.mainflag == ITEM_KAT_POTIONS || selectedInvItem.mainflag == ITEM_KAT_FOOD){
 				MEM_Info(selectedInvItem.description);
@@ -578,17 +442,9 @@ func void B4DI_Bars_update(){
 		};
 	} else {
 		//Inventory got closed
-		B4DI_Bars_hideItemPreview(); //maybe redundant?!
-	};
-	//TODO option on when to show/hide manaBar
-	if ( (!Npc_IsInFightMode( hero, FMODE_NONE ) || heroHpChanged || heroManaChanged || isInventoryOpen ) & MEM_dBar_Hp.isFadedOut ) {
-		//B4DI_hpBar_show();
-		B4DI_Bar_show(MEM_dBar_HP_handle); //TODO Update
-		B4DI_eBar_show(MEM_dBar_MANA_handle);
-	} else if(Npc_IsInFightMode(hero, FMODE_NONE) & !heroHpChanged & !heroManaChanged & !isInventoryOpen & !MEM_dBar_Hp.isFadedOut) {
-		//B4DI_hpBar_hide();	
-		B4DI_Bar_hide(MEM_dBar_HP_handle);	//TODO Update
-		B4DI_eBar_hide(MEM_dBar_MANA_handle);
+		if (!areItemPreviewsHidden) {
+			B4DI_Bars_hideItemPreview(); //close previews after inventory closed
+		};
 	};
 	//MEM_Info("B4DI_Bars_update");
 	//B4DI_debugSpy("B4DI_ITEM_is: ", item.nameID);
@@ -609,7 +465,7 @@ func void B4DI_Bars_applySettings() {
 	B4DI_HpBar_Refresh();
 
 	B4DI_Bar_dynamicMenuBasedScale(MEM_dBar_MANA.bar);
-	B4DI_ManaBar_Refresh();
+	B4DI_manaBar_Refresh();
 
 	MEM_Info("B4DI_Bars_applySettings");
 };
@@ -620,6 +476,35 @@ func void B4DI_Bars_applySettings() {
 //  Hooking Functions to Update bars
 //
 //#################################################################
+//========================================
+// ManaBar
+//========================================
+//update mana Consumtion
+func void B4DI_manaBar_hooking_Spell_ProcessMana( var int manaInvested){
+	PassArgumentI(manaInvested);
+	ContinueCall();
+	B4DI_Bars_update();
+	B4DI_Info1("B4DI_manaBar_hooking_Spell_ProcessMana called" , manaInvested);
+};
+
+//decide which animation of consumtionBar should be chosen
+func void B4DI_manaBar_hooking_Spell_ProcessMana_Release( var int manaInvested) {
+	PassArgumentI(manaInvested);
+	ContinueCall();
+	//TODO animations, cancelation of ConsumtionBar
+	var int returnValue; returnValue = MEM_PopIntResult();
+	If(returnValue == SPL_SENDCAST){
+		//enough Mana successfully used
+	} else 
+	if(returnValue == SPL_SENDSTOP){
+		//not enough mana send or just stopped charging
+	};
+	B4DI_Info1("B4DI_manaBar_hooking_Spell_ProcessMana_Release called" , manaInvested);
+};
+
+//========================================
+// Inventory
+//========================================
 func void B4DI_inventory_opend(){
 	var C_NPC caller; caller = MEM_PtrToInst(ECX);
 	if (Npc_IsPlayer(caller)) {
@@ -647,6 +532,9 @@ func void B4DI_inventory_closed(){
 	};
 };
 
+//========================================
+// Fightmode
+//========================================
 func void B4DI_update_fight_mode(){
 	//MEM_Info("B4DI_update_fight_mode");
 	//closing Inventory by drawing weapon
@@ -716,41 +604,31 @@ func void B4DI_oCNpc__SetWeaponMode2__zSTRING(){
 	};
 };
 
+//========================================
+// HpBar
+//========================================
 func void B4DI_oCNpc__OnDamage_Hit(){
 	MEM_Info("B4DI_oCNpc__OnDamage_Hit");
 	var C_NPC caller; caller = MEM_PtrToInst(ECX);
 	//TODO else part for Focusbar update?
 	if (Npc_IsPlayer(caller)) {
-		//B4DI_update_fight_mode();
-		B4DI_Bars_update();
-		B4DI_debugSpy("B4DI_oCNpc__OnDamage_Hit called by: ", caller.name);
+		heroGotHit = true;
+	} else {
+		heroGotHit = false;
 	};
+	B4DI_debugSpy("B4DI_oCNpc__OnDamage_Hit called by: ", caller.name);
 };
 
-//func void B4DI_drawWeapon1(){
-//	B4DI_update_fight_mode();
-//	MEM_Info("B4DI_drawWeapon1");
-//};
-
-//func void B4DI_drawWeapon2(){
-//	B4DI_update_fight_mode();
-//	MEM_Info("B4DI_drawWeapon2");
-//};
-
-//func void B4DI_removeWeapon(){
-//	B4DI_update_fight_mode();
-//	MEM_Info("B4DI_removeWeapon");
-//};
-
-//func void B4DI_removeWeapon1(){
-//	B4DI_update_fight_mode();
-//	MEM_Info("B4DI_removeWeapon1");
-//};
-
-//func void B4DI_removeWeapon2(){
-//	B4DI_update_fight_mode();
-//	MEM_Info("B4DI_removeWeapon2");
-//};
+func void B4DI_oCNpc__OnDamage_Hit_return(){
+	MEM_Info("B4DI_oCNpc__OnDamage_Hit_return");
+	//TODO else part for Focusbar update?
+	if (heroGotHit) {
+		//B4DI_update_fight_mode();
+		B4DI_Bars_update();
+		MEM_Info("B4DI_oCNpc__OnDamage_Hit_return called after hero got hit");
+		heroGotHit = false;
+	};
+};
 
 func void B4DI_openSpellbook(){
 	B4DI_update_fight_mode();
@@ -802,67 +680,4 @@ func void B4DI_oCNpc_GetFromInv(){
 
 };*/
 
-//#################################################################
-//
-//  Initialisation Function Hooks
-//
-//#################################################################
 
-// called in B4DI_InitOnce
-func void B4DI_Bars_InitOnce() {
-	//init globals
-	MEM_InitGlobalInst ();
-	//FMODE_NONE as not in combat 
-	B4DI_hpBar_InitOnce();
-	HookDaedalusFuncS("B_GivePlayerXP", "B4DI_xpBar_update"); 						// B4DI_xpBar_update()
-	//MEM_Game.pause_screen as a TODO condition
-	HookEngine(cGameManager__ApplySomeSettings_rtn, 6, "B4DI_Bars_applySettings");  // B4DI_Bars_applySettings()
-	HookEngine(oCNpc__OpenScreen_Status, 7 , "B4DI_xpBar_show"); 					// B4DI_xpBar_show()
-
-	HookEngine(oCNpc__OpenInventory, 6 , "B4DI_inventory_opend");					// B4DI_inventory_opend()
-	HookEngine(oCNpc__CloseInventory, 9 , "B4DI_inventory_closed");					// B4DI_inventory_closed()
-	//HookEngine(CGameManager__HandleCancelKey, 7 , "B4DI_inventory_closed");			// B4DI_inventory_closed()
-	//HookEngine(zCMenuItemInput__HasBeenCanceled, 6 , "B4DI_inventory_closed");			// B4DI_inventory_closed()
-	//HookEngine(oCItemContainer__Close, 7 , "B4DI_inventory_closed");			// B4DI_inventory_closed() //works
-	HookEngine(oCNpc__CloseDeadNpc, 5 , "B4DI_inventory_closed");			// B4DI_inventory_closed() // does the job the best
-	//HookEngine(oCGame__UpdateStatus, 8 , "B4DI_Bars_update"); Cloud be an Option but does not cover draw/sheat weapons, option for focus bar update
-	// oCNpc::GetFocusNpc(void) alternative for focus bar
-
-	// B_AssessDamage for damage related show HPbar
-
-	//HookEngine(oCNpc__EV_DrawWeapon, 6, "B4DI_drawWeapon");	// direct draw PC, NPC
-	//HookEngine(oCNpc__EV_DrawWeapon1, 5, "B4DI_drawWeapon1"); 	// General Draw PC, NPC
-	//HookEngine(oCNpc__EV_DrawWeapon2, 6, "B4DI_drawWeapon2");		// Gernal Draw PC, NPC
-	HookEngine(oCNpc__OpenSpellBook, 10, "B4DI_openSpellbook");
-	HookEngine(oCNpc__CloseSpellBook, 6, "B4DI_closeSpellbook");
-	//HookEngine(oCNpc__EV_ChooseWeapon, 6, "B4DI_ChooseWeapon");
-
-	//HookEngine(oCNpc__EV_RemoveWeapon, 7, "B4DI_removeWeapon"); //will be called by: direct weapon sheath, NPCs
-	//HookEngine(oCNpc__EV_RemoveWeapon1, 7, "B4DI_removeWeapon1"); // General sheath PC
-	//HookEngine(oCNpc__EV_RemoveWeapon2, 6, "B4DI_removeWeapon2");	// General sheath PC
-
-	HookEngine(oCViewDialogInventory__GetSelectedItem, 6, "B4DI_oCViewDialogInventory_GetSelectedItem");
-	//HookEngine(oCItemContainer__GetSelectedItem, 5, "B4DI_oCItemContainer_GetSelectedItem");
-	//HookEngine(oCNpcInventory__GetItem, 6, "B4DI_oCNpcInventory_GetItem");
-	HookEngine(oCNpc__GetFromInv, 10, "B4DI_oCNpc_GetFromInv");
-
-	HookEngine(oCNpc__SetWeaponMode_custom_branch1, 5, "B4DI_oCNpc__SetWeaponMode_custom_branch1");
-	HookEngine(oCNpc__SetWeaponMode_custom_branch2, 5, "B4DI_oCNpc__SetWeaponMode_custom_branch2");
-	HookEngine(oCNpc__SetWeaponMode_custom_branch3, 5, "B4DI_oCNpc__SetWeaponMode_custom_branch3");
-	//HookEngine(oCNpc__SetWeaponMode, 5, "B4DI_oCNpc__SetWeaponMode");
-	//HookEngine(oCNpc__SetWeaponMode2, 6, "B4DI_oCNpc__SetWeaponMode2");
-	//HookEngine(oCNpc__SetWeaponMode2__zSTRING, 7, "B4DI_oCNpc__SetWeaponMode2__zSTRING");
-
-	HookEngine(oCNpc__OnDamage_Hit, 7, "B4DI_oCNpc__OnDamage_Hit");
-	//HookEngine(oCNpc__UseItem, 7, "B4DI_oCNpc__UseItem");
-
-
-	MEM_Info("B4DI Bars ininitialised");
-};
-
-func void B4DI_Bars_InitAlways() {
-	isInventoryOpen = false;
-
-	B4DI_hpBar_InitAlways();
-	B4DI_manaBar_InitAlways();
-};

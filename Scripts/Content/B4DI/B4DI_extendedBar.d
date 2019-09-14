@@ -14,7 +14,8 @@ func void B4DI_Bar_SetBarSizeCenteredPercent(var int bar_hndl, var int x_percent
     var _bar b; b = get(bar_hndl);
     var zCView vBar; vBar = View_Get(b.v1);
     //save the size before the resize
-    var int sizex_pre; sizex_pre = Print_ToVirtual(b.val,PS_X); 
+    //var int sizex_pre; sizex_pre = Print_ToVirtual(b.val,PS_X); 
+    var int sizex_pre; sizex_pre = roundf( mulf( fracf( b.val , b.valMax), mulf( mkf(b.initialDynamicVSizes[IDS_VBAR_X]), dynScalingFactor ) ) ) ; 
     var int sizey_pre; sizey_pre = roundf( mulf( mkf(b.initialDynamicVSizes[IDS_VBAR_Y]), dynScalingFactor ) ) ; // Dynamic Test +1 is missing, but needed?
 
     //scale on all axis
@@ -27,6 +28,19 @@ func void B4DI_Bar_SetBarSizeCenteredPercent(var int bar_hndl, var int x_percent
     B4DI_debugSpy("Bar SizeY",IntToString(vBar.vsizey));
 
 };
+
+func void B4DI_Bar_SetBarSizeCenteredPercentY(var int bar_hndl, var int y_percentage){
+    B4DI_Bar_SetBarSizeCenteredPercent(bar_hndl, 100, y_percentage);
+};
+
+func void B4DI_Bar_SetBarSizeCenteredPercentX(var int bar_hndl, var int x_percentage){
+    B4DI_Bar_SetBarSizeCenteredPercent(bar_hndl, x_percentage,100 );
+};
+
+func void B4DI_Bar_SetBarSizeCenteredPercentXY(var int bar_hndl, var int xy_percentage){
+    B4DI_Bar_SetBarSizeCenteredPercent(bar_hndl, xy_percentage, xy_percentage );
+};
+
 
 //========================================
 // [intern] Helper Scales depenting on Resolution
@@ -99,7 +113,23 @@ func void B4DI_Bar_dynamicMenuBasedScale(var int bar_hndl){
     SB_Destroy();
 };
 
+//========================================
+// eBar Alpha
+//========================================
+func void B4DI_eBar_SetAlpha(var int eBar_hndl, var int alpha) {
+    if(!Hlp_IsValidHandle(eBar_hndl)) { return; };
+    var _extendedBar eBar; eBar = get(eBar_hndl);
+    var _bar bar; bar = get(eBar.bar);
 
+    View_SetAlpha(bar.v0, alpha);
+    View_SetAlphaAll(bar.vMiddle, alpha);
+    View_SetAlpha(bar.v1, alpha);
+    
+};
+
+//========================================
+// eBar Create
+//========================================
 func int B4DI_eBar_Create(var int Bar_constructor_instance) {
     var int new_eBar_hndl; new_eBar_hndl = new(_extendedBar@);
     var _extendedBar eBar; eBar = get(new_eBar_hndl);
@@ -107,31 +137,21 @@ func int B4DI_eBar_Create(var int Bar_constructor_instance) {
     eBar.bar = Bar_CreateCenterDynamic(Bar_constructor_instance);
     B4DI_Bar_dynamicMenuBasedScale(eBar.bar);
 
-    /*eBar.barPreview = */B4DI_BarPreview_Create(new_eBar_hndl);
+    eBar.barPreview = B4DI_BarPreview_Create(new_eBar_hndl);
+    if(!Hlp_IsValidHandle(eBar.barPreview)) {
+        MEM_Warn("B4DI_eBar_Create failed at B4DI_BarPreview_Create"); 
+        return 0;
+    };
 
-    Bar_SetAlpha(eBar.bar, 0);
+    B4DI_eBar_SetAlpha(new_eBar_hndl, 0);
     eBar.isFadedOut = 1;
 
     return new_eBar_hndl;
 };
 
 //========================================
-// Bar Alpha
+// eBar Animations
 //========================================
-func void B4DI_eBar_SetAlpha(var int eBar_hndl, var int alpha) {
-    if(!Hlp_IsValidHandle(eBar_hndl)) { return; };
-    var _extendedBar eBar; eBar = get(eBar_hndl);
-    var _bar bar; bar = get(eBar.bar);
-
-    var zCView v0; v0 = View_Get(bar.v0);
-    v0.alpha = alpha;
-    //var zCView vMiddle; vMiddle = View_Get(bar.vMiddle);
-    //vMiddle.alpha = alpha;
-    View_SetAlphaAll(bar.vMiddle, alpha);
-    var zCView v1; v1 = View_Get(bar.v1);
-    v1.alpha = alpha;
-};
-
 func void B4DI_eBar_fadeOut(var int eBar_hndl, var int deleteBar) {
     var _extendedBar eBar_inst; eBar_inst = get(eBar_hndl);
     var _bar bar_inst; bar_inst = get(eBar_inst.bar);
@@ -147,9 +167,13 @@ func void B4DI_eBar_fadeOut(var int eBar_hndl, var int deleteBar) {
     Anim8q(eBar_inst.anim8FadeOut,   0, 2000, A8_SlowEnd);
 };
 
+//========================================
+// eBar Label
+//========================================
+//TODO Fix??? Label gets not shown after bar fades out and inventory gets opended
 func string B4DI_eBar_generateLabelTextSimple(var int ebar_hndl) {
     if(!Hlp_IsValidHandle(ebar_hndl)) {
-        MEM_Info("B4DI_eBar_generateLabelTextSimple failed");
+        MEM_Warn("B4DI_eBar_generateLabelTextSimple failed");
         return "";
     };
     if(SB_Get()) {
@@ -178,9 +202,13 @@ func string B4DI_eBar_generateLabelTextSimple(var int ebar_hndl) {
     var string label; label = SB_ToString();
     SB_Destroy();
     SB_Use(B4DI_preserve_current_StringBuilder);
+    B4DI_debugSpy("B4DI_eBar_generateLabelTextSimple: ", label);
     return label;
 };
 
+//========================================
+// eBar Hide / Show
+//========================================
 func void B4DI_eBar_hide( var int eBar_hndl){
     if(!Hlp_IsValidHandle(ebar_hndl)) {
         MEM_Info("B4DI_eBar_hide failed");
@@ -206,14 +234,17 @@ func void B4DI_eBar_show( var int eBar_hndl){
     B4DI_eBar_SetAlpha(eBar_hndl, 255);
     Bar_Show(eBar_inst.bar);
     var _bar bar; bar = get(eBar_inst.bar);
-    //TODO make optional 
-    View_DeleteText(bar.vMiddle); //experimental use of middle
+    ////TODO make optional 
+    //View_DeleteText(bar.vMiddle); //experimental use of middle
 
-    View_AddText(bar.vMiddle, 0, 0, B4DI_eBar_generateLabelTextSimple(eBar_hndl), TEXT_FONT_Inventory);
+    //View_AddText(bar.vMiddle, 0, 0, B4DI_eBar_generateLabelTextSimple(eBar_hndl), TEXT_FONT_Inventory);
 
     MEM_Info("B4DI_eBar_show successful");
 };
 
+//========================================
+// eBar Preview hide/show/Value
+//========================================
 func void B4DI_eBar_HidePreview(var int eBar_hndl){
     if(!Hlp_IsValidHandle(eBar_hndl)) { return; };
     var _extendedBar eBar; eBar = get(eBar_hndl);
@@ -227,7 +258,8 @@ func void B4DI_eBar_ShowPreview(var int eBar_hndl, var int value) {
     var _extendedBar eBar; eBar = get(eBar_hndl);
 
     B4DI_BarPreview_CalcPosScale(eBar.barPreview, value);
-
+    //TODO Refresh label
+    areItemPreviewsHidden = false;
     MEM_Info("B4DI_eBar_ShowPreview successful");
 };
 
@@ -245,4 +277,40 @@ func void B4DI_Bar_SetValues(var int bar_hndl, var int index_value, var int inde
     //MEM_Info(cs2(" bar.val: ",i2s(bar.val)));
 };
 
+//========================================
+// Bar Label may be deprecated
+//========================================
+func string B4DI_Bar_generateLabel(var int bar_hndl, var int current_value, var int max_value) {
+    if(SB_Get()) {
+        B4DI_preserve_current_StringBuilder = SB_Get();
+    };
+    var int sbuilder; sbuilder=SB_New();
+    SB_Use(sbuilder);
+    SBi(current_value);
+    //if()
+     SB(" / "); SBi(max_value);
+    var string label; label = SB_ToString();
+    SB_Destroy();
+    SB_Use(B4DI_preserve_current_StringBuilder);
+    return label;
+};
+
+//========================================
+// eBar Refresh
+//========================================
+func void B4DI_eBar_Refresh(var int eBar_hndl, var int index_value, var int index_valueMax) {
+    if(!Hlp_IsValidHandle(eBar_hndl)) { return; };
+    var _extendedBar eBar; eBar = get(eBar_hndl);
+    B4DI_Bar_SetValues(eBar.bar, index_value, index_valueMax);
+    
+    var _bar bar; bar = get(eBar.bar);
+    //TODO make optional
+    View_DeleteText(bar.vMiddle);
+    View_AddText(bar.vMiddle, 0, 0, B4DI_eBar_generateLabelTextSimple(eBar_hndl), TEXT_FONT_Inventory);
+    if(eBar.isFadedOut) {
+        B4DI_eBar_SetAlpha(eBar_hndl, 0);
+    };
+
+    MEM_Info("B4DI_eBar_Refresh");
+};
 
