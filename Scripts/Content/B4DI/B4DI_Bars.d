@@ -151,6 +151,8 @@ func void B4DI_Bars_hideItemPreview() {
 	B4DI_eBar_HidePreview(MEM_eBar_HP_handle);
 	B4DI_eBar_HidePreview(MEM_eBar_MANA_handle);
 	areItemPreviewsHidden = true;
+	B4DI_eBar_RefreshLabel(MEM_eBar_HP_handle);
+	B4DI_eBar_RefreshLabel(MEM_eBar_MANA_handle);
 	MEM_Info("B4DI_Bars_hideItemPreview");
 };
 
@@ -427,7 +429,7 @@ func void B4DI_Bars_update(){
 		B4DI_Bar_show(MEM_dBar_HP_handle); //TODO Update
 		B4DI_eBar_show(MEM_eBar_MANA_handle);
 		B4DI_eBar_show(MEM_eBar_HP_handle);
-	} else if(Npc_IsInFightMode(hero, FMODE_NONE) & !heroHpChanged & !heroManaChanged & !isInventoryOpen & !MEM_dBar_Hp.isFadedOut & !MEM_eBar_Hp.isFadedOut) {
+	} else if(Npc_IsInFightMode( hero, FMODE_NONE ) & !heroHpChanged & !heroManaChanged & !isInventoryOpen & !MEM_dBar_Hp.isFadedOut & !MEM_eBar_Hp.isFadedOut) {
 		//B4DI_hpBar_hide();	
 		B4DI_Bar_hide(MEM_dBar_HP_handle);	//TODO Update
 		B4DI_eBar_hide(MEM_eBar_MANA_handle);
@@ -444,14 +446,16 @@ func void B4DI_Bars_update(){
 				MEM_Info(selectedInvItem.description);
 				B4DI_Bars_showItemPreview();
 			} else {
-				B4DI_Bars_hideItemPreview();
+				if (!areItemPreviewsHidden) {
+					B4DI_Bars_hideItemPreview();
+				};
 			};
 			//TODO Disable preview after inventory closed and update on: item used | got dmg | switched Item
 		} else {
 			//TODO check for preview animation end, repeat
 		};
 	} else {
-		//Inventory got closed
+		//Inventory got closed or is just not open
 		if (!areItemPreviewsHidden) {
 			B4DI_Bars_hideItemPreview(); //close previews after inventory closed
 		};
@@ -528,7 +532,7 @@ func void B4DI_inventory_opend(){
 
 func void B4DI_inventory_closeHelper() {
 	isInventoryOpen = false;
-	B4DI_Bars_update(); // call again to make sure status get updated
+	B4DI_Bars_update(); // call again to make sure status get updated, not necessary i think caus of the FF?
 	lastSelectedItemName = "none";
 	B4DI_Bars_hideItemPreview(); //maybe redundant?!
 

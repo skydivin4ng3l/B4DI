@@ -143,6 +143,7 @@ func int B4DI_eBar_Create(var int Bar_constructor_instance) {
         return 0;
     };
 
+    Bar_Show(eBar.bar); //not neccessary
     B4DI_eBar_SetAlpha(new_eBar_hndl, 0);
     eBar.isFadedOut = 1;
 
@@ -207,6 +208,24 @@ func string B4DI_eBar_generateLabelTextSimple(var int ebar_hndl) {
 };
 
 //========================================
+// eBar RefreshLabel
+//========================================
+func void B4DI_eBar_RefreshLabel(var int eBar_hndl) {
+    if(!Hlp_IsValidHandle(eBar_hndl)) { return; };
+    var _extendedBar eBar; eBar = get(eBar_hndl);
+    
+    var _bar bar; bar = get(eBar.bar);
+    //TODO make optional
+    View_DeleteText(bar.vMiddle);
+    View_AddText(bar.vMiddle, 0, -100, B4DI_eBar_generateLabelTextSimple(eBar_hndl), TEXT_FONT_Inventory);
+    if(eBar.isFadedOut) {
+        B4DI_eBar_SetAlpha(eBar_hndl, 0);
+    };
+
+    B4DI_Info1("B4DI_eBar_RefreshLabel call while isFadedOut: ", eBar.isFadedOut);
+};
+
+//========================================
 // eBar Hide / Show
 //========================================
 func void B4DI_eBar_hide( var int eBar_hndl){
@@ -233,8 +252,11 @@ func void B4DI_eBar_show( var int eBar_hndl){
     eBar_inst.isFadedOut = 0;
     B4DI_eBar_SetAlpha(eBar_hndl, 255);
     Bar_Show(eBar_inst.bar);
-    var _bar bar; bar = get(eBar_inst.bar);
+
     ////TODO make optional 
+    //B4DI_eBar_RefreshLabel(eBar_hndl);
+
+    //var _bar bar; bar = get(eBar_inst.bar);
     //View_DeleteText(bar.vMiddle); //experimental use of middle
 
     //View_AddText(bar.vMiddle, 0, 0, B4DI_eBar_generateLabelTextSimple(eBar_hndl), TEXT_FONT_Inventory);
@@ -243,7 +265,7 @@ func void B4DI_eBar_show( var int eBar_hndl){
 };
 
 //========================================
-// eBar Preview hide/show/Value
+// eBar Preview hide/show
 //========================================
 func void B4DI_eBar_HidePreview(var int eBar_hndl){
     if(!Hlp_IsValidHandle(eBar_hndl)) { return; };
@@ -258,11 +280,15 @@ func void B4DI_eBar_ShowPreview(var int eBar_hndl, var int value) {
     var _extendedBar eBar; eBar = get(eBar_hndl);
 
     B4DI_BarPreview_CalcPosScale(eBar.barPreview, value);
-    //TODO Refresh label
+    B4DI_eBar_RefreshLabel(eBar_hndl);
+
     areItemPreviewsHidden = false;
     MEM_Info("B4DI_eBar_ShowPreview successful");
 };
 
+//========================================
+// eBar Value
+//========================================
 func void B4DI_Bar_SetValues(var int bar_hndl, var int index_value, var int index_valueMax) {
     if(!Hlp_IsValidHandle(bar_hndl)) { return; };
 
@@ -303,13 +329,7 @@ func void B4DI_eBar_Refresh(var int eBar_hndl, var int index_value, var int inde
     var _extendedBar eBar; eBar = get(eBar_hndl);
     B4DI_Bar_SetValues(eBar.bar, index_value, index_valueMax);
     
-    var _bar bar; bar = get(eBar.bar);
-    //TODO make optional
-    View_DeleteText(bar.vMiddle);
-    View_AddText(bar.vMiddle, 0, 0, B4DI_eBar_generateLabelTextSimple(eBar_hndl), TEXT_FONT_Inventory);
-    if(eBar.isFadedOut) {
-        B4DI_eBar_SetAlpha(eBar_hndl, 0);
-    };
+    B4DI_eBar_RefreshLabel(eBar_hndl);
 
     MEM_Info("B4DI_eBar_Refresh");
 };
