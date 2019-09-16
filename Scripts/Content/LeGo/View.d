@@ -474,7 +474,7 @@ func void View_DeleteText(var int hndl) {
 };
 
 //========================================
-// Text hinzuf�gen
+// Text hinzufuegen
 //
 // Positions are Virtuel, relativ to the size of the parent View
 // top left of the view: 0,0 right buttom of the view: PS_VMAX, PS_VMAX
@@ -495,12 +495,35 @@ func void View_AddText(var int hndl, var int x, var int y, var string text, var 
     ViewPtr_AddText(getPtr(hndl), x, y, text, font, -1);
 };
 
+//========================================
+// Text hinzufuegen (zentriert)
+//========================================
+func void ViewPtr_AddTextCentered(var int ptr, var string text, var string font, var int color) {
+    var zCView v; v = _^(ptr);
+    
+    var int lLenght; lLenght = Print_ToVirtual( Print_GetStringWidth(text, font), PS_X );
+    var int fHeight; fHeight = Print_ToVirtual( Print_GetFontHeight(font), PS_Y );
+
+    var int xPos; xPos = (PS_VMAX / 2) - ( Print_ToVirtual(lLenght, v.vsizex) / 2 ); 
+    var int yPos; yPos = (PS_VMAX / 2) - ( Print_ToVirtual(fHeight, v.vsizey) / 2 ); 
+
+    ViewPtr_AddText(getPtr(hndl), xPos, yPos, text, font, color);
+};
+
+func void View_AddTextCentered(var int hndl, var string text, var string font) {
+    ViewPtr_AddTextCentered(getPtr(hndl), text, font, -1);
+};
+
+func void View_AddTextCenteredColored(var int hndl, var string text, var string font, var int color) {
+    ViewPtr_AddTextCentered(getPtr(hndl), text, font, color);
+};
+
 func void View_AddTextColored(var int hndl, var int x, var int y, var string text, var string font, var int color) {
     ViewPtr_AddText(getPtr(hndl), x, y, text, font, color);
 };
 
 //========================================
-// Textview hinzuf�gen
+// Textview hinzufuegen
 //========================================
 func void ViewPtr_AddTextView(var int ptr, var int view) {
     var zCView v; v = _^(ptr);
