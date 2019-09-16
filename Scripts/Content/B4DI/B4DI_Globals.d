@@ -14,5 +14,6 @@ var int lastHeroMaxMANA;
 
 var int isInventoryOpen; 
 var int areItemPreviewsHidden;
+//var int anyFightModeActive;
 
 var int heroGotHit;

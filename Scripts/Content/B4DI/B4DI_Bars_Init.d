@@ -14,7 +14,7 @@ func void B4DI_Bars_InitOnce() {
 	HookDaedalusFuncS("B_GivePlayerXP", "B4DI_xpBar_update"); 						// B4DI_xpBar_update(var int add_xp)
 	//MEM_Game.pause_screen as a TODO condition
 	HookEngine(cGameManager__ApplySomeSettings_rtn, 6, "B4DI_Bars_applySettings");  // B4DI_Bars_applySettings()
-	HookEngine(oCNpc__OpenScreen_Status, 7 , "B4DI_xpBar_show"); 					// B4DI_xpBar_show()
+	HookEngine(oCNpc__OpenScreen_Status, 7 , "B4DI_OpenScreen_Status"); 					// B4DI_xpBar_show()
 
 	HookEngine(oCNpc__OpenInventory, 6 , "B4DI_inventory_opend");					// B4DI_inventory_opend()
 	HookEngine(oCNpc__CloseInventory, 9 , "B4DI_inventory_closed");					// B4DI_inventory_closed()
@@ -61,6 +61,7 @@ func void B4DI_Bars_InitOnce() {
 
 func void B4DI_Bars_InitAlways() {
 	isInventoryOpen = false;
+	//anyFightModeActive = false; //check if possible to save and load active fight mode then swap to intit once
 	areItemPreviewsHidden = true;
 
 	B4DI_hpBar_InitAlways();

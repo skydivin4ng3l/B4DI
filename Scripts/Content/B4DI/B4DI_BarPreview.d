@@ -35,6 +35,7 @@ func int B4DI_BarPreview_GetValue( var int barPreview_hndl) {
         return 0;
     };
     var _barPreview bp; bp = get(barPreview_hndl);
+    B4DI_Info1("B4DI_BarPreview_GetValue: ", bp.val);
     return bp.val;
 };
 
@@ -152,6 +153,7 @@ func void B4DI_BarPreview_CalcPosScale( var int barPreview_hndl, var int value) 
         SB_Destroy();
     };
 
+    
 
 };
 

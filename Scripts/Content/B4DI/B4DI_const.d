@@ -23,6 +23,8 @@ const int    B4DI_INITIALIZED        = 0;                    // Indicator whethe
 
 const int B4DI_BARPREVIEW_HAS_OWN_LABEL = 1;
 
+const string B4DI_LABEL_FONT = "Font_old_10_white.tga";
+
 /// Hooks
 
 const int oCNpc__OpenScreen_Status 				= 7592320;		// 0x73D980 // HookLen: 7

@@ -211,13 +211,23 @@ func string B4DI_eBar_generateLabelTextSimple(var int ebar_hndl) {
 // eBar RefreshLabel
 //========================================
 func void B4DI_eBar_RefreshLabel(var int eBar_hndl) {
+    //TODO make optional
     if(!Hlp_IsValidHandle(eBar_hndl)) { return; };
     var _extendedBar eBar; eBar = get(eBar_hndl);
     
     var _bar bar; bar = get(eBar.bar);
-    //TODO make optional
+    var zCView vLabel; vLabel = View_Get(bar.vMiddle);
+    var string label; label = B4DI_eBar_generateLabelTextSimple(eBar_hndl);
+
+    var int lLenght; lLenght = Print_ToVirtual( Print_GetStringWidth(label, B4DI_LABEL_FONT), PS_X );
+    var int fHeight; fHeight = Print_ToVirtual( Print_GetFontHeight(B4DI_LABEL_FONT), PS_Y );
+
+    var int xPos; xPos = (PS_VMAX / 2) - ( Print_ToVirtual(lLenght, vLabel.vsizex) / 2 ); // >>1 == / 2
+    var int yPos; yPos = (PS_VMAX / 2) - ( Print_ToVirtual(fHeight, vLabel.vsizey) / 2 ); // >>1 == / 2
+    B4DI_Info2("Label xPos: ", xPos, " yPos: ", yPos );
+
     View_DeleteText(bar.vMiddle);
-    View_AddText(bar.vMiddle, 0, -100, B4DI_eBar_generateLabelTextSimple(eBar_hndl), TEXT_FONT_Inventory);
+    View_AddText(bar.vMiddle, xPos, yPos , label , B4DI_LABEL_FONT);
     if(eBar.isFadedOut) {
         B4DI_eBar_SetAlpha(eBar_hndl, 0);
     };
@@ -306,20 +316,20 @@ func void B4DI_Bar_SetValues(var int bar_hndl, var int index_value, var int inde
 //========================================
 // Bar Label may be deprecated
 //========================================
-func string B4DI_Bar_generateLabel(var int bar_hndl, var int current_value, var int max_value) {
-    if(SB_Get()) {
-        B4DI_preserve_current_StringBuilder = SB_Get();
-    };
-    var int sbuilder; sbuilder=SB_New();
-    SB_Use(sbuilder);
-    SBi(current_value);
-    //if()
-     SB(" / "); SBi(max_value);
-    var string label; label = SB_ToString();
-    SB_Destroy();
-    SB_Use(B4DI_preserve_current_StringBuilder);
-    return label;
-};
+//func string B4DI_Bar_generateLabel(var int bar_hndl, var int current_value, var int max_value) {
+//    if(SB_Get()) {
+//        B4DI_preserve_current_StringBuilder = SB_Get();
+//    };
+//    var int sbuilder; sbuilder=SB_New();
+//    SB_Use(sbuilder);
+//    SBi(current_value);
+//    //if()
+//     SB(" / "); SBi(max_value);
+//    var string label; label = SB_ToString();
+//    SB_Destroy();
+//    SB_Use(B4DI_preserve_current_StringBuilder);
+//    return label;
+//};
 
 //========================================
 // eBar Refresh
@@ -328,7 +338,7 @@ func void B4DI_eBar_Refresh(var int eBar_hndl, var int index_value, var int inde
     if(!Hlp_IsValidHandle(eBar_hndl)) { return; };
     var _extendedBar eBar; eBar = get(eBar_hndl);
     B4DI_Bar_SetValues(eBar.bar, index_value, index_valueMax);
-    
+
     B4DI_eBar_RefreshLabel(eBar_hndl);
 
     MEM_Info("B4DI_eBar_Refresh");
