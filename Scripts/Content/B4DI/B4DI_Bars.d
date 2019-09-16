@@ -177,6 +177,8 @@ func void B4DI_Bars_showItemPreview() {
 			value = MEM_ReadStatArr(selectedInvItem.COUNT,index);
 			MEM_Info("B4DI_Bars_showItemPreview HPMax");
 			//TODO preview HPMax
+			B4DI_eBar_SetPreviewChangesMaximum(MEM_eBar_HP_handle);
+			B4DI_eBar_ShowPreview(MEM_eBar_HP_handle, value);
 		};
 		if( STR_Compare(type , NAME_Bonus_Mana ) == STR_EQUAL ) {
 			value = MEM_ReadStatArr(selectedInvItem.COUNT,index);
@@ -188,6 +190,8 @@ func void B4DI_Bars_showItemPreview() {
 			value = MEM_ReadStatArr(selectedInvItem.COUNT,index);
 			MEM_Info("B4DI_Bars_showItemPreview MANAMax");
 			//TODO preview manaMax
+			B4DI_eBar_SetPreviewChangesMaximum(MEM_eBar_MANA_handle);
+			B4DI_eBar_ShowPreview(MEM_eBar_MANA_handle, value);
 		};
 		if( STR_Compare(type , NAME_Mana_needed ) == STR_EQUAL ) {
 			value = MEM_ReadStatArr(selectedInvItem.COUNT,index);

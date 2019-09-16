@@ -21,6 +21,7 @@ func int B4DI_BarPreview_Create( var int eBar_hndl){
     View_SetTexture(bp.vOverShoot, ViewPtr_GetTexture( MEM_InstToPtr(vBar) ) );
 
     bp.val = 0;
+    bp.changesMaximum = 0;
     bp.isFadedOutPreview = 1;
     bp.isFadedOutOvershoot = 1;
     bp.eBar_parent = eBar_hndl;
@@ -37,6 +38,24 @@ func int B4DI_BarPreview_GetValue( var int barPreview_hndl) {
     var _barPreview bp; bp = get(barPreview_hndl);
     B4DI_Info1("B4DI_BarPreview_GetValue: ", bp.val);
     return bp.val;
+};
+
+func void B4DI_BarPreview_SetChangesMaximum( var int barPreview_hndl ){
+    if(!Hlp_IsValidHandle(barPreview_hndl)) {
+        MEM_Warn("B4DI_BarPreview_SetChangesMaximum failed ");
+        return;
+    };
+    var _barPreview bp; bp = get(barPreview_hndl);
+    bp.changesMaximum = 1;
+};
+
+func void B4DI_BarPreview_GetChangesMaximum( var int barPreview_hndl ){
+    if(!Hlp_IsValidHandle(barPreview_hndl)) {
+        MEM_Warn("B4DI_BarPreview_GetChangesMaximum failed ");
+        return;
+    };
+    var _barPreview bp; bp = get(barPreview_hndl);
+    return bp.changesMaximum;
 };
 
 func void B4DI_BarPreview_Show( var int barPreview_hndl) {
@@ -87,6 +106,7 @@ func void B4DI_BarPreview_hide( var int barPreview_hndl) {
     var _barPreview bp; bp = get(barPreview_hndl);
     //TODO: cancle animanitions
     bp.val = 0;
+    bp.changesMaximum = 0;
     bp.isFadedOutPreview = 1;
     View_Close(bp.vPreView);
     B4DI_BarPreview_hideOverShoot(barPreview_hndl);
@@ -102,7 +122,7 @@ func void B4DI_BarPreview_CalcPosScale( var int barPreview_hndl, var int value) 
     var _extendedBar eBar; eBar = get(bp.eBar_parent);
     var _bar bar; bar = get(eBar.bar);
     var zCview vBar; vBar = View_Get(bar.v1);
-    var zCView preview; preview = View_Get(bp.vPreView);
+    var zCView vPreview; vPreview = View_Get(bp.vPreView);
 
     bp.val = value;
 
@@ -148,8 +168,16 @@ func void B4DI_BarPreview_CalcPosScale( var int barPreview_hndl, var int value) 
     };
     
     if(B4DI_BARPREVIEW_HAS_OWN_LABEL){
+        var string label; label = SB_ToString();
+
+        var int lLenght; lLenght = Print_ToVirtual( Print_GetStringWidth(label, B4DI_LABEL_FONT), PS_X );
+        var int fHeight; fHeight = Print_ToVirtual( Print_GetFontHeight(B4DI_LABEL_FONT), PS_Y );
+
+        var int xPos; xPos = (PS_VMAX / 2) - ( Print_ToVirtual(lLenght, vLabel.vsizex) / 2 ); // >>1 == / 2
+        var int yPos; yPos = (PS_VMAX / 2) - ( Print_ToVirtual(fHeight, vLabel.vsizey) / 2 ); // >>1 == / 2
+
         View_DeleteText(bp.vPreView);
-        View_AddText(bp.vPreView, preview.vsizex>>1, preview.vsizey>>1, SB_ToString(), TEXT_FONT_Inventory );
+        View_AddText(bp.vPreView, xPos, yPos, label, TEXT_FONT_Inventory );
         SB_Destroy();
     };
 

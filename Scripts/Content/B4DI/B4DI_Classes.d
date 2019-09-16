@@ -37,6 +37,7 @@ class _barPreview {
     var int vPreView;                    // zCView(h)
     var int vOverShoot;                 // zCView(h)
     var int val;
+    var int changesMaximum;
     var int anim8Pulse;               // A8Head(h)
     var int eBar_parent;               // _extentedBar(h)
     var int isFadedOutPreview;                 // Boolean

@@ -186,6 +186,7 @@ func string B4DI_eBar_generateLabelTextSimple(var int ebar_hndl) {
     var _extendedBar eBar; eBar = get(eBar_hndl);
     var _bar bar; bar = get(eBar.bar);
     var int previewValue; previewValue = B4DI_BarPreview_GetValue(eBar.barPreview);
+    var int changesMaximum; changesMaximum = B4DI_BarPreview_GetChangesMaximum(eBar.barPreview);
 
     SBi(bar.val);
     if(previewValue < 0) {
@@ -200,6 +201,13 @@ func string B4DI_eBar_generateLabelTextSimple(var int ebar_hndl) {
         };
     };
     SB(" / "); SBi(bar.valMax);
+    if(changesMaximum) {
+        if(previewValue<0) {
+            SB(" ");
+        } else if (previewValue > 0) {
+            SB(" +"); SBi(previewValue);
+        };
+    };
     var string label; label = SB_ToString();
     SB_Destroy();
     SB_Use(B4DI_preserve_current_StringBuilder);
@@ -294,6 +302,14 @@ func void B4DI_eBar_ShowPreview(var int eBar_hndl, var int value) {
 
     areItemPreviewsHidden = false;
     MEM_Info("B4DI_eBar_ShowPreview successful");
+};
+
+func void B4DI_eBar_SetPreviewChangesMaximum(var int eBar_hndl){
+    if(!Hlp_IsValidHandle(eBar_hndl)) { return; };
+    var _extendedBar eBar; eBar = get(eBar_hndl);
+
+    B4DI_BarPreview_SetChangesMaximum(eBar.barPreview);
+
 };
 
 //========================================
