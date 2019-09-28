@@ -4,6 +4,9 @@ B4DI_Globals.d
 
 B4DI_BarPreview.d
 B4DI_extendedBar.d
+B4DI_Bars_GeneralFunctions.d
+
+B4DI_Bars_FocusBar.d
 B4DI_Bars.d
 B4DI_Bars_Init.d
 B4DI_Init.d

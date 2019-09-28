@@ -414,13 +414,13 @@ func void ViewPtr_ResizeCentered(var int ptr, var int x, var int y) {
     ViewPtr_Resize(ptr, x, y);
     //Calc the size difference caused by the resize all in virtual space
     var int posDifY; posDifY = (v.vsizey - sizey_pre)/2;
-    B4DI_debugSpy("posDifY", IntToString(posDifY));
+    //B4DI_debugSpy("posDifY", IntToString(posDifY));
     //positive difference means View is now bigger than before
     //  therefore needs to be moved into the opposite direction
     posDifY *= -1;
     
     var int posDifX; posDifX = (v.vsizex - sizex_pre)/2;
-    B4DI_debugSpy("posDifX", IntToString(posDifX));
+    //B4DI_debugSpy("posDifX", IntToString(posDifX));
     posDifX *= -1;
     
     ViewPtr_MoveTo(ptr, v.vposx+posDifX, v.vposy+posDifY);
@@ -438,13 +438,13 @@ func void ViewPtr_ResizeCenteredValidScreenSpace(var int ptr, var int x, var int
     ViewPtr_Resize(ptr, x, y);
     //Calc the size difference caused by the resize all in virtual space
     var int posDifY; posDifY = (v.vsizey - sizey_pre)/2;
-    B4DI_debugSpy("posDifY", IntToString(posDifY));
+    //B4DI_debugSpy("posDifY", IntToString(posDifY));
     //positive difference means View is now bigger than before
     //  therefore needs to be moved into the opposite direction
     posDifY *= -1;
     
     var int posDifX; posDifX = (v.vsizex - sizex_pre)/2;
-    B4DI_debugSpy("posDifX", IntToString(posDifX));
+    //B4DI_debugSpy("posDifX", IntToString(posDifX));
     posDifX *= -1;
     
     ViewPtr_MoveToValidScreenSpace(ptr, v.vposx+posDifX, v.vposy+posDifY);
@@ -507,7 +507,7 @@ func void ViewPtr_AddTextCentered(var int ptr, var string text, var string font,
     var int xPos; xPos = (PS_VMAX / 2) - ( Print_ToVirtual(lLenght, v.vsizex) / 2 ); 
     var int yPos; yPos = (PS_VMAX / 2) - ( Print_ToVirtual(fHeight, v.vsizey) / 2 ); 
 
-    ViewPtr_AddText(getPtr(hndl), xPos, yPos, text, font, color);
+    ViewPtr_AddText(ptr, xPos, yPos, text, font, color);
 };
 
 func void View_AddTextCentered(var int hndl, var string text, var string font) {

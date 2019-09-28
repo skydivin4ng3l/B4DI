@@ -16,4 +16,8 @@ var int isInventoryOpen;
 var int areItemPreviewsHidden;
 //var int anyFightModeActive;
 
+var int idOfCurrentFocus;
+var int lastAttitudeOfCurrentFocus;
+
 var int heroGotHit;
+var int enemyInFocusGotHit;

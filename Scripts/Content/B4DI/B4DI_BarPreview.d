@@ -36,7 +36,7 @@ func int B4DI_BarPreview_GetValue( var int barPreview_hndl) {
         return 0;
     };
     var _barPreview bp; bp = get(barPreview_hndl);
-    B4DI_Info1("B4DI_BarPreview_GetValue: ", bp.val);
+    //B4DI_Info1("B4DI_BarPreview_GetValue: ", bp.val);
     return bp.val;
 };
 
@@ -49,12 +49,13 @@ func void B4DI_BarPreview_SetChangesMaximum( var int barPreview_hndl ){
     bp.changesMaximum = 1;
 };
 
-func void B4DI_BarPreview_GetChangesMaximum( var int barPreview_hndl ){
+func int B4DI_BarPreview_GetChangesMaximum( var int barPreview_hndl ){
     if(!Hlp_IsValidHandle(barPreview_hndl)) {
         MEM_Warn("B4DI_BarPreview_GetChangesMaximum failed ");
-        return;
+        return 0;
     };
     var _barPreview bp; bp = get(barPreview_hndl);
+
     return bp.changesMaximum;
 };
 
@@ -95,7 +96,7 @@ func void B4DI_BarPreview_hideOverShoot( var int barPreview_hndl) {
     //TODO: cancle animanitions
     bp.isFadedOutOvershoot = 1;
     View_Close(bp.vOverShoot);
-    MEM_Info("B4DI_BarPreview_hideOverShoot");
+    //MEM_Info("B4DI_BarPreview_hideOverShoot");
 };
 
 func void B4DI_BarPreview_hide( var int barPreview_hndl) {
@@ -126,6 +127,7 @@ func void B4DI_BarPreview_CalcPosScale( var int barPreview_hndl, var int value) 
 
     bp.val = value;
 
+    //TODO negative Preview
     if(B4DI_BARPREVIEW_HAS_OWN_LABEL){
         var int s0;s0=SB_New(); SB_Use(s0);
         SB("+");
@@ -166,6 +168,7 @@ func void B4DI_BarPreview_CalcPosScale( var int barPreview_hndl, var int value) 
             SBi(value);
         };
     };
+    //TODO preview for maximum increase
     
     if(B4DI_BARPREVIEW_HAS_OWN_LABEL){
         var string label; label = SB_ToString();
@@ -173,8 +176,8 @@ func void B4DI_BarPreview_CalcPosScale( var int barPreview_hndl, var int value) 
         var int lLenght; lLenght = Print_ToVirtual( Print_GetStringWidth(label, B4DI_LABEL_FONT), PS_X );
         var int fHeight; fHeight = Print_ToVirtual( Print_GetFontHeight(B4DI_LABEL_FONT), PS_Y );
 
-        var int xPos; xPos = (PS_VMAX / 2) - ( Print_ToVirtual(lLenght, vLabel.vsizex) / 2 ); // >>1 == / 2
-        var int yPos; yPos = (PS_VMAX / 2) - ( Print_ToVirtual(fHeight, vLabel.vsizey) / 2 ); // >>1 == / 2
+        var int xPos; xPos = (PS_VMAX / 2) - ( Print_ToVirtual(lLenght, vPreView.vsizex) / 2 ); // >>1 == / 2
+        var int yPos; yPos = (PS_VMAX / 2) - ( Print_ToVirtual(fHeight, vPreView.vsizey) / 2 ); // >>1 == / 2
 
         View_DeleteText(bp.vPreView);
         View_AddText(bp.vPreView, xPos, yPos, label, TEXT_FONT_Inventory );

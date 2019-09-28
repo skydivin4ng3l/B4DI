@@ -100,17 +100,6 @@ func void B4DI_Bar_dynamicMenuBasedScale(var int bar_hndl){
     //compensate scaling difference of left and top offset
     //should not be needed for centered//View_MoveTo(b.v1, vBar.vposx- barLeftOffset , vBar.vposy-barTopOffset);
 
-    ////---debug print
-    
-    var int s0;s0=SB_New();
-    SB_Use(s0);
-    SB("scaleFactor: "); SBi(roundf(dynScalingFactor));SB("  ");
-    SB("dynScalingFactor: "); SB(toStringf(dynScalingFactor)); SB(" / ");
-    SB("BACK: ");   SBi(vBack.psizex); SB(" , "); SBi(vBack.psizey); SB(" ");
-    SB("BAR: ");   SBi(vBar.psizex); SB(" , "); SBi(vBar.psizey); SB(" ");
-    SB("barW: "); SBi( Print_ToPixel( b.barW, PS_X ) );
-    Print_ExtPxl(50,Print_Screen[PS_Y] / 2, SB_ToString(), FONT_Screen, RGBA(255,0,0,200),2500);
-    SB_Destroy();
 };
 
 //========================================
@@ -211,7 +200,7 @@ func string B4DI_eBar_generateLabelTextSimple(var int ebar_hndl) {
     var string label; label = SB_ToString();
     SB_Destroy();
     SB_Use(B4DI_preserve_current_StringBuilder);
-    B4DI_debugSpy("B4DI_eBar_generateLabelTextSimple: ", label);
+    //B4DI_debugSpy("B4DI_eBar_generateLabelTextSimple: ", label);
     return label;
 };
 
@@ -232,7 +221,7 @@ func void B4DI_eBar_RefreshLabel(var int eBar_hndl) {
 
     var int xPos; xPos = (PS_VMAX / 2) - ( Print_ToVirtual(lLenght, vLabel.vsizex) / 2 ); // >>1 == / 2
     var int yPos; yPos = (PS_VMAX / 2) - ( Print_ToVirtual(fHeight, vLabel.vsizey) / 2 ); // >>1 == / 2
-    B4DI_Info2("Label xPos: ", xPos, " yPos: ", yPos );
+    //B4DI_Info2("Label xPos: ", xPos, " yPos: ", yPos );
 
     View_DeleteText(bar.vMiddle);
     View_AddText(bar.vMiddle, xPos, yPos , label , B4DI_LABEL_FONT);
@@ -240,22 +229,30 @@ func void B4DI_eBar_RefreshLabel(var int eBar_hndl) {
         B4DI_eBar_SetAlpha(eBar_hndl, 0);
     };
 
-    B4DI_Info1("B4DI_eBar_RefreshLabel call while isFadedOut: ", eBar.isFadedOut);
+    //B4DI_Info1("B4DI_eBar_RefreshLabel call while isFadedOut: ", eBar.isFadedOut);
 };
 
 //========================================
 // eBar Hide / Show
 //========================================
-func void B4DI_eBar_hide( var int eBar_hndl){
+func void B4DI_eBar_hide( var int eBar_hndl, var int instantHide){
     if(!Hlp_IsValidHandle(ebar_hndl)) {
         MEM_Info("B4DI_eBar_hide failed");
         return;
     };
     var _extendedBar eBar_inst; eBar_inst = get(ebar_hndl);
 
-    eBar_inst.isFadedOut = 1;
-    B4DI_eBar_fadeOut(eBar_hndl, false);
-    MEM_Info("B4DI_eBar_hide successful");
+    if( !eBar_inst.isFadedOut ) {
+        eBar_inst.isFadedOut = 1;
+        if(instantHide) {
+            B4DI_eBar_SetAlpha(eBar_hndl, 0);
+        } else {
+            B4DI_eBar_fadeOut(eBar_hndl, false);
+        };
+        MEM_Info("B4DI_eBar_hide successful");
+    } else {
+        MEM_Info("B4DI_eBar_hide already hidden");
+    };
 };
 
 func void B4DI_eBar_show( var int eBar_hndl){
@@ -264,12 +261,17 @@ func void B4DI_eBar_show( var int eBar_hndl){
         return;
     };
     var _extendedBar eBar_inst; eBar_inst = get(eBar_hndl);
-    if(Hlp_IsValidHandle(eBar_inst.anim8FadeOut) ){
-        Anim8_Delete(eBar_inst.anim8FadeOut);
+    if (eBar_inst.isFadedOut) {
+        if(Hlp_IsValidHandle(eBar_inst.anim8FadeOut) ){
+            Anim8_Delete(eBar_inst.anim8FadeOut);
+        };
+        eBar_inst.isFadedOut = 0;
+        B4DI_eBar_SetAlpha(eBar_hndl, 255);
+        //Bar_Show(eBar_inst.bar);
+        MEM_Info("B4DI_eBar_show successful");
+    } else {
+        MEM_Info("B4DI_eBar_show already visible");
     };
-    eBar_inst.isFadedOut = 0;
-    B4DI_eBar_SetAlpha(eBar_hndl, 255);
-    Bar_Show(eBar_inst.bar);
 
     ////TODO make optional 
     //B4DI_eBar_RefreshLabel(eBar_hndl);
@@ -279,7 +281,6 @@ func void B4DI_eBar_show( var int eBar_hndl){
 
     //View_AddText(bar.vMiddle, 0, 0, B4DI_eBar_generateLabelTextSimple(eBar_hndl), TEXT_FONT_Inventory);
 
-    MEM_Info("B4DI_eBar_show successful");
 };
 
 //========================================
@@ -315,18 +316,30 @@ func void B4DI_eBar_SetPreviewChangesMaximum(var int eBar_hndl){
 //========================================
 // eBar Value
 //========================================
-func void B4DI_Bar_SetValues(var int bar_hndl, var int index_value, var int index_valueMax) {
-    if(!Hlp_IsValidHandle(bar_hndl)) { return; };
-
-    Bar_SetMax(bar_hndl, MEM_ReadStatArr(hero.attribute, index_valueMax) );
-    Bar_SetValue(bar_hndl, MEM_ReadStatArr(hero.attribute, index_value) );
+func void B4DI_Bar_SetValuesNPC(var int bar_hndl, var int index_value, var int index_valueMax, var int C_NPC_ptr) {
+    if( !Hlp_IsValidHandle(bar_hndl) ) { return; };
     
-    MEM_Info("B4DI_Bar_SetValues");
-    //var _bar bar; bar = get(bar_hndl);
-    //MEM_Info(cs2("hero.attribute[ATR_HITPOINTS_MAX]: ",i2s(hero.attribute[ATR_HITPOINTS_MAX])));
-    //MEM_Info(cs2(" hero.attribute[ATR_HITPOINTS]: ",i2s(hero.attribute[ATR_HITPOINTS])));
-    //MEM_Info(cs2("bar.valMax: ",i2s(bar.valMax)));
-    //MEM_Info(cs2(" bar.val: ",i2s(bar.val)));
+    var C_NPC my_npc;
+    if(C_NPC_ptr < 1) {
+        my_npc = _^(_@(hero));
+
+    } else {
+        my_npc = MEM_PtrToInst(C_NPC_ptr);
+        if( !Hlp_IsValidNpc( my_npc ) ) { 
+            MEM_Info("B4DI_Bar_SetValuesNpc failed not correct NPC");
+            return;
+        };
+        MEM_Info("B4DI_Bar_SetValuesNPC");
+    };
+
+    Bar_SetMax(bar_hndl, MEM_ReadStatArr(my_npc.attribute, index_valueMax) );
+    Bar_SetValue(bar_hndl, MEM_ReadStatArr(my_npc.attribute, index_value) );
+    
+    
+};
+
+func void B4DI_Bar_SetValues(var int bar_hndl, var int index_value, var int index_valueMax) {
+    B4DI_Bar_SetValuesNPC(bar_hndl, index_value, index_valueMax, 0);
 };
 
 //========================================
@@ -350,13 +363,28 @@ func void B4DI_Bar_SetValues(var int bar_hndl, var int index_value, var int inde
 //========================================
 // eBar Refresh
 //========================================
-func void B4DI_eBar_Refresh(var int eBar_hndl, var int index_value, var int index_valueMax) {
+func void B4DI_eBar_RefreshNPC(var int eBar_hndl, var int index_value, var int index_valueMax, var int C_NPC_ptr) {
     if(!Hlp_IsValidHandle(eBar_hndl)) { return; };
     var _extendedBar eBar; eBar = get(eBar_hndl);
-    B4DI_Bar_SetValues(eBar.bar, index_value, index_valueMax);
+
+    if ( C_NPC_ptr < 1 ) {
+        B4DI_Bar_SetValues(eBar.bar, index_value, index_valueMax);
+    } else {
+        var C_NPC my_npc; my_npc = MEM_PtrToInst(C_NPC_ptr);
+        if ( !Hlp_IsValidNpc( my_npc ) ) {
+            MEM_Warn("B4DI_eBar_RefreshNPC failed wrong NPC_ptr");
+            return;
+        };
+        B4DI_Bar_SetValuesNPC(eBar.bar, index_value, index_valueMax, C_NPC_ptr);
+        //MEM_Info("B4DI_eBar_Refresh NPC specific");
+    };
 
     B4DI_eBar_RefreshLabel(eBar_hndl);
 
     MEM_Info("B4DI_eBar_Refresh");
+};
+
+func void B4DI_eBar_Refresh(var int eBar_hndl, var int index_value, var int index_valueMax) {
+    B4DI_eBar_RefreshNPC( eBar_hndl, index_value, index_valueMax, 0);
 };
 

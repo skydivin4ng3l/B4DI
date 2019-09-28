@@ -1,77 +1,14 @@
 //////
 /// TODO move all changes in LeGo Classes here or at least seperate additions from vanilla LeGo
 
-
-//#################################################################
-//
-//  General Functions
-//
-//#################################################################
-
-//TODO Depricated -> migrate XP-Bar
-func void B4DI_Bar_fadeOut(var int bar_hndl, var int deleteBar) {
-	var _bar bar_inst; bar_inst = get(bar_hndl);
-	bar_inst.anim8FadeOut = Anim8_NewExt(255, Bar_SetAlpha, bar_hndl, false);
-	Anim8_RemoveIfEmpty(bar_inst.anim8FadeOut, true);
-	if (deleteBar) {
-		Anim8_RemoveDataIfEmpty(bar_inst.anim8FadeOut, true);
-	} else {
-		Anim8_RemoveDataIfEmpty(bar_inst.anim8FadeOut, false);
+func void B4DI_heroInstance_InitAlways() {
+	var int oCNpc_hero_ptr; oCNpc_hero_ptr = MEM_InstToPtr(oHero);
+	if(!Hlp_Is_oCNpc( oCNpc_hero_ptr ) ) {
+		var int hero_ptr; hero_ptr = MEM_InstToPtr(hero);
+	  	oHero = MEM_PtrToInst(hero_ptr);
 	};
 	
-	Anim8(bar_inst.anim8FadeOut, 255,  5000, A8_Wait);
-	Anim8q(bar_inst.anim8FadeOut,   0, 2000, A8_SlowEnd);
-
 };
-
-func void B4DI_Bar_pulse_size(var int bar_hndl) {
-	var int a8_XpBar_pulse; a8_XpBar_pulse = Anim8_NewExt(100 , B4DI_Bar_SetBarSizeCenteredPercentXY, bar_hndl, false); //height input
-	Anim8_RemoveIfEmpty(a8_XpBar_pulse, true);
-	Anim8_RemoveDataIfEmpty(a8_XpBar_pulse, false);
-	
-	Anim8 (a8_XpBar_pulse, 100,  100, A8_Wait);
-	Anim8q(a8_XpBar_pulse, 150, 200, A8_SlowEnd);
-	Anim8q(a8_XpBar_pulse, 100, 100, A8_SlowStart);
-
-};
-
-//TODO Depricated
-//func void B4DI_Bar_hide( var int bar_hndl){
-//	if(!Hlp_IsValidHandle(bar_hndl)) {
-//		MEM_Info("B4DI_Bar_hide failed");
-//		return;
-//	};
-//	var _bar bar_inst; bar_inst = get(bar_hndl);
-//	bar_inst.isFadedOut = 1;
-//	B4DI_Bar_fadeOut(bar_hndl, false);
-//	MEM_Info("B4DI_Bar_hide successful");
-
-//};
-
-//TODO Depricated
-//func void B4DI_Bar_show( var int bar_hndl){
-//	if(!Hlp_IsValidHandle(bar_hndl)) {
-//		MEM_Info("B4DI_Bar_show failed");
-//		return;
-//	};
-//	var _bar bar_inst; bar_inst = get(bar_hndl);
-//	if(Hlp_IsValidHandle(bar_inst.anim8FadeOut) ){
-//		Anim8_Delete(bar_inst.anim8FadeOut);
-//	};
-//	bar_inst.isFadedOut = 0;
-//	Bar_SetAlpha(bar_hndl, 255);
-//	Bar_Show(bar_hndl);
-	
-//	MEM_Info("B4DI_Bar_show successful");
-//};
-
-func void B4DI_originalBar_hide( var int obar_ptr){
-	var oCViewStatusBar bar_inst; bar_inst = MEM_PtrToInst(obar_ptr);
-	bar_inst.zCView_alpha = 0; //backView
-	ViewPtr_SetAlpha(bar_inst.range_bar, 0); //middleView
-	ViewPtr_SetAlpha(bar_inst.value_bar, 0);	//barView
-};
-
 //#################################################################
 //
 //  Inventory related
@@ -206,10 +143,10 @@ func void B4DI_Bars_showItemPreview() {
 //=====Inv_GetSelectedItem=====
 
 func int Inv_GetSelectedItem(){
-	var int hero_ptr; hero_ptr = MEM_InstToPtr(hero);
-	var oCNpc oCNPC_hero; oCNPC_hero = MEM_PtrToInst(hero_ptr);
-	var int itm_index; itm_index = oCNPC_hero.inventory2_oCItemContainer_selectedItem + 2; 		//anscheinend sind die ersten beiden items in der List nie belegt.
-	var zCListSort list; list = _^(oCNPC_hero.inventory2_oCItemContainer_contents);
+	//var int hero_ptr; hero_ptr = MEM_InstToPtr(hero);
+	//var oCNpc oCNPC_hero; oCNPC_hero = MEM_PtrToInst(hero_ptr);
+	var int itm_index; itm_index = oHero.inventory2_oCItemContainer_selectedItem + 2; 		//anscheinend sind die ersten beiden items in der List nie belegt.
+	var zCListSort list; list = _^(oHero.inventory2_oCItemContainer_contents);
 	if (List_HasLengthS(_@(list), itm_index))
 	{	
 		var int itm_ptr; itm_ptr = List_GetS(_@(list), itm_index);
@@ -437,8 +374,8 @@ func void B4DI_Bars_update(){
 	} else if(Npc_IsInFightMode( hero, FMODE_NONE ) & !heroHpChanged & !heroManaChanged & !isInventoryOpen & !MEM_eBar_Hp.isFadedOut) {
 		//B4DI_hpBar_hide();	
 		//B4DI_Bar_hide(MEM_dBar_HP_handle);	//TODO Update
-		B4DI_eBar_hide(MEM_eBar_MANA_handle);
-		B4DI_eBar_hide(MEM_eBar_HP_handle);
+		B4DI_eBar_hide(MEM_eBar_MANA_handle, false);
+		B4DI_eBar_hide(MEM_eBar_HP_handle, false);
 	};
 	if(isInventoryOpen){
 		selectedInvItem = _^(Inv_GetSelectedItem());
@@ -487,6 +424,10 @@ func void B4DI_Bars_applySettings() {
 	B4DI_Bar_dynamicMenuBasedScale(MEM_eBar_MANA.bar);
 	B4DI_manaBar_Refresh();
 
+	B4DI_Bar_dynamicMenuBasedScale(MEM_eBar_FOCUS.bar);
+	//TODO find a way rto refeshed if necessary and relevant NPC
+	//B4DI_focusBar_Refresh();
+
 	MEM_Info("B4DI_Bars_applySettings");
 };
 
@@ -522,6 +463,26 @@ func void B4DI_manaBar_hooking_Spell_ProcessMana_Release( var int manaInvested) 
 	B4DI_Info1("B4DI_manaBar_hooking_Spell_ProcessMana_Release called" , manaInvested);
 };
 
+//========================================
+// FocusBar
+//========================================
+func void B4DI_oCGame__UpdatePlayerStatus(){
+	MEM_Info("B4DI_oCGame__UpdatePlayerStatus called");
+	//B4DI_focusBar_update();
+	//MEM_Info("B4DI_oCGame__UpdatePlayerStatus finished");
+};
+
+func void B4DI_oCGame__UpdatePlayerStatus_FocusBar(){
+	//MEM_Info("B4DI_oCGame__UpdatePlayerStatus_FocusBar called");
+	B4DI_focusBar_update();
+	//MEM_Info("B4DI_oCGame__UpdatePlayerStatus_FocusBar finished");
+};
+
+func void B4DI_oCGame__UpdatePlayerStatus_return(){
+	MEM_Info("B4DI_oCGame__UpdatePlayerStatus_return called");
+	B4DI_focusBar_update();
+	MEM_Info("B4DI_oCGame__UpdatePlayerStatus_return finished");
+};
 //========================================
 // Inventory
 //========================================
@@ -627,6 +588,16 @@ func void B4DIoCNpc__SetWeaponMode_custom_branch3(){
 		B4DI_update_fight_mode();
 };
 
+func void B4DI_oCNpc__SetWeaponMode_Ninja_GFA(){
+	MEM_Info("B4DI_oCNpc__SetWeaponMode_Ninja_GFA");
+	var oCNpc caller; caller = MEM_PtrToInst(ECX);
+	if (Npc_IsPlayer(caller)) {
+		B4DI_debugSpy("B4DI_oCNpc__SetWeaponMode_Ninja_GFA called by: ", caller.name);
+		B4DI_debugSpy("B4DI_oCNpc__SetWeaponMode_Ninja_GFA fMode is: ", IntToString(caller.fmode));
+		B4DI_update_fight_mode();
+	};
+};
+
 func void B4DI_oCNpc__SetWeaponMode2(){
 	//MEM_Info("B4DI_drawWeapon");
 	var oCNpc caller; caller = MEM_PtrToInst(ECX);
@@ -648,7 +619,7 @@ func void B4DI_oCNpc__SetWeaponMode2__zSTRING(){
 };
 
 //========================================
-// HpBar
+// HpBar/FocusBar
 //========================================
 func void B4DI_oCNpc__OnDamage_Hit(){
 	MEM_Info("B4DI_oCNpc__OnDamage_Hit");
@@ -658,6 +629,11 @@ func void B4DI_oCNpc__OnDamage_Hit(){
 		heroGotHit = true;
 	} else {
 		heroGotHit = false;
+		var int callerID; callerID = Npc_GetID(caller);
+		B4DI_Info1("callerID: ",callerID);
+		if (callerID == idOfCurrentFocus){
+			enemyInFocusGotHit = true;
+		};
 	};
 	B4DI_debugSpy("B4DI_oCNpc__OnDamage_Hit called by: ", caller.name);
 };
@@ -670,6 +646,11 @@ func void B4DI_oCNpc__OnDamage_Hit_return(){
 		B4DI_Bars_update();
 		MEM_Info("B4DI_oCNpc__OnDamage_Hit_return called after hero got hit");
 		heroGotHit = false;
+	};
+	if(enemyInFocusGotHit) { 
+		B4DI_focusBar_update();
+		MEM_Info("B4DI_oCNpc__OnDamage_Hit_return called after enemy in Focus got hit");
+		enemyInFocusGotHit = false;
 	};
 };
 

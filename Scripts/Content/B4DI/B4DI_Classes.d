@@ -97,19 +97,24 @@ instance B4DI_ManaBar(GothicBar){
     barTex = "Bar_Mana.tga";
 };
 
+instance B4DI_FocusBar(GothicBar){
+    x = 128+90; //128 virtual should be margin left
+    y = Print_Screen[PS_Y] -100;
+    barTop = 2;     // 2 is almost too small
+    barTex = "Bar_Health.tga";
+};
+
 /***********************************\
            Original Bars
 \***********************************/
 
 instance MEM_oBar_Hp(oCViewStatusBar);
 instance MEM_oBar_Mana(oCViewStatusBar);
+instance MEM_oBar_Focus(oCViewStatusBar);
 
 /***********************************\
             extented Bars
 \***********************************/
-
-var int MEM_dBar_HP_handle;
-instance MEM_dBar_HP(_bar);
 
 var int MEM_eBar_HP_handle;
 instance MEM_eBar_HP(_extendedBar);
@@ -117,8 +122,9 @@ instance MEM_eBar_HP(_extendedBar);
 var int MEM_eBar_MANA_handle;
 instance MEM_eBar_MANA(_extendedBar);
 
-var int MEM_preView_HP_handle;
-instance MEM_preView_HP(zCView);
+var int MEM_eBar_FOCUS_handle;
+instance MEM_eBar_FOCUS(_extendedBar);
+
 
 /***********************************\
       Selected Inventory Item
@@ -126,3 +132,10 @@ instance MEM_preView_HP(zCView);
 
 instance selectedInvItem(oCItem);
 var string lastSelectedItemName;
+
+/***********************************\
+      Hero Cast to oCNpc
+\***********************************/
+
+instance oHero(oCNpc);
+

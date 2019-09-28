@@ -265,8 +265,8 @@ func int Bar_CreateCenterDynamic(var int constructor_instance) {
     //TODO change to virtual? dynamic Resultionbased scale in Prototype?
     bar.v0 = View_CreateCenterPxl(bar_constr.x, bar_constr.y, bar_constr.width, bar_constr.height);
     bar.barW = bar_constr.width - bar_constr.barLeft *2;
-    bar.vMiddle = View_CreateCenterPxl(bar_constr.x, bar_constr.y, bar.barW, bar_constr.height- bar_constr.barTop *2);
     bar.v1 = View_CreateCenterPxl(bar_constr.x, bar_constr.y, bar.barW, bar_constr.height- bar_constr.barTop *2);
+    bar.vMiddle = View_CreateCenterPxl(bar_constr.x, bar_constr.y, bar.barW, bar_constr.height- bar_constr.barTop *2);
     //TODO remove? vMiddle is Range
     bar.barW = Print_ToVirtual(bar.barW, PS_X);
     //^^

@@ -21,7 +21,7 @@ const int    B4DI_INITIALIZED        = 0;                    // Indicator whethe
 // _barPreview Options
 //========================================
 
-const int B4DI_BARPREVIEW_HAS_OWN_LABEL = 1;
+const int B4DI_BARPREVIEW_HAS_OWN_LABEL = 0;
 
 const string B4DI_LABEL_FONT = "Font_old_10_white.tga";
 
@@ -70,6 +70,9 @@ const int oCNpc__SetWeaponMode_custom_branch1	= 7575981;     	//0x007399AD	// Ho
 const int oCNpc__SetWeaponMode_custom_branch2	= 7576043;     	//0x007399EB	// HookLen:	5 //draw magic
 const int oCNpc__SetWeaponMode_custom_branch3	= 7576106;     	//0x00739A2A	// HookLen:	5 //broken hook or uncommon case
 
+const int oCNpc__SetWeaponMode_Ninja			= 7575921;				//0x739971 //HookLen: 6
+
+
 //virtual void __thiscall oCNpc::SetWeaponMode2(int)    	0x00738E80	0	6
 const int oCNpc__SetWeaponMode2					= 7573120;    	//0x00738E80	// HookLen:	6
 //void __thiscall oCNpc::SetWeaponMode2(zSTRING const &)  	0x00738C60	0	7
@@ -84,7 +87,11 @@ const int oCNpc__OnDamage_Hit_return			= 6737701;				//0x066CF25 	// HookLen:	6
 
 //int __thiscall oCNpc::UseItem(oCItem *) 	0x0073BC10	0	7
 
+const int oCGame__UpdatePlayerStatus                = 7093113; //0x6C3B79 //HookLen: 8 Hook: Focusnames
 
+const int oCGame__UpdatePlayerStatus_focusbar = 7091981; //0x6C370D //HookLen: 6
+//0x6C3B79 //HookLen: 8 //Ninja Focus Names
+const int oCGame__UpdatePlayerStatus_return = 7093239;//0x006C3BF7 // HookLen: 7
 
 
 

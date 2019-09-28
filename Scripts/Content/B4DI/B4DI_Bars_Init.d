@@ -11,6 +11,9 @@ func void B4DI_Bars_InitOnce() {
 	//FMODE_NONE as not in combat 
 	B4DI_hpBar_InitOnce();
 	B4DI_manaBar_InitOnce();
+	B4DI_focusBar_InitOnce();
+
+	
 	HookDaedalusFuncS("B_GivePlayerXP", "B4DI_xpBar_update"); 						// B4DI_xpBar_update(var int add_xp)
 	//MEM_Game.pause_screen as a TODO condition
 	HookEngine(cGameManager__ApplySomeSettings_rtn, 6, "B4DI_Bars_applySettings");  // B4DI_Bars_applySettings()
@@ -43,18 +46,23 @@ func void B4DI_Bars_InitOnce() {
 	//HookEngine(oCNpcInventory__GetItem, 6, "B4DI_oCNpcInventory_GetItem");
 	HookEngine(oCNpc__GetFromInv, 10, "B4DI_oCNpc_GetFromInv");
 
-	HookEngine(oCNpc__SetWeaponMode_custom_branch1, 5, "B4DI_oCNpc__SetWeaponMode_custom_branch1");
-	HookEngine(oCNpc__SetWeaponMode_custom_branch2, 5, "B4DI_oCNpc__SetWeaponMode_custom_branch2");
-	HookEngine(oCNpc__SetWeaponMode_custom_branch3, 5, "B4DI_oCNpc__SetWeaponMode_custom_branch3");
+	//HookEngine(oCNpc__SetWeaponMode_custom_branch1, 5, "B4DI_oCNpc__SetWeaponMode_custom_branch1");
+	//HookEngine(oCNpc__SetWeaponMode_custom_branch2, 5, "B4DI_oCNpc__SetWeaponMode_custom_branch2");
+	//HookEngine(oCNpc__SetWeaponMode_custom_branch3, 5, "B4DI_oCNpc__SetWeaponMode_custom_branch3");
+
+	HookEngine(oCNpc__SetWeaponMode_Ninja, 6, "B4DI_oCNpc__SetWeaponMode_Ninja_GFA"); // B4DI_oCNpc__SetWeaponMode_Ninja_GFA()
 	//HookEngine(oCNpc__SetWeaponMode, 5, "B4DI_oCNpc__SetWeaponMode");
 	//HookEngine(oCNpc__SetWeaponMode2, 6, "B4DI_oCNpc__SetWeaponMode2");
 	//HookEngine(oCNpc__SetWeaponMode2__zSTRING, 7, "B4DI_oCNpc__SetWeaponMode2__zSTRING");
 
-	HookEngine(oCNpc__OnDamage_Hit, 7, "B4DI_oCNpc__OnDamage_Hit");
+	HookEngine(oCNpc__OnDamage_Hit, 7, "B4DI_oCNpc__OnDamage_Hit"); //B4DI_oCNpc__OnDamage_Hit()
 	//HookEngine(oCNpc__OnDamage_Hit_custom, 5, "B4DI_oCNpc__OnDamage_Hit");
-	HookEngine(oCNpc__OnDamage_Hit_return, 6, "B4DI_oCNpc__OnDamage_Hit_return"); //B4DI_oCNpc__OnDamage_Hit()
+	HookEngine(oCNpc__OnDamage_Hit_return, 6, "B4DI_oCNpc__OnDamage_Hit_return"); //B4DI_oCNpc__OnDamage_Hit_return()
 	//HookEngine(oCNpc__UseItem, 7, "B4DI_oCNpc__UseItem");
 
+	//HookEngineF(oCGame__UpdatePlayerStatus, 8, B4DI_oCGame__UpdatePlayerStatus); //B4DI_oCGame__UpdatePlayerStatus()
+	HookEngineF(oCGame__UpdatePlayerStatus_focusbar, 6, B4DI_oCGame__UpdatePlayerStatus_FocusBar); //B4DI_oCGame__UpdatePlayerStatus_FocusBar()
+	//HookEngineF(oCGame__UpdatePlayerStatus_return, 7, B4DI_oCGame__UpdatePlayerStatus_return); //B4DI_oCGame__UpdatePlayerStatus_return()
 
 	MEM_Info("B4DI Bars ininitialised");
 };
@@ -63,7 +71,9 @@ func void B4DI_Bars_InitAlways() {
 	isInventoryOpen = false;
 	//anyFightModeActive = false; //check if possible to save and load active fight mode then swap to intit once
 	areItemPreviewsHidden = true;
+	B4DI_heroInstance_InitAlways();
 
 	B4DI_hpBar_InitAlways();
 	B4DI_manaBar_InitAlways();
+	B4DI_focusBar_InitAlways();
 };
