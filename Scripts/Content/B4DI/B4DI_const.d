@@ -90,9 +90,20 @@ const int oCNpc__OnDamage_Hit_return			= 6737701;				//0x066CF25 	// HookLen:	6
 const int oCGame__UpdatePlayerStatus                = 7093113; //0x6C3B79 //HookLen: 8 Hook: Focusnames
 
 const int oCGame__UpdatePlayerStatus_focusbar = 7091981; //0x6C370D //HookLen: 6
+const int oCGame__UpdatePlayerStatus_manaBar =7091233; //0x006C3421 //HookLen: 6
 //0x6C3B79 //HookLen: 8 //Ninja Focus Names
 const int oCGame__UpdatePlayerStatus_return = 7093239;//0x006C3BF7 // HookLen: 7
 
+//Dialog
+const int oCNpc__ActivateDialogCam = 7700784; //0x00758130 // HookLen: 6
+const int oCNpc__DeactivateDialogCam = 7701344;	//0x00758360 // HookLen: 6
+
+//Spell
+const int oCNpc__ReadySpell = 6816480; //0x006802E0 // HookLen: 7
+const int oCNpc__UnreadySpell = 6816896; // 0x00680480 // HookLen: 7
+
+//const int oCSpell__Cast = ;	//
+const int oCSpell__Cast_return = 4740356;	//0x00485504 // HookLen: 7
 
 
 // interpretations of ini Setting

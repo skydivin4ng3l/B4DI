@@ -235,7 +235,7 @@ func void B4DI_eBar_RefreshLabel(var int eBar_hndl) {
 //========================================
 // eBar Hide / Show
 //========================================
-func void B4DI_eBar_hide( var int eBar_hndl, var int instantHide){
+func void B4DI_eBar_hideCustom( var int eBar_hndl, var int animated){
     if(!Hlp_IsValidHandle(ebar_hndl)) {
         MEM_Info("B4DI_eBar_hide failed");
         return;
@@ -244,7 +244,7 @@ func void B4DI_eBar_hide( var int eBar_hndl, var int instantHide){
 
     if( !eBar_inst.isFadedOut ) {
         eBar_inst.isFadedOut = 1;
-        if(instantHide) {
+        if(!animated) {
             B4DI_eBar_SetAlpha(eBar_hndl, 0);
         } else {
             B4DI_eBar_fadeOut(eBar_hndl, false);
@@ -253,6 +253,14 @@ func void B4DI_eBar_hide( var int eBar_hndl, var int instantHide){
     } else {
         MEM_Info("B4DI_eBar_hide already hidden");
     };
+};
+
+func void B4DI_eBar_hideInstant( var int eBar_hndl){
+    B4DI_eBar_hideCustom(eBar_hndl, false);
+};
+
+func void B4DI_eBar_hideFaded( var int eBar_hndl){
+    B4DI_eBar_hideCustom(eBar_hndl, true);
 };
 
 func void B4DI_eBar_show( var int eBar_hndl){
@@ -329,7 +337,7 @@ func void B4DI_Bar_SetValuesNPC(var int bar_hndl, var int index_value, var int i
             MEM_Info("B4DI_Bar_SetValuesNpc failed not correct NPC");
             return;
         };
-        MEM_Info("B4DI_Bar_SetValuesNPC");
+        //MEM_Info("B4DI_Bar_SetValuesNPC");
     };
 
     Bar_SetMax(bar_hndl, MEM_ReadStatArr(my_npc.attribute, index_valueMax) );
@@ -380,8 +388,10 @@ func void B4DI_eBar_RefreshNPC(var int eBar_hndl, var int index_value, var int i
     };
 
     B4DI_eBar_RefreshLabel(eBar_hndl);
+    var _bar bar; bar = get(eBar.bar);
 
-    MEM_Info("B4DI_eBar_Refresh");
+    //MEM_Info("B4DI_eBar_Refresh");
+    B4DI_debugSpy("B4DI_eBar_Refresh ", View_GetTexture(bar.v1) );
 };
 
 func void B4DI_eBar_Refresh(var int eBar_hndl, var int index_value, var int index_valueMax) {

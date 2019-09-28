@@ -37,6 +37,10 @@ func void B4DI_Bars_InitOnce() {
 	HookEngine(oCNpc__CloseSpellBook, 6, "B4DI_closeSpellbook");
 	//HookEngine(oCNpc__EV_ChooseWeapon, 6, "B4DI_ChooseWeapon");
 
+	HookEngineF(oCNpc__ReadySpell, 7, B4DI_oCNpc__ReadySpell);
+	HookEngineF(oCNpc__UnreadySpell, 7, B4DI_oCNpc__UnreadySpell);
+	HookEngineF(oCSpell__Cast_return, 7, B4DI_oCSpell__Cast_return);
+
 	//HookEngine(oCNpc__EV_RemoveWeapon, 7, "B4DI_removeWeapon"); //will be called by: direct weapon sheath, NPCs
 	//HookEngine(oCNpc__EV_RemoveWeapon1, 7, "B4DI_removeWeapon1"); // General sheath PC
 	//HookEngine(oCNpc__EV_RemoveWeapon2, 6, "B4DI_removeWeapon2");	// General sheath PC
@@ -60,9 +64,13 @@ func void B4DI_Bars_InitOnce() {
 	HookEngine(oCNpc__OnDamage_Hit_return, 6, "B4DI_oCNpc__OnDamage_Hit_return"); //B4DI_oCNpc__OnDamage_Hit_return()
 	//HookEngine(oCNpc__UseItem, 7, "B4DI_oCNpc__UseItem");
 
-	//HookEngineF(oCGame__UpdatePlayerStatus, 8, B4DI_oCGame__UpdatePlayerStatus); //B4DI_oCGame__UpdatePlayerStatus()
-	HookEngineF(oCGame__UpdatePlayerStatus_focusbar, 6, B4DI_oCGame__UpdatePlayerStatus_FocusBar); //B4DI_oCGame__UpdatePlayerStatus_FocusBar()
+	HookEngineF(oCGame__UpdatePlayerStatus, 8, B4DI_oCGame__UpdatePlayerStatus); //B4DI_oCGame__UpdatePlayerStatus()
+	//HookEngineF(oCGame__UpdatePlayerStatus_focusbar, 6, B4DI_oCGame__UpdatePlayerStatus_FocusBar); //B4DI_oCGame__UpdatePlayerStatus_FocusBar()
 	//HookEngineF(oCGame__UpdatePlayerStatus_return, 7, B4DI_oCGame__UpdatePlayerStatus_return); //B4DI_oCGame__UpdatePlayerStatus_return()
+	HookEngineF(oCGame__UpdatePlayerStatus_manaBar, 6, B4DI_oCGame__UpdatePlayerStatus_manaBar); //B4DI_oCGame__UpdatePlayerStatus_manaBar()
+
+	HookEngineF(oCNpc__ActivateDialogCam, 6, B4DI_oCNpc__ActivateDialogCam);
+	HookEngineF(oCNpc__DeactivateDialogCam, 6, B4DI_oCNpc__DeactivateDialogCam);
 
 	MEM_Info("B4DI Bars ininitialised");
 };

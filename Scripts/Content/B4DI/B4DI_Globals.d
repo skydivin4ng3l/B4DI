@@ -12,6 +12,8 @@ var int lastHeroMaxHP;
 var int lastHeroMANA;
 var int lastHeroMaxMANA;
 
+var int lastNpcHP;
+
 var int isInventoryOpen; 
 var int areItemPreviewsHidden;
 //var int anyFightModeActive;

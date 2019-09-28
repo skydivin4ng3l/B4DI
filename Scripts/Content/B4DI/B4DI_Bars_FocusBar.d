@@ -9,31 +9,53 @@ func void B4DI_focusBar_Refresh(var int C_NPC_ptr){
 };
 
 func void B4DI_hook_UpdatePlayerStatus_return() {
+	//MEM_Info("B4DI_hook_UpdatePlayerStatus_return Called");
 	if ( !isHookF(oCGame__UpdatePlayerStatus_return, B4DI_oCGame__UpdatePlayerStatus_return) ) {
 		HookEngineF(oCGame__UpdatePlayerStatus_return, 7, B4DI_oCGame__UpdatePlayerStatus_return); //B4DI_oCGame__UpdatePlayerStatus_return()
+		MEM_Info("B4DI_hook_UpdatePlayerStatus_return removed");
 	};
 };
 
 func void B4DI_unhook_UpdatePlayerStatus_return() {
+	//MEM_Info("B4DI_unhook_UpdatePlayerStatus_return Called");
 	if ( isHookF(oCGame__UpdatePlayerStatus_return, B4DI_oCGame__UpdatePlayerStatus_return) ) {
 		RemoveHookF(oCGame__UpdatePlayerStatus_return, 7, B4DI_oCGame__UpdatePlayerStatus_return); //B4DI_oCGame__UpdatePlayerStatus_return()
+		MEM_Info("B4DI_unhook_UpdatePlayerStatus_return removed");
+	};
+};
+
+func int B4DI_focusedNpcHp_changed(){
+	var C_Npc npc_inFocus; npc_inFocus = MEM_PtrToInst(oHero.focus_vob);
+	var int HpDifference; HpDifference = npc_inFocus.attribute[ATR_HITPOINTS]-lastNpcHP;
+	if (HpDifference) {
+		lastNpcHP = npc_inFocus.attribute[ATR_HITPOINTS];
+		B4DI_debugSpy( "B4DI_focusBar_focusedNpcHp_changed: ", IntToString(HpDifference) );
+		return HpDifference;
+	} else {
+		return false;
 	};
 };
 
 func void B4DI_focusBar_update(){
 	//MEM_Info("B4DI_focusBar_update called");
-	if( Hlp_Is_oCNpc(oHero.focus_vob) ) {
+	//B4DI_Info1("B4DI_focusBar_update showPlayerStatus:", MEM_GAME.showPlayerStatus);
+	//TODO Fix showing bar of NPC although item is in Focus directly after NPC
+	if( Hlp_Is_oCNpc(oHero.focus_vob) && MEM_GAME.showPlayerStatus ) {
 		//MEM_Info("B4DI_focusBar_update Its an NPC!");
 		var C_Npc npc_inFocus; npc_inFocus = MEM_PtrToInst(oHero.focus_vob);
-		B4DI_focusBar_Refresh(MEM_InstToPtr(npc_inFocus));
-		B4DI_debugSpy("npc_inFocus Name: ", npc_inFocus.name);
-		B4DI_Info1("npc_inFocus IDX: ", npc_inFocus.id);
-		B4DI_Info1("npc_HP: ", npc_inFocus.attribute[ATR_HITPOINTS]);
+		var int new_idOfCurrentFocus; new_idOfCurrentFocus = Npc_GetID(npc_inFocus);
+		//TODO Refresh only when HP Changed or different NPC in Focus
+		if (new_idOfCurrentFocus != idOfCurrentFocus || B4DI_focusedNpcHp_changed() ) {
+			B4DI_focusBar_Refresh(MEM_InstToPtr(npc_inFocus));
+		};
+		//B4DI_Info1("npc_inFocus IDX: ", npc_inFocus.id);
+		//B4DI_Info1("npc_HP: ", npc_inFocus.attribute[ATR_HITPOINTS]);
 
 		//TODO check if it is the same npc than before and check for HP difference for animation
 		var int att; att = Npc_GetPermAttitude(hero, npc_inFocus);
 
-		if( Npc_GetID(npc_inFocus) != idOfCurrentFocus || (Npc_GetID(npc_inFocus) == idOfCurrentFocus && att != lastAttitudeOfCurrentFocus) ) {
+		if( new_idOfCurrentFocus != idOfCurrentFocus || (new_idOfCurrentFocus == idOfCurrentFocus && att != lastAttitudeOfCurrentFocus) ) {
+			B4DI_debugSpy("npc_inFocus Name: ", npc_inFocus.name);
 
 			idOfCurrentFocus = Npc_GetID(npc_inFocus);
 			lastAttitudeOfCurrentFocus = att;
@@ -64,24 +86,27 @@ func void B4DI_focusBar_update(){
 
 			};
 		};
-	} else if(Hlp_Is_oCItem(oHero.focus_vob) ) {
+	} else if(Hlp_Is_oCItem(oHero.focus_vob) && MEM_GAME.showPlayerStatus ) {
 		var c_item itm; itm = MEM_PtrToInst(oHero.focus_vob);
 		if( ( Hlp_GetInstanceID(itm) != idOfCurrentFocus ) ) {
-			idOfCurrentFocus = Hlp_GetInstanceID(itm);
 			B4DI_debugSpy("item_inFocus: ", itm.name);
-			B4DI_eBar_hide(MEM_eBar_FOCUS_handle, true);
+			idOfCurrentFocus = Hlp_GetInstanceID(itm);
+			B4DI_eBar_hideInstant(MEM_eBar_FOCUS_handle);
 			B4DI_hook_UpdatePlayerStatus_return();
 			// Setze col = RGBA(.., .., .., ..); um die Farbe einzustellen
 			//TODO show preview??
+		} else{ // Bit hacky but for now this should work
+			B4DI_unhook_UpdatePlayerStatus_return();
+
 		};
+	//Is a neutral element / nothing / dialog
 	} else {
 		MEM_Info("B4DI_focusBar_update else branch");
+		B4DI_unhook_UpdatePlayerStatus_return();
 		if( !MEM_eBar_FOCUS.isFadedOut ) {
 			idOfCurrentFocus = 0;
-			B4DI_eBar_hide(MEM_eBar_FOCUS_handle, true);
-			B4DI_unhook_UpdatePlayerStatus_return();
+			B4DI_eBar_hideInstant(MEM_eBar_FOCUS_handle);
 		};
-		//Is a neutral element or nothing?
 	};
 };
 
@@ -103,6 +128,7 @@ func void B4DI_focusBar_InitAlways(){
 	Bar_MoveLeftUpperToValidScreenSpace(MEM_eBar_FOCUS.bar, MEM_oBar_Focus.zCView_vposx, MEM_oBar_Focus.zCView_vposy );
 
 	idOfCurrentFocus = 0;
+	lastNpcHP = 0;
 
 	MEM_Info("B4DI_focusBar_InitAlways");
 };
