@@ -10,6 +10,7 @@ class _extendedBar {
     var int barPreview;               // _barPreview(h)
     var int isFadedOut;                   // Bool
     var int anim8FadeOut;               // A8Head(h)
+    var int anim8PulseSize;               // A8Head(h)
 };
 
 instance _extendedBar@(_extendedBar);
@@ -23,6 +24,9 @@ func void _extendedBar_Delete(var _extendedBar eBar) {
     };
     if(Hlp_IsValidHandle(eBar.anim8FadeOut)) {
         Anim8_Delete(eBar.anim8FadeOut);
+    };
+    if(Hlp_IsValidHandle(eBar.anim8PulseSize)) {
+        Anim8_Delete(eBar.anim8PulseSize);
     };
 };
 
@@ -125,6 +129,8 @@ instance MEM_eBar_MANA(_extendedBar);
 var int MEM_eBar_FOCUS_handle;
 instance MEM_eBar_FOCUS(_extendedBar);
 
+var int MEM_eBar_XP_handle;
+instance MEM_eBar_XP(_extendedBar);
 
 /***********************************\
       Selected Inventory Item

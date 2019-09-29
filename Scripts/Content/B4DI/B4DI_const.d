@@ -25,8 +25,27 @@ const int B4DI_BARPREVIEW_HAS_OWN_LABEL = 0;
 
 const string B4DI_LABEL_FONT = "Font_old_10_white.tga";
 
-/// Hooks
+//========================================
+// interpretations of ini Setting
+//========================================
+const int B4DI_BarScale_off		= 100; // will not be used?
+const int B4DI_BarScale_auto	= 100; // will not be used?
+const int B4DI_BarScale_50		= 50; // 50 %
+const int B4DI_BarScale_100		= 100; // 100%
+const int B4DI_BarScale_150		= 150; // 150%
+const int B4DI_BarScale_200		= 200; // 200%
 
+//========================================
+// Animation Modes
+//========================================
+
+const int B4DI_PULSE_SIZE_CENTERED_XY 	= 0;
+const int B4DI_PULSE_SIZE_CENTERED_X  	= 1;
+const int B4DI_PULSE_SIZE_CENTERED_Y 	= 2;
+
+//========================================
+// Hooks
+//========================================
 const int oCNpc__OpenScreen_Status 				= 7592320;		// 0x73D980 // HookLen: 7
 const int cGameManager__ApplySomeSettings_rtn 	= 4362866; 		// 0x429272 // HookLen: 6
 // Kooked by Quickslots of lego wich is not implemented?
@@ -106,10 +125,4 @@ const int oCNpc__UnreadySpell = 6816896; // 0x00680480 // HookLen: 7
 const int oCSpell__Cast_return = 4740356;	//0x00485504 // HookLen: 7
 
 
-// interpretations of ini Setting
-const int B4DI_BarScale_off		= 100; // will not be used?
-const int B4DI_BarScale_auto	= 100; // will not be used?
-const int B4DI_BarScale_50		= 50; // 50 %
-const int B4DI_BarScale_100		= 100; // 100%
-const int B4DI_BarScale_150		= 150; // 150%
-const int B4DI_BarScale_200		= 200; // 200%
+

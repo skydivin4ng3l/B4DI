@@ -12,6 +12,7 @@ func void B4DI_Bars_InitOnce() {
 	B4DI_hpBar_InitOnce();
 	B4DI_manaBar_InitOnce();
 	B4DI_focusBar_InitOnce();
+	B4DI_xpBar_InitOnce();
 
 	
 	HookDaedalusFuncS("B_GivePlayerXP", "B4DI_xpBar_update"); 						// B4DI_xpBar_update(var int add_xp)
@@ -84,4 +85,5 @@ func void B4DI_Bars_InitAlways() {
 	B4DI_hpBar_InitAlways();
 	B4DI_manaBar_InitAlways();
 	B4DI_focusBar_InitAlways();
+	B4DI_xpBar_InitAlways();
 };

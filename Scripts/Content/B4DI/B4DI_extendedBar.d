@@ -10,7 +10,7 @@
 func void B4DI_Bar_SetBarSizeCenteredPercent(var int bar_hndl, var int x_percentage, var int y_percentage ) { 
     Print_GetScreenSize();
     //------------------
-    if(!Hlp_IsValidHandle(bar_hndl)) { return; };
+    if(!Hlp_IsValidHandle(bar_hndl)) { MEM_Warn("B4DI_Bar_SetBarSizeCenteredPercent failed"); return; };
     var _bar b; b = get(bar_hndl);
     var zCView vBar; vBar = View_Get(b.v1);
     //save the size before the resize
@@ -40,7 +40,6 @@ func void B4DI_Bar_SetBarSizeCenteredPercentX(var int bar_hndl, var int x_percen
 func void B4DI_Bar_SetBarSizeCenteredPercentXY(var int bar_hndl, var int xy_percentage){
     B4DI_Bar_SetBarSizeCenteredPercent(bar_hndl, xy_percentage, xy_percentage );
 };
-
 
 //========================================
 // [intern] Helper Scales depenting on Resolution
@@ -85,7 +84,7 @@ func int B4DI_Bars_getDynamicScaleOptionValuef(){
 // [Intern] Resizes bars according of Menu value (gothic.ini)
 //========================================
 func void B4DI_Bar_dynamicMenuBasedScale(var int bar_hndl){
-    if(!Hlp_IsValidHandle(bar_hndl)) { return; };
+    if(!Hlp_IsValidHandle(bar_hndl)) { MEM_Warn("B4DI_Bar_dynamicMenuBasedScale failed"); return; };
     var _bar b; b = get(bar_hndl);
     
     var zCView vBack; vBack = View_Get(b.v0);
@@ -106,7 +105,7 @@ func void B4DI_Bar_dynamicMenuBasedScale(var int bar_hndl){
 // eBar Alpha
 //========================================
 func void B4DI_eBar_SetAlpha(var int eBar_hndl, var int alpha) {
-    if(!Hlp_IsValidHandle(eBar_hndl)) { return; };
+    if(!Hlp_IsValidHandle(eBar_hndl)) { MEM_Warn("B4DI_eBar_SetAlpha failed"); return; };
     var _extendedBar eBar; eBar = get(eBar_hndl);
     var _bar bar; bar = get(eBar.bar);
 
@@ -144,7 +143,7 @@ func int B4DI_eBar_Create(var int Bar_constructor_instance) {
 //========================================
 func void B4DI_eBar_fadeOut(var int eBar_hndl, var int deleteBar) {
     var _extendedBar eBar_inst; eBar_inst = get(eBar_hndl);
-    var _bar bar_inst; bar_inst = get(eBar_inst.bar);
+    //var _bar bar_inst; bar_inst = get(eBar_inst.bar);
     eBar_inst.anim8FadeOut = Anim8_NewExt(255, B4DI_eBar_SetAlpha, eBar_hndl, false);
     Anim8_RemoveIfEmpty(eBar_inst.anim8FadeOut, true);
     if (deleteBar) {
@@ -157,15 +156,42 @@ func void B4DI_eBar_fadeOut(var int eBar_hndl, var int deleteBar) {
     Anim8q(eBar_inst.anim8FadeOut,   0, 2000, A8_SlowEnd);
 };
 
+func void B4DI_eBar_pulse_size(var int eBar_hndl, var func pulseFunc/*var int axis_mode*/) {
+    if (!Hlp_IsValidHandle(ebar_hndl)) { MEM_Warn("B4DI_eBar_pulse_size failed"); return; };
+    var _extendedBar eBar; eBar = get(eBar_hndl);
+
+    var int alreadyPulsating; alreadyPulsating = false;
+    if ( Hlp_IsValidHandle(eBar.anim8PulseSize) ) {
+            //Anim8_Delete(eBar.anim8PulseSize);
+            alreadyPulsating = true;
+        };
+    if (!alreadyPulsating /*&& axis_mode == B4DI_PULSE_SIZE_CENTERED_XY*/) {
+        eBar.anim8PulseSize = Anim8_NewExt(100 , pulseFunc/*B4DI_Bar_SetBarSizeCenteredPercentXY*/, eBar.bar, false);
+    }/* else if (!alreadyPulsating && axis_mode == B4DI_PULSE_SIZE_CENTERED_X) {
+        eBar.anim8PulseSize = Anim8_NewExt(100 , B4DI_Bar_SetBarSizeCenteredPercentX, eBar_inst.bar, false);
+    } else if (!alreadyPulsating && axis_mode == B4DI_PULSE_SIZE_CENTERED_Y) {
+        eBar.anim8PulseSize = Anim8_NewExt(100 , B4DI_Bar_SetBarSizeCenteredPercentY, eBar_inst.bar, false);
+    }*/;
+    Anim8_RemoveIfEmpty(eBar.anim8PulseSize, true);
+    Anim8_RemoveDataIfEmpty(eBar.anim8PulseSize, false);
+
+    if(alreadyPulsating) {
+        Anim8q(eBar.anim8PulseSize, 100,  100, A8_Wait);
+    } else {
+        Anim8(eBar.anim8PulseSize, 100,  100, A8_Wait);
+    };
+    Anim8q(eBar.anim8PulseSize, 150, 200, A8_SlowEnd);
+    Anim8q(eBar.anim8PulseSize, 100, 100, A8_SlowStart);
+
+};
+
 //========================================
 // eBar Label
 //========================================
 //TODO Fix??? Label gets not shown after bar fades out and inventory gets opended
 func string B4DI_eBar_generateLabelTextSimple(var int ebar_hndl) {
-    if(!Hlp_IsValidHandle(ebar_hndl)) {
-        MEM_Warn("B4DI_eBar_generateLabelTextSimple failed");
-        return "";
-    };
+    if(!Hlp_IsValidHandle(ebar_hndl)) { MEM_Warn("B4DI_eBar_generateLabelTextSimple failed"); return ""; };
+
     if(SB_Get()) {
         B4DI_preserve_current_StringBuilder = SB_Get();
     };
@@ -209,7 +235,7 @@ func string B4DI_eBar_generateLabelTextSimple(var int ebar_hndl) {
 //========================================
 func void B4DI_eBar_RefreshLabel(var int eBar_hndl) {
     //TODO make optional
-    if(!Hlp_IsValidHandle(eBar_hndl)) { return; };
+    if(!Hlp_IsValidHandle(eBar_hndl)) { MEM_Warn("B4DI_eBar_RefreshLabel failed"); return; };
     var _extendedBar eBar; eBar = get(eBar_hndl);
     
     var _bar bar; bar = get(eBar.bar);
@@ -236,10 +262,7 @@ func void B4DI_eBar_RefreshLabel(var int eBar_hndl) {
 // eBar Hide / Show
 //========================================
 func void B4DI_eBar_hideCustom( var int eBar_hndl, var int animated){
-    if(!Hlp_IsValidHandle(ebar_hndl)) {
-        MEM_Info("B4DI_eBar_hide failed");
-        return;
-    };
+    if(!Hlp_IsValidHandle(ebar_hndl)) { MEM_Info("B4DI_eBar_hide failed"); return; };
     var _extendedBar eBar_inst; eBar_inst = get(ebar_hndl);
 
     if( !eBar_inst.isFadedOut ) {
@@ -295,7 +318,7 @@ func void B4DI_eBar_show( var int eBar_hndl){
 // eBar Preview hide/show
 //========================================
 func void B4DI_eBar_HidePreview(var int eBar_hndl){
-    if(!Hlp_IsValidHandle(eBar_hndl)) { return; };
+    if(!Hlp_IsValidHandle(eBar_hndl)) { MEM_Warn("B4DI_eBar_HidePreview failed"); return; };
     var _extendedBar eBar; eBar = get(eBar_hndl);
     B4DI_BarPreview_hide(eBar.barPreview);
 
@@ -303,7 +326,7 @@ func void B4DI_eBar_HidePreview(var int eBar_hndl){
 };
 
 func void B4DI_eBar_ShowPreview(var int eBar_hndl, var int value) {
-    if(!Hlp_IsValidHandle(eBar_hndl)) { return; };
+    if(!Hlp_IsValidHandle(eBar_hndl)) { MEM_Warn("B4DI_eBar_ShowPreview failed"); return; };
     var _extendedBar eBar; eBar = get(eBar_hndl);
 
     B4DI_BarPreview_CalcPosScale(eBar.barPreview, value);
@@ -314,7 +337,7 @@ func void B4DI_eBar_ShowPreview(var int eBar_hndl, var int value) {
 };
 
 func void B4DI_eBar_SetPreviewChangesMaximum(var int eBar_hndl){
-    if(!Hlp_IsValidHandle(eBar_hndl)) { return; };
+    if(!Hlp_IsValidHandle(eBar_hndl)) { MEM_Warn("B4DI_eBar_SetPreviewChangesMaximum failed"); return; };
     var _extendedBar eBar; eBar = get(eBar_hndl);
 
     B4DI_BarPreview_SetChangesMaximum(eBar.barPreview);
@@ -324,8 +347,22 @@ func void B4DI_eBar_SetPreviewChangesMaximum(var int eBar_hndl){
 //========================================
 // eBar Value
 //========================================
+func void B4DI_Bar_SetValuesBasic(var int bar_hndl, var int value, var int valueMax) {
+    if( !Hlp_IsValidHandle(bar_hndl) ) { MEM_Warn("B4DI_Bar_SetValuesBasic failed"); return; };
+
+    Bar_SetMax(bar_hndl, valueMax);
+    Bar_SetValue(bar_hndl, value);
+};
+
+func void B4DI_eBar_SetValuesBasic(var int eBar_hndl, var int value, var int valueMax) {
+    if( !Hlp_IsValidHandle(eBar_hndl) ) { MEM_Warn("B4DI_eBar_SetValuesBasic failed"); return; };
+    var _extendedBar eBar; eBar = get(eBar_hndl);
+
+    B4DI_Bar_SetValuesBasic(eBar.bar, value, valueMax);
+};
+
 func void B4DI_Bar_SetValuesNPC(var int bar_hndl, var int index_value, var int index_valueMax, var int C_NPC_ptr) {
-    if( !Hlp_IsValidHandle(bar_hndl) ) { return; };
+    if( !Hlp_IsValidHandle(bar_hndl) ) { MEM_Warn("B4DI_Bar_SetValuesNPC failed"); return; };
     
     var C_NPC my_npc;
     if(C_NPC_ptr < 1) {
@@ -340,8 +377,9 @@ func void B4DI_Bar_SetValuesNPC(var int bar_hndl, var int index_value, var int i
         //MEM_Info("B4DI_Bar_SetValuesNPC");
     };
 
-    Bar_SetMax(bar_hndl, MEM_ReadStatArr(my_npc.attribute, index_valueMax) );
-    Bar_SetValue(bar_hndl, MEM_ReadStatArr(my_npc.attribute, index_value) );
+    B4DI_Bar_SetValuesBasic( bar_hndl, MEM_ReadStatArr(my_npc.attribute, index_value), MEM_ReadStatArr(my_npc.attribute, index_valueMax) );
+    //Bar_SetMax(bar_hndl, MEM_ReadStatArr(my_npc.attribute, index_valueMax) );
+    //Bar_SetValue(bar_hndl, MEM_ReadStatArr(my_npc.attribute, index_value) );
     
     
 };
@@ -349,6 +387,7 @@ func void B4DI_Bar_SetValuesNPC(var int bar_hndl, var int index_value, var int i
 func void B4DI_Bar_SetValues(var int bar_hndl, var int index_value, var int index_valueMax) {
     B4DI_Bar_SetValuesNPC(bar_hndl, index_value, index_valueMax, 0);
 };
+
 
 //========================================
 // Bar Label may be deprecated
@@ -371,8 +410,9 @@ func void B4DI_Bar_SetValues(var int bar_hndl, var int index_value, var int inde
 //========================================
 // eBar Refresh
 //========================================
+//TODO generalize maybe with pointer to npc in extenedbar,...to allow xpbar to use refresh the same way and refresh be simpler
 func void B4DI_eBar_RefreshNPC(var int eBar_hndl, var int index_value, var int index_valueMax, var int C_NPC_ptr) {
-    if(!Hlp_IsValidHandle(eBar_hndl)) { return; };
+    if(!Hlp_IsValidHandle(eBar_hndl)) { MEM_Warn("B4DI_eBar_RefreshNPC failed"); return; };
     var _extendedBar eBar; eBar = get(eBar_hndl);
 
     if ( C_NPC_ptr < 1 ) {
