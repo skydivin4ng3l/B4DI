@@ -59,6 +59,54 @@ func int B4DI_BarPreview_GetChangesMaximum( var int barPreview_hndl ){
     return bp.changesMaximum;
 };
 
+func void B4DI_BarPreview_SetSizeLeftsidedPercent( var int barPreview_hndl, var int x_percentage, var int y_percentage) {
+    Print_GetScreenSize();
+    //------------------
+    if(!Hlp_IsValidHandle(barPreview_hndl)) { MEM_Warn("B4DI_BarPreview_SetSizePercent failed"); return; };
+    var _barPreview bp; bp = get(barPreview_hndl);
+    var zCView vPreView; vPreView = View_Get(bp.vPreView);
+    var _extendedBar eBar_parent; eBar_parent = get(bp.eBar_parent);
+    var _bar bar; bar = get(eBar_parent.bar);
+    //save the size before the resize
+    //var int sizex_pre; sizex_pre = Print_ToVirtual(b.val,PS_X); 
+    var int sizex_pre; sizex_pre = roundf( mulf( fracf( bp.val , bar.valMax), mulf( mkf(bar.initialDynamicVSizes[IDS_VBAR_X]), dynScalingFactor ) ) ) ; 
+    var int sizey_pre; sizey_pre = roundf( mulf( mkf(bar.initialDynamicVSizes[IDS_VBAR_Y]), dynScalingFactor ) ) ; 
+
+    //scale on all axis
+    View_Resize(bp.vPreView, sizex_pre * x_percentage / 100 , sizey_pre * y_percentage / 100 ); 
+        
+    //Debug
+    //B4DI_debugSpy("B4DI_BarPreview_SetSizeLeftsidedPercent PositionX",IntToString(vPreView.vposx));
+    //B4DI_debugSpy("B4DI_BarPreview_SetSizeLeftsidedPercent PositionY",IntToString(vPreView.vposy));
+    //B4DI_debugSpy("B4DI_BarPreview_SetSizeLeftsidedPercent SizeX",IntToString(vPreView.vsizex));
+    //B4DI_debugSpy("B4DI_BarPreview_SetSizeLeftsidedPercent SizeY",IntToString(vPreView.vsizey));
+
+};
+
+func void B4DI_BarPreview_SetSizeLeftsidedPercentXY( var int barPreview_hndl, var int xy_percentage ) {
+    B4DI_BarPreview_SetSizeLeftsidedPercent(barPreview_hndl, xy_percentage, xy_percentage);
+};
+
+func void B4DI_BarPreview_SetSizeLeftsidedPercentX( var int barPreview_hndl, var int x_percentage ) {
+    B4DI_BarPreview_SetSizeLeftsidedPercent(barPreview_hndl, x_percentage, 100);
+};
+
+func void B4DI_BarPreview_SetSizeLeftsidedPercentY( var int barPreview_hndl, var int y_percentage ) {
+    B4DI_BarPreview_SetSizeLeftsidedPercent(barPreview_hndl, 100, y_percentage);
+};
+
+func void B4DI_BarPreview_slide_size(var int barPreview_hndl, var func slideFunc) {
+    if ( !Hlp_IsValidHandle(barPreview_hndl) ) { return; };
+    var _barPreview bp; bp = get(barPreview_hndl);
+    bp.anim8Pulse = Anim8_NewExt(100 , slideFunc, barPreview_hndl, false); //height input
+    Anim8_RemoveIfEmpty(bp.anim8Pulse, true);
+    Anim8_RemoveDataIfEmpty(bp.anim8Pulse, true);
+    
+    Anim8 (bp.anim8Pulse, 100,  100, A8_Wait);
+    Anim8q(bp.anim8Pulse, 0, 500, A8_SlowEnd);
+
+};
+
 func void B4DI_BarPreview_Show( var int barPreview_hndl) {
     if(!Hlp_IsValidHandle(barPreview_hndl)) {
         MEM_Warn("B4DI_BarPreview_Show failed ");
@@ -136,6 +184,7 @@ func void B4DI_BarPreview_CalcPosScale( var int barPreview_hndl, var int value) 
     MEM_Info(IntToString(diffValueToBarValMax));
     
     var int preview_vsizex;
+    //value(preview) with overshoot
     if(diffValueToBarValMax < value){       
         preview_vsizex = (((diffValueToBarValMax *1000) / bar.valMax) * bar.barW / 1000);
         var int overshoot_vsizex; overshoot_vsizex = ((( (value - diffValueToBarValMax) *1000) / bar.valMax) * bar.barW / 1000);
@@ -184,7 +233,6 @@ func void B4DI_BarPreview_CalcPosScale( var int barPreview_hndl, var int value) 
         SB_Destroy();
     };
 
-    
-
 };
+
 
