@@ -20,14 +20,14 @@
 
 //};
 
-func void B4DI_Bar_pulse_size(var int bar_hndl) {
-	var int a8_XpBar_pulse; a8_XpBar_pulse = Anim8_NewExt(100 , B4DI_Bar_SetBarSizeCenteredPercentXY, bar_hndl, false); //height input
-	Anim8_RemoveIfEmpty(a8_XpBar_pulse, true);
-	Anim8_RemoveDataIfEmpty(a8_XpBar_pulse, false);
+func void B4DI_Bar_pulse_size(var int bar_hndl, var func pulseFunc) {
+	var int a8_Bar_pulse; a8_Bar_pulse = Anim8_NewExt(100 , pulseFunc, bar_hndl, false); //height input
+	Anim8_RemoveIfEmpty(a8_Bar_pulse, true);
+	Anim8_RemoveDataIfEmpty(a8_Bar_pulse, true);
 	
-	Anim8 (a8_XpBar_pulse, 100,  100, A8_Wait);
-	Anim8q(a8_XpBar_pulse, 150, 200, A8_SlowEnd);
-	Anim8q(a8_XpBar_pulse, 100, 100, A8_SlowStart);
+	Anim8 (a8_Bar_pulse, 100,  100, A8_Wait);
+	Anim8q(a8_Bar_pulse, 150, 200, A8_SlowEnd);
+	Anim8q(a8_Bar_pulse, 100, 100, A8_SlowStart);
 
 };
 
