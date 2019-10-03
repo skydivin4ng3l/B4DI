@@ -54,16 +54,16 @@ func int GetArrayPtr_coordinatesWithinScreen(var int left, var int top, var int 
 //========================================
 func void _ViewPtr_CreateIntoPtr(var int ptr, var int x1, var int y1, var int x2, var int y2) {
     //keep within the screen borders
-    B4DI_debugSpy("x1",IntToString(x1));
-    B4DI_debugSpy("y1",IntToString(y1));
-    B4DI_debugSpy("x2",IntToString(x2));
-    B4DI_debugSpy("y2",IntToString(y2));
+    //B4DI_debugSpy("x1",IntToString(x1));
+    //B4DI_debugSpy("y1",IntToString(y1));
+    //B4DI_debugSpy("x2",IntToString(x2));
+    //B4DI_debugSpy("y2",IntToString(y2));
     var int ptr_coords; ptr_coords = GetArrayPtr_coordinatesWithinScreen(x1,y1,x2,y2);
     x1 = MEM_ArrayRead(ptr_coords, 0);
     y1 = MEM_ArrayRead(ptr_coords, 1);
     x2 = MEM_ArrayRead(ptr_coords, 2);
     y2 = MEM_ArrayRead(ptr_coords, 3);
-    B4DI_debugSpy("ValidCoords",MEM_ArrayToString(ptr_coords));
+    //B4DI_debugSpy("ValidCoords",MEM_ArrayToString(ptr_coords));
     MEM_ArrayFree(ptr_coords);
 
     CALL_IntParam(2);
