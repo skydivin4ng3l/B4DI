@@ -152,6 +152,13 @@ func void Bar_SetValue(var int bar, var int val) {
     };
 };
 
+func int Bar_GetValue( var int bar_hndl ) {
+    if(!Hlp_IsValidHandle(bar_hndl)) { return 0; };
+    var _bar b; b = get(bar_hndl);
+
+    return b.val;
+};
+
 //========================================
 // [Intern] Resizes bars in valid space (untested)
 //
