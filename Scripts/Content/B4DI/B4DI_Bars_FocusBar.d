@@ -3,26 +3,9 @@
 //  Focus Bar
 //
 //#################################################################
-//TODO somehow add callback hide once focus bar gets hidden,...other hook maybe?
 func void B4DI_focusBar_Refresh(var int C_NPC_ptr){
 	B4DI_eBar_RefreshNPC(MEM_eBar_FOCUS_handle, ATR_HITPOINTS, ATR_HITPOINTS_MAX, C_NPC_ptr);
 };
-
-/*func void B4DI_hook_UpdatePlayerStatus_return() {
-	//MEM_Info("B4DI_hook_UpdatePlayerStatus_return Called");
-	if ( !isHookF(oCGame__UpdatePlayerStatus_return, B4DI_oCGame__UpdatePlayerStatus_return) ) {
-		HookEngineF(oCGame__UpdatePlayerStatus_return, 7, B4DI_oCGame__UpdatePlayerStatus_return); //B4DI_oCGame__UpdatePlayerStatus_return()
-		MEM_Info("B4DI_hook_UpdatePlayerStatus_return removed");
-	};
-};
-
-func void B4DI_unhook_UpdatePlayerStatus_return() {
-	//MEM_Info("B4DI_unhook_UpdatePlayerStatus_return Called");
-	if ( isHookF(oCGame__UpdatePlayerStatus_return, B4DI_oCGame__UpdatePlayerStatus_return) ) {
-		RemoveHookF(oCGame__UpdatePlayerStatus_return, 7, B4DI_oCGame__UpdatePlayerStatus_return); //B4DI_oCGame__UpdatePlayerStatus_return()
-		MEM_Info("B4DI_unhook_UpdatePlayerStatus_return removed");
-	};
-};*/
 
 func void B4DI_focusBar_show() {
 	B4DI_eBar_show(MEM_eBar_FOCUS_handle);
@@ -38,19 +21,19 @@ func void B4DI_focusBar_hide() {
 
 func int B4DI_focusBar_handleAttitude(var int attitude) {
 	if ( attitude == ATT_FRIENDLY && B4DI_FOCUSBAR_SHOW_ATT_FRIENDLY) {
-		MEM_Info("ATT_FRIENDLY");
+		//MEM_Info("ATT_FRIENDLY");
 		return true;
 
 	} else if( attitude == ATT_NEUTRAL && B4DI_FOCUSBAR_SHOW_ATT_NEUTRAL )  {   
-		MEM_Info("ATT_NEUTRAL");
+		//MEM_Info("ATT_NEUTRAL");
 		return true;
 
 	} else if( attitude == ATT_ANGRY && B4DI_FOCUSBAR_SHOW_ATT_ANGRY )    {
-		MEM_Info("ATT_ANGRY");
+		//MEM_Info("ATT_ANGRY");
 		return true;
 
 	} else if( attitude == ATT_HOSTILE && B4DI_FOCUSBAR_SHOW_ATT_HOSTILE )  { 
-		MEM_Info("ATT_HOSTILE");
+		//MEM_Info("ATT_HOSTILE");
 		return true;
 	};
 	//don't show focusbar based on selected options on attitudes
@@ -78,7 +61,7 @@ func void B4DI_focusBar_update(){
 		var C_Npc npc_inFocus; npc_inFocus = MEM_PtrToInst(oHero.focus_vob);
 		var int new_idOfCurrentFocus; new_idOfCurrentFocus = Npc_GetID(npc_inFocus);
 		// Refresh only when HP Changed or different NPC in Focus
-		//TODO check if it is the same npc than before and check for HP difference for animation
+		//TODO check if it is the same npc as before and check for HP difference for animation
 		if (new_idOfCurrentFocus != idOfCurrentFocus ) {
 			B4DI_debugSpy("npc_inFocus Name: ", npc_inFocus.name);
 			B4DI_focusBar_Refresh(MEM_InstToPtr(npc_inFocus));
