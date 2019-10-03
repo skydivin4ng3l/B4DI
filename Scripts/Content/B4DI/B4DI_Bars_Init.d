@@ -67,7 +67,7 @@ func void B4DI_Bars_InitOnce() {
 
 	HookEngineF(oCGame__UpdatePlayerStatus, 8, B4DI_oCGame__UpdatePlayerStatus); //B4DI_oCGame__UpdatePlayerStatus()
 	//HookEngineF(oCGame__UpdatePlayerStatus_focusbar, 6, B4DI_oCGame__UpdatePlayerStatus_FocusBar); //B4DI_oCGame__UpdatePlayerStatus_FocusBar()
-	//HookEngineF(oCGame__UpdatePlayerStatus_return, 7, B4DI_oCGame__UpdatePlayerStatus_return); //B4DI_oCGame__UpdatePlayerStatus_return()
+	HookEngineF(oCGame__UpdatePlayerStatus_return, 7, B4DI_oCGame__UpdatePlayerStatus_return); //B4DI_oCGame__UpdatePlayerStatus_return()
 	HookEngineF(oCGame__UpdatePlayerStatus_manaBar, 6, B4DI_oCGame__UpdatePlayerStatus_manaBar); //B4DI_oCGame__UpdatePlayerStatus_manaBar()
 
 	HookEngineF(oCNpc__ActivateDialogCam, 6, B4DI_oCNpc__ActivateDialogCam);

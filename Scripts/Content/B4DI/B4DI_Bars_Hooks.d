@@ -66,8 +66,10 @@ func void B4DI_oCGame__UpdatePlayerStatus_FocusBar(){
 
 //Gets Hooked after focusbar appearance and unhooked after hide
 func void B4DI_oCGame__UpdatePlayerStatus_return(){
-	MEM_Info("B4DI_oCGame__UpdatePlayerStatus_return called");
-	B4DI_focusBar_update();
+	//MEM_Info("B4DI_oCGame__UpdatePlayerStatus_return called");
+	if (FocusBar_update_CallbackActive) {
+		B4DI_focusBar_update();
+	};
 	//MEM_Info("B4DI_oCGame__UpdatePlayerStatus_return finished");
 };
 

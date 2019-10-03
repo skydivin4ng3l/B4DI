@@ -17,6 +17,7 @@ var int lastNpcHP;
 var int isInventoryOpen; 
 var int areItemPreviewsHidden;
 //var int anyFightModeActive;
+var int FocusBar_update_CallbackActive;
 
 var int idOfCurrentFocus;
 var int lastAttitudeOfCurrentFocus;

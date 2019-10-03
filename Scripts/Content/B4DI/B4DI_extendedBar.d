@@ -274,7 +274,7 @@ func void B4DI_eBar_hideCustom( var int eBar_hndl, var int animated){
         };
         MEM_Info("B4DI_eBar_hide successful");
     } else {
-        MEM_Info("B4DI_eBar_hide already hidden");
+        //MEM_Info("B4DI_eBar_hide already hidden");
     };
 };
 
@@ -301,7 +301,7 @@ func void B4DI_eBar_show( var int eBar_hndl){
         //Bar_Show(eBar_inst.bar);
         MEM_Info("B4DI_eBar_show successful");
     } else {
-        MEM_Info("B4DI_eBar_show already visible");
+        //MEM_Info("B4DI_eBar_show already visible");
     };
 
     ////TODO make optional 

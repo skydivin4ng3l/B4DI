@@ -187,67 +187,6 @@ func void B4DI_manaBar_InitOnce(){
 	MEM_Info("B4DI_manaBar_InitOnce");
 };
 
-//#################################################################
-//
-//  XP Bar
-//
-//#################################################################
-//TODO: change to persitent bar 
-/*func void B4DI_XpBar_calcXp(var int XpBar){
-	// ------ XP Setup ------
-	var int level_last; var int exp_lastLvlUp;
-
-	level_last = hero.level-1;
-	if (level_last<0){
-		level_last =0;
-		exp_lastLvlUp=0;
-	}
-	else{
-		exp_lastLvlUp = (500*((level_last+2)/2)*(level_last+1));
-		//var int exp_next = (500*((hero.level+2)/2)*(hero.level+1));
-	};
-
-	//var int exp_neededFromThisLvlToNext = exp_next - exp_lastLvlUp;
-	Bar_SetMax(XpBar, hero.exp_next- exp_lastLvlUp);
-	Bar_SetValue(XpBar, hero.exp - exp_lastLvlUp);
-};
-
-func int B4DI_xpBar_create(){
-	////preventing overlapping animations but I fear that the frameFunction still continoue
-	//if(Hlp_IsValidHandle(a8_XpBar)) {
-	//	if (!Anim8_Empty(a8_XpBar)){
-	//		Anim8_Delete(a8_XpBar);
-	//		Bar_Delete(XpBar);
-	//	};
-	//};
-	var int XpBar;
-	//if(!Hlp_IsValidHandle(XpBar)) {
-		XpBar = Bar_CreateCenterDynamic(B4DI_XpBar);
-		B4DI_Bar_dynamicMenuBasedScale(XpBar);
-		//var int text_ptr; text_ptr = Print_Ext(100,100, "New Bar Created", FONT_Screen, RGBA(255,0,0,200),1000);
-	//};
-
-	B4DI_XpBar_calcXp(XpBar);
-
-	return XpBar;
-};
-
-func void B4DI_xpBar_show(){
-	var int XpBar; XpBar = B4DI_xpBar_create();
-	B4DI_Bar_fadeOut(XpBar, true);
-	//Bar_Show(XpBar);
-	//B4DI_Bar_pulse_size(XpBar);
-	
-};
-
-
-func void B4DI_xpBar_update(var int add_xp) {
-	PassArgumentI(add_xp);
-	ContinueCall();
-	var int XpBar; XpBar = B4DI_xpBar_create();
-	B4DI_Bar_pulse_size(XpBar);
-	B4DI_Bar_fadeOut(XpBar, true);
-};*/
 
 //#################################################################
 //
@@ -266,9 +205,9 @@ func void B4DI_Bars_update(){
 	};
 	//TODO option on when to show/hide manaBar
 	if ( (!Npc_IsInFightMode( hero, FMODE_NONE ) || heroHpChanged || heroManaChanged || isInventoryOpen ) & MEM_eBar_Hp.isFadedOut ) {
-		B4DI_eBar_show(MEM_eBar_MANA_handle);
 		B4DI_eBar_show(MEM_eBar_HP_handle);
-		if(Npc_IsInFightMode( hero, FMODE_MAGIC )) {
+		if(Npc_IsInFightMode( hero, FMODE_MAGIC ) || isInventoryOpen ) {
+			B4DI_eBar_show(MEM_eBar_MANA_handle);
 			B4DI_Info1("SpellMana:", oHero.spellMana);
 		};
 	} else if(Npc_IsInFightMode( hero, FMODE_NONE ) & !heroHpChanged & !heroManaChanged & !isInventoryOpen & !MEM_eBar_Hp.isFadedOut) {

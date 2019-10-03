@@ -36,6 +36,17 @@ const int B4DI_BarScale_150		= 150; // 150%
 const int B4DI_BarScale_200		= 200; // 200%
 
 //========================================
+// FocusBar Options
+//========================================
+const int B4DI_FOCUSBAR_SHOW_ATT_FRIENDLY 	= 1;
+const int B4DI_FOCUSBAR_SHOW_ATT_NEUTRAL 	= 1;
+const int B4DI_FOCUSBAR_SHOW_ATT_ANGRY 		= 1;
+const int B4DI_FOCUSBAR_SHOW_ATT_HOSTILE 	= 1;
+
+const int B4DI_FOCUSBAR_SHOW_LABLE			= 1;
+
+
+//========================================
 // Animation Modes
 //========================================
 

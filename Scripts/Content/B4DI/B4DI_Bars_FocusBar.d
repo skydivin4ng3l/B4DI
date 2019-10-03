@@ -8,7 +8,7 @@ func void B4DI_focusBar_Refresh(var int C_NPC_ptr){
 	B4DI_eBar_RefreshNPC(MEM_eBar_FOCUS_handle, ATR_HITPOINTS, ATR_HITPOINTS_MAX, C_NPC_ptr);
 };
 
-func void B4DI_hook_UpdatePlayerStatus_return() {
+/*func void B4DI_hook_UpdatePlayerStatus_return() {
 	//MEM_Info("B4DI_hook_UpdatePlayerStatus_return Called");
 	if ( !isHookF(oCGame__UpdatePlayerStatus_return, B4DI_oCGame__UpdatePlayerStatus_return) ) {
 		HookEngineF(oCGame__UpdatePlayerStatus_return, 7, B4DI_oCGame__UpdatePlayerStatus_return); //B4DI_oCGame__UpdatePlayerStatus_return()
@@ -22,6 +22,39 @@ func void B4DI_unhook_UpdatePlayerStatus_return() {
 		RemoveHookF(oCGame__UpdatePlayerStatus_return, 7, B4DI_oCGame__UpdatePlayerStatus_return); //B4DI_oCGame__UpdatePlayerStatus_return()
 		MEM_Info("B4DI_unhook_UpdatePlayerStatus_return removed");
 	};
+};*/
+
+func void B4DI_focusBar_show() {
+	B4DI_eBar_show(MEM_eBar_FOCUS_handle);
+	//B4DI_hook_UpdatePlayerStatus_return();
+	FocusBar_update_CallbackActive = true;
+};
+
+func void B4DI_focusBar_hide() {
+	idOfCurrentFocus = 0;
+	B4DI_eBar_hideInstant(MEM_eBar_FOCUS_handle);
+	FocusBar_update_CallbackActive = false;
+};
+
+func int B4DI_focusBar_handleAttitude(var int attitude) {
+	if ( attitude == ATT_FRIENDLY && B4DI_FOCUSBAR_SHOW_ATT_FRIENDLY) {
+		MEM_Info("ATT_FRIENDLY");
+		return true;
+
+	} else if( attitude == ATT_NEUTRAL && B4DI_FOCUSBAR_SHOW_ATT_NEUTRAL )  {   
+		MEM_Info("ATT_NEUTRAL");
+		return true;
+
+	} else if( attitude == ATT_ANGRY && B4DI_FOCUSBAR_SHOW_ATT_ANGRY )    {
+		MEM_Info("ATT_ANGRY");
+		return true;
+
+	} else if( attitude == ATT_HOSTILE && B4DI_FOCUSBAR_SHOW_ATT_HOSTILE )  { 
+		MEM_Info("ATT_HOSTILE");
+		return true;
+	};
+	//don't show focusbar based on selected options on attitudes
+	return false;
 };
 
 func int B4DI_focusedNpcHp_changed(){
@@ -36,55 +69,44 @@ func int B4DI_focusedNpcHp_changed(){
 	};
 };
 
+// Will be called Twice 
 func void B4DI_focusBar_update(){
 	//MEM_Info("B4DI_focusBar_update called");
 	//B4DI_Info1("B4DI_focusBar_update showPlayerStatus:", MEM_GAME.showPlayerStatus);
-	//TODO Fix showing bar of NPC although item is in Focus directly after NPC
 	if( Hlp_Is_oCNpc(oHero.focus_vob) && MEM_GAME.showPlayerStatus ) {
 		//MEM_Info("B4DI_focusBar_update Its an NPC!");
 		var C_Npc npc_inFocus; npc_inFocus = MEM_PtrToInst(oHero.focus_vob);
 		var int new_idOfCurrentFocus; new_idOfCurrentFocus = Npc_GetID(npc_inFocus);
-		//TODO Refresh only when HP Changed or different NPC in Focus
-		if (new_idOfCurrentFocus != idOfCurrentFocus || B4DI_focusedNpcHp_changed() ) {
+		// Refresh only when HP Changed or different NPC in Focus
+		//TODO check if it is the same npc than before and check for HP difference for animation
+		if (new_idOfCurrentFocus != idOfCurrentFocus ) {
+			B4DI_debugSpy("npc_inFocus Name: ", npc_inFocus.name);
+			B4DI_focusBar_Refresh(MEM_InstToPtr(npc_inFocus));
+		} else if ( new_idOfCurrentFocus == idOfCurrentFocus && B4DI_focusedNpcHp_changed() ) {
+			//TODO Mark for animation //maybe through OnDamageHit?
 			B4DI_focusBar_Refresh(MEM_InstToPtr(npc_inFocus));
 		};
-		//B4DI_Info1("npc_inFocus IDX: ", npc_inFocus.id);
 		//B4DI_Info1("npc_HP: ", npc_inFocus.attribute[ATR_HITPOINTS]);
 
-		//TODO check if it is the same npc than before and check for HP difference for animation
-		var int att; att = Npc_GetPermAttitude(hero, npc_inFocus);
-
-		if( new_idOfCurrentFocus != idOfCurrentFocus || (new_idOfCurrentFocus == idOfCurrentFocus && att != lastAttitudeOfCurrentFocus) ) {
-			B4DI_debugSpy("npc_inFocus Name: ", npc_inFocus.name);
-
+		if( !Npc_isDead( npc_inFocus ) /*&& ( new_idOfCurrentFocus != idOfCurrentFocus || (new_idOfCurrentFocus == idOfCurrentFocus && att != lastAttitudeOfCurrentFocus) )*/ ) {
+			//B4DI_Info1("npc_inFocus noFocus:", npc_inFocus.noFocus);
 			idOfCurrentFocus = Npc_GetID(npc_inFocus);
-			lastAttitudeOfCurrentFocus = att;
-			//TODO customizable when to show FocusBar
-			//TODO allow show of focus bar when att towards player changes
-			if (att == ATT_FRIENDLY) {
-				B4DI_Info1("idOfCurrentFocus: ", idOfCurrentFocus);
-				MEM_Info("ATT_FRIENDLY");
-				B4DI_eBar_show(MEM_eBar_FOCUS_handle);
-				B4DI_hook_UpdatePlayerStatus_return();
-			} else if(att == ATT_NEUTRAL)  {   
-				B4DI_Info1("idOfCurrentFocus: ", idOfCurrentFocus);
-				MEM_Info("ATT_NEUTRAL");
-				B4DI_eBar_show(MEM_eBar_FOCUS_handle);
-				B4DI_hook_UpdatePlayerStatus_return();
-
-			} else if(att == ATT_ANGRY)    {
-				B4DI_Info1("idOfCurrentFocus: ", idOfCurrentFocus);
-				MEM_Info("ATT_ANGRY");
-				B4DI_eBar_show(MEM_eBar_FOCUS_handle);
-				B4DI_hook_UpdatePlayerStatus_return();
-
-			} else if(att == ATT_HOSTILE)  { 
-				B4DI_Info1("idOfCurrentFocus: ", idOfCurrentFocus);
-				MEM_Info("ATT_HOSTILE");
-				B4DI_eBar_show(MEM_eBar_FOCUS_handle);
-				B4DI_hook_UpdatePlayerStatus_return();
+			//lastAttitudeOfCurrentFocus = att;
+			//customizable when to show FocusBar
+			var int att; att = Npc_GetPermAttitude(hero, npc_inFocus);
+			if ( B4DI_focusBar_handleAttitude(att) && !npc_inFocus.noFocus ) {
+				//TODO Customizeable if focus is present at all / only in Combat?
+				B4DI_focusBar_show();
+				//TODO Animated If marked for?? maybe better in refresh function?
+			} else {
+				B4DI_eBar_hideInstant(MEM_eBar_FOCUS_handle);
 
 			};
+			
+		} else {
+			//MEM_Info("I am an NPC but DEAD ");
+			//TODO Check for avilable loot?
+			B4DI_eBar_hideInstant(MEM_eBar_FOCUS_handle);
 		};
 	} else if(Hlp_Is_oCItem(oHero.focus_vob) && MEM_GAME.showPlayerStatus ) {
 		var c_item itm; itm = MEM_PtrToInst(oHero.focus_vob);
@@ -92,21 +114,15 @@ func void B4DI_focusBar_update(){
 			B4DI_debugSpy("item_inFocus: ", itm.name);
 			idOfCurrentFocus = Hlp_GetInstanceID(itm);
 			B4DI_eBar_hideInstant(MEM_eBar_FOCUS_handle);
-			B4DI_hook_UpdatePlayerStatus_return();
 			// Setze col = RGBA(.., .., .., ..); um die Farbe einzustellen
 			//TODO show preview??
-		} else{ // Bit hacky but for now this should work
-			B4DI_unhook_UpdatePlayerStatus_return();
-
+		} else{ 
+			
 		};
-	//Is a neutral element / nothing / dialog
+	//Is a neutral element / Callback of StatusUpdate Return / dialog
 	} else {
 		MEM_Info("B4DI_focusBar_update else branch");
-		B4DI_unhook_UpdatePlayerStatus_return();
-		if( !MEM_eBar_FOCUS.isFadedOut ) {
-			idOfCurrentFocus = 0;
-			B4DI_eBar_hideInstant(MEM_eBar_FOCUS_handle);
-		};
+		B4DI_focusBar_hide();
 	};
 };
 
@@ -129,6 +145,7 @@ func void B4DI_focusBar_InitAlways(){
 
 	idOfCurrentFocus = 0;
 	lastNpcHP = 0;
+	FocusBar_update_CallbackActive = 0;
 
 	MEM_Info("B4DI_focusBar_InitAlways");
 };
