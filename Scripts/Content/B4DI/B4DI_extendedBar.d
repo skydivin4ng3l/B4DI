@@ -22,10 +22,10 @@ func void B4DI_Bar_SetBarSizeCenteredPercent(var int bar_hndl, var int x_percent
     View_ResizeCentered(b.v1, sizex_pre * x_percentage / 100 , sizey_pre * y_percentage / 100 ); 
         
     //Debug
-    B4DI_debugSpy("Bar PositionX",IntToString(vBar.vposx));
-    B4DI_debugSpy("Bar PositionY",IntToString(vBar.vposy));
-    B4DI_debugSpy("Bar SizeX",IntToString(vBar.vsizex));
-    B4DI_debugSpy("Bar SizeY",IntToString(vBar.vsizey));
+    //B4DI_debugSpy("Bar PositionX",IntToString(vBar.vposx));
+    //B4DI_debugSpy("Bar PositionY",IntToString(vBar.vposy));
+    //B4DI_debugSpy("Bar SizeX",IntToString(vBar.vsizex));
+    //B4DI_debugSpy("Bar SizeY",IntToString(vBar.vsizey));
 
 };
 
@@ -130,8 +130,10 @@ func int B4DI_eBar_Create(var int Bar_constructor_instance) {
         MEM_Warn("B4DI_eBar_Create failed at B4DI_BarPreview_Create"); 
         return 0;
     };
+    //eBar.barPostview = B4DI_BarPreview_Create(new_eBar_hndl);
 
-    Bar_Show(eBar.bar); //not neccessary
+    Bar_Show(eBar.bar);
+    //created invisible
     B4DI_eBar_SetAlpha(new_eBar_hndl, 0);
     eBar.isFadedOut = 1;
 
@@ -156,7 +158,7 @@ func void B4DI_eBar_fadeOut(var int eBar_hndl, var int deleteBar) {
     Anim8q(eBar_inst.anim8FadeOut,   0, 2000, A8_SlowEnd);
 };
 
-func void B4DI_eBar_pulse_size(var int eBar_hndl, var func pulseFunc/*var int axis_mode*/) {
+func void B4DI_eBar_pulse_size(var int eBar_hndl, var func pulseFunc) {
     if (!Hlp_IsValidHandle(ebar_hndl)) { MEM_Warn("B4DI_eBar_pulse_size failed"); return; };
     var _extendedBar eBar; eBar = get(eBar_hndl);
 
@@ -165,13 +167,9 @@ func void B4DI_eBar_pulse_size(var int eBar_hndl, var func pulseFunc/*var int ax
             //Anim8_Delete(eBar.anim8PulseSize);
             alreadyPulsating = true;
         };
-    if (!alreadyPulsating /*&& axis_mode == B4DI_PULSE_SIZE_CENTERED_XY*/) {
-        eBar.anim8PulseSize = Anim8_NewExt(100 , pulseFunc/*B4DI_Bar_SetBarSizeCenteredPercentXY*/, eBar.bar, false);
-    }/* else if (!alreadyPulsating && axis_mode == B4DI_PULSE_SIZE_CENTERED_X) {
-        eBar.anim8PulseSize = Anim8_NewExt(100 , B4DI_Bar_SetBarSizeCenteredPercentX, eBar_inst.bar, false);
-    } else if (!alreadyPulsating && axis_mode == B4DI_PULSE_SIZE_CENTERED_Y) {
-        eBar.anim8PulseSize = Anim8_NewExt(100 , B4DI_Bar_SetBarSizeCenteredPercentY, eBar_inst.bar, false);
-    }*/;
+    if ( !alreadyPulsating ) {
+        eBar.anim8PulseSize = Anim8_NewExt(100 , pulseFunc, eBar.bar, false);
+    };
     Anim8_RemoveIfEmpty(eBar.anim8PulseSize, true);
     Anim8_RemoveDataIfEmpty(eBar.anim8PulseSize, false);
 
@@ -280,6 +278,8 @@ func void B4DI_eBar_hideCustom( var int eBar_hndl, var int animated){
 
 func void B4DI_eBar_hideInstant( var int eBar_hndl){
     B4DI_eBar_hideCustom(eBar_hndl, false);
+    var _extendedBar eBar; eBar = get(eBar_hndl);
+    //B4DI_BarPreview_hide(eBar.barPostview); TODO
 };
 
 func void B4DI_eBar_hideFaded( var int eBar_hndl){
@@ -349,20 +349,44 @@ func void B4DI_eBar_SetPreviewChangesMaximum(var int eBar_hndl){
 //========================================
 func void B4DI_Bar_SetValuesBasic(var int bar_hndl, var int value, var int valueMax) {
     if( !Hlp_IsValidHandle(bar_hndl) ) { MEM_Warn("B4DI_Bar_SetValuesBasic failed"); return; };
-
+    
     Bar_SetMax(bar_hndl, valueMax);
     Bar_SetValue(bar_hndl, value);
 };
 
+//TODO Postview rework, prevent overshoot cause new npc value change
 func void B4DI_eBar_SetValuesBasic(var int eBar_hndl, var int value, var int valueMax) {
     if( !Hlp_IsValidHandle(eBar_hndl) ) { MEM_Warn("B4DI_eBar_SetValuesBasic failed"); return; };
     var _extendedBar eBar; eBar = get(eBar_hndl);
+    var int old_value; old_value = Bar_GetValue(eBar.bar);
+    var int value_diff; value_diff = value - old_value;
 
-    B4DI_Bar_SetValuesBasic(eBar.bar, value, valueMax);
+    B4DI_Info1("value_diff: ", value_diff);
+    if ( value_diff == 0 ) {
+        B4DI_Bar_SetValuesBasic(eBar.bar, value, valueMax);
+
+    } else if ( value_diff < 0 ) {
+        B4DI_Bar_SetValuesBasic(eBar.bar, value, valueMax);
+
+        eBar.barPostview = B4DI_BarPreview_Create(eBar_hndl);
+        B4DI_BarPreview_CalcPosScale(eBar.barPostview, abs(value_diff));
+        //B4DI_BarPreview_Show(eBar.barPostview);
+        B4DI_BarPreview_slide_size(eBar.barPostview, B4DI_BarPreview_SetSizeLeftsidedPercentX);
+
+    } else if ( value_diff > 0) {
+        eBar.barPostview = B4DI_BarPreview_Create(eBar_hndl);
+        B4DI_BarPreview_CalcPosScale(eBar.barPostview, value_diff);
+        //B4DI_BarPreview_Show(eBar.barPostview);
+        B4DI_BarPreview_slide_size(eBar.barPostview, B4DI_BarPreview_SetSizeLeftsidedPercentX);
+        //TODO add setValuesBasic as Callback of slideRight Animation
+        B4DI_Bar_SetValuesBasic(eBar.bar, value, valueMax);
+    };
+
+
 };
 
-func void B4DI_Bar_SetValuesNPC(var int bar_hndl, var int index_value, var int index_valueMax, var int C_NPC_ptr) {
-    if( !Hlp_IsValidHandle(bar_hndl) ) { MEM_Warn("B4DI_Bar_SetValuesNPC failed"); return; };
+func void B4DI_eBar_SetValuesNPC(var int eBar_hndl, var int index_value, var int index_valueMax, var int C_NPC_ptr) {
+    if( !Hlp_IsValidHandle(eBar_hndl) ) { MEM_Warn("B4DI_eBar_SetValuesNPC failed"); return; };
     
     var C_NPC my_npc;
     if(C_NPC_ptr < 1) {
@@ -371,21 +395,18 @@ func void B4DI_Bar_SetValuesNPC(var int bar_hndl, var int index_value, var int i
     } else {
         my_npc = MEM_PtrToInst(C_NPC_ptr);
         if( !Hlp_IsValidNpc( my_npc ) ) { 
-            MEM_Info("B4DI_Bar_SetValuesNpc failed not correct NPC");
+            MEM_Info("B4DI_eBar_SetValuesNpc failed not correct NPC");
             return;
         };
-        //MEM_Info("B4DI_Bar_SetValuesNPC");
+        //MEM_Info("B4DI_eBar_SetValuesNPC");
     };
 
-    B4DI_Bar_SetValuesBasic( bar_hndl, MEM_ReadStatArr(my_npc.attribute, index_value), MEM_ReadStatArr(my_npc.attribute, index_valueMax) );
-    //Bar_SetMax(bar_hndl, MEM_ReadStatArr(my_npc.attribute, index_valueMax) );
-    //Bar_SetValue(bar_hndl, MEM_ReadStatArr(my_npc.attribute, index_value) );
-    
+    B4DI_eBar_SetValuesBasic( eBar_hndl, MEM_ReadStatArr(my_npc.attribute, index_value), MEM_ReadStatArr(my_npc.attribute, index_valueMax) );    
     
 };
 
-func void B4DI_Bar_SetValues(var int bar_hndl, var int index_value, var int index_valueMax) {
-    B4DI_Bar_SetValuesNPC(bar_hndl, index_value, index_valueMax, 0);
+func void B4DI_eBar_SetValues(var int ebar_hndl, var int index_value, var int index_valueMax) {
+    B4DI_eBar_SetValuesNPC(ebar_hndl, index_value, index_valueMax, 0);
 };
 
 
@@ -416,14 +437,14 @@ func void B4DI_eBar_RefreshNPC(var int eBar_hndl, var int index_value, var int i
     var _extendedBar eBar; eBar = get(eBar_hndl);
 
     if ( C_NPC_ptr < 1 ) {
-        B4DI_Bar_SetValues(eBar.bar, index_value, index_valueMax);
+        B4DI_eBar_SetValues(eBar_hndl, index_value, index_valueMax);
     } else {
         var C_NPC my_npc; my_npc = MEM_PtrToInst(C_NPC_ptr);
         if ( !Hlp_IsValidNpc( my_npc ) ) {
             MEM_Warn("B4DI_eBar_RefreshNPC failed wrong NPC_ptr");
             return;
         };
-        B4DI_Bar_SetValuesNPC(eBar.bar, index_value, index_valueMax, C_NPC_ptr);
+        B4DI_eBar_SetValuesNPC(eBar_hndl, index_value, index_valueMax, C_NPC_ptr);
         //MEM_Info("B4DI_eBar_Refresh NPC specific");
     };
 

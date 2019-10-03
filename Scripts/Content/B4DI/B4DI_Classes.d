@@ -8,6 +8,7 @@ class _extendedBar {
     
     var int bar;                    // _bar(h)
     var int barPreview;               // _barPreview(h)
+    var int barPostview;                // _barPreview(h)
     var int isFadedOut;                   // Bool
     var int anim8FadeOut;               // A8Head(h)
     var int anim8PulseSize;               // A8Head(h)
@@ -19,8 +20,11 @@ func void _extendedBar_Delete(var _extendedBar eBar) {
     if(Hlp_IsValidHandle(eBar.bar)) {
         delete(eBar.bar);
     };
-    if(Hlp_IsValidHandle(eBar.bar)) {
+    if(Hlp_IsValidHandle(eBar.barPreview)) {
         delete(eBar.barPreview);
+    };
+    if(Hlp_IsValidHandle(eBar.barPostview)) {
+        delete(eBar.barPostview);
     };
     if(Hlp_IsValidHandle(eBar.anim8FadeOut)) {
         Anim8_Delete(eBar.anim8FadeOut);
