@@ -45,6 +45,10 @@ const int B4DI_FOCUSBAR_SHOW_ATT_HOSTILE 	= 1;
 
 const int B4DI_FOCUSBAR_SHOW_LABLE			= 1;
 
+//Const
+
+const int B4DI_FOCUSBAR_INITIAL_REFRESH = 0;
+
 
 //========================================
 // Animation Modes

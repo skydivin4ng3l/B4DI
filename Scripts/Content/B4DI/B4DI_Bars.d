@@ -121,6 +121,7 @@ func void B4DI_hpBar_InitAlways(){
 		MEM_Info("B4DI_hpBar_InitAlways: Creating an HP Bar Handle");
 
 		MEM_eBar_HP_handle = B4DI_eBar_Create(B4DI_HpBar);
+		B4DI_eBar_SetNpcRef(MEM_eBar_HP_handle, MEM_InstToPtr(hero));
 	};
 	MEM_eBar_Hp = get(MEM_eBar_HP_handle);
 	B4DI_HpBar_Refresh();
@@ -166,6 +167,7 @@ func void B4DI_manaBar_InitAlways(){
 	// new dBars dynamic
 	if(!Hlp_IsValidHandle(MEM_eBar_MANA_handle)){
 		MEM_eBar_MANA_handle = B4DI_eBar_Create(B4DI_ManaBar);
+		B4DI_eBar_SetNpcRef(MEM_eBar_MANA_handle, MEM_InstToPtr(hero));
 	};
 	MEM_eBar_MANA = get(MEM_eBar_MANA_handle);
 	B4DI_manaBar_Refresh();

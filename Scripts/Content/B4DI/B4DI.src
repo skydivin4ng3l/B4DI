@@ -3,6 +3,7 @@ B4DI_Classes.d
 B4DI_Globals.d
 
 B4DI_BarPreview.d
+B4DI_BarPostview.d
 B4DI_extendedBar.d
 B4DI_Bars_GeneralFunctions.d
 

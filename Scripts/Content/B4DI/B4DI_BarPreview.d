@@ -1,5 +1,5 @@
 /***********************************\
-                BARPREVIW
+                BARPREVIEW
 \***********************************/
 
 func int B4DI_BarPreview_Create( var int eBar_hndl){

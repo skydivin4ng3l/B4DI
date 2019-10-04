@@ -116,6 +116,28 @@ func void B4DI_eBar_SetAlpha(var int eBar_hndl, var int alpha) {
 };
 
 //========================================
+// eBar NPC
+//========================================
+func void B4DI_eBar_SetNpcRef(var int eBar_hndl, var int C_NPC_ptr) {
+    if(!Hlp_IsValidHandle(eBar_hndl)) { MEM_Warn("B4DI_eBar_SetNpcRef failed: invalid eBar_hndl"); return; };
+    var _extendedBar eBar; eBar = get(eBar_hndl);
+    var C_NPC new_npc_inst; new_npc_inst = MEM_PtrToInst(C_NPC_ptr);
+    if ( !Hlp_IsValidNpc( new_npc_inst ) ) { MEM_Warn("B4DI_eBar_SetNpcRef failed: invalid C_NPC_ptr"); return; };
+    eBar.npcRef = C_NPC_ptr;
+};
+
+func int B4DI_eBar_GetNpcRef(var int eBar_hndl) {
+    if(!Hlp_IsValidHandle(eBar_hndl)) { MEM_Warn("B4DI_eBar_GetNpcRef failed: invalid eBar_hndl"); return 0; };
+    var _extendedBar eBar; eBar = get(eBar_hndl);
+    if ( eBar.npcRef ) {
+        return eBar.npcRef;
+    } else {
+        return false;
+    };
+};
+
+
+//========================================
 // eBar Create
 //========================================
 func int B4DI_eBar_Create(var int Bar_constructor_instance) {
@@ -136,6 +158,8 @@ func int B4DI_eBar_Create(var int Bar_constructor_instance) {
     //created invisible
     B4DI_eBar_SetAlpha(new_eBar_hndl, 0);
     eBar.isFadedOut = 1;
+
+    eBar.npcRef = 0;
 
     return new_eBar_hndl;
 };
@@ -279,7 +303,9 @@ func void B4DI_eBar_hideCustom( var int eBar_hndl, var int animated){
 func void B4DI_eBar_hideInstant( var int eBar_hndl){
     B4DI_eBar_hideCustom(eBar_hndl, false);
     var _extendedBar eBar; eBar = get(eBar_hndl);
-    //B4DI_BarPreview_hide(eBar.barPostview); TODO
+    if ( Hlp_IsValidHandle(eBar.barPostview) ) {
+        B4DI_BarPostview_delete(eBar.barPostview);
+    };
 };
 
 func void B4DI_eBar_hideFaded( var int eBar_hndl){
@@ -354,59 +380,91 @@ func void B4DI_Bar_SetValuesBasic(var int bar_hndl, var int value, var int value
     Bar_SetValue(bar_hndl, value);
 };
 
-//TODO Postview rework, prevent overshoot cause new npc value change
+
 func void B4DI_eBar_SetValuesBasic(var int eBar_hndl, var int value, var int valueMax) {
     if( !Hlp_IsValidHandle(eBar_hndl) ) { MEM_Warn("B4DI_eBar_SetValuesBasic failed"); return; };
     var _extendedBar eBar; eBar = get(eBar_hndl);
-    var int old_value; old_value = Bar_GetValue(eBar.bar);
-    var int value_diff; value_diff = value - old_value;
 
-    B4DI_Info1("value_diff: ", value_diff);
-    if ( value_diff == 0 ) {
-        B4DI_Bar_SetValuesBasic(eBar.bar, value, valueMax);
-
-    } else if ( value_diff < 0 ) {
-        B4DI_Bar_SetValuesBasic(eBar.bar, value, valueMax);
-
-        eBar.barPostview = B4DI_BarPreview_Create(eBar_hndl);
-        B4DI_BarPreview_CalcPosScale(eBar.barPostview, abs(value_diff));
-        //B4DI_BarPreview_Show(eBar.barPostview);
-        B4DI_BarPreview_slide_size(eBar.barPostview, B4DI_BarPreview_SetSizeLeftsidedPercentX);
-
-    } else if ( value_diff > 0) {
-        eBar.barPostview = B4DI_BarPreview_Create(eBar_hndl);
-        B4DI_BarPreview_CalcPosScale(eBar.barPostview, value_diff);
-        //B4DI_BarPreview_Show(eBar.barPostview);
-        B4DI_BarPreview_slide_size(eBar.barPostview, B4DI_BarPreview_SetSizeLeftsidedPercentX);
-        //TODO add setValuesBasic as Callback of slideRight Animation
-        B4DI_Bar_SetValuesBasic(eBar.bar, value, valueMax);
-    };
-
-
+    B4DI_Bar_SetValuesBasic(eBar.bar, value, valueMax);
 };
 
-func void B4DI_eBar_SetValuesNPC(var int eBar_hndl, var int index_value, var int index_valueMax, var int C_NPC_ptr) {
-    if( !Hlp_IsValidHandle(eBar_hndl) ) { MEM_Warn("B4DI_eBar_SetValuesNPC failed"); return; };
+//TODO depricate
+//func void B4DI_eBar_SetValuesNPC(var int eBar_hndl, var int index_value, var int index_valueMax, var int C_NPC_ptr) {
+//    if( !Hlp_IsValidHandle(eBar_hndl) ) { MEM_Warn("B4DI_eBar_SetValuesNPC failed"); return; };
     
-    var C_NPC my_npc;
-    if(C_NPC_ptr < 1) {
-        my_npc = _^(_@(hero));
+//    var C_NPC my_npc;
+//    if(C_NPC_ptr < 1) {
+//        my_npc = _^(_@(hero));
 
-    } else {
-        my_npc = MEM_PtrToInst(C_NPC_ptr);
-        if( !Hlp_IsValidNpc( my_npc ) ) { 
-            MEM_Info("B4DI_eBar_SetValuesNpc failed not correct NPC");
-            return;
-        };
-        //MEM_Info("B4DI_eBar_SetValuesNPC");
+//    } else {
+//        my_npc = MEM_PtrToInst(C_NPC_ptr);
+//        if( !Hlp_IsValidNpc( my_npc ) ) { 
+//            MEM_Info("B4DI_eBar_SetValuesNpc failed not correct NPC");
+//            return;
+//        };
+//        //MEM_Info("B4DI_eBar_SetValuesNPC");
+//    };
+
+//    B4DI_eBar_SetValuesBasic( eBar_hndl, MEM_ReadStatArr(my_npc.attribute, index_value), MEM_ReadStatArr(my_npc.attribute, index_valueMax) );    
+    
+//};
+
+func void B4DI_eBar_SetValuesAttributeBased(var int eBar_hndl, var int index_value, var int index_valueMax) {
+    if( !Hlp_IsValidHandle(eBar_hndl) ) { MEM_Warn("B4DI_eBar_SetValuesAttributeBased failed"); return; };
+    var _extendedBar eBar; eBar = get(eBar_hndl);
+    var C_NPC npcRef_inst; npcRef_inst = MEM_PtrToInst(eBar.npcRef);
+    
+    if( !Hlp_IsValidNpc( npcRef_inst ) ) { 
+        MEM_Info("B4DI_eBar_SetValuesAttributeBased failed not correct NPC");
+        return;
     };
+        //MEM_Info("B4DI_eBar_SetValuesAttributeBased");
 
-    B4DI_eBar_SetValuesBasic( eBar_hndl, MEM_ReadStatArr(my_npc.attribute, index_value), MEM_ReadStatArr(my_npc.attribute, index_valueMax) );    
+    B4DI_eBar_SetValuesBasic( eBar_hndl, MEM_ReadStatArr(npcRef_inst.attribute, index_value), MEM_ReadStatArr(npcRef_inst.attribute, index_valueMax) );    
     
 };
 
 func void B4DI_eBar_SetValues(var int ebar_hndl, var int index_value, var int index_valueMax) {
-    B4DI_eBar_SetValuesNPC(ebar_hndl, index_value, index_valueMax, 0);
+    //B4DI_eBar_SetValuesNPC(ebar_hndl, index_value, index_valueMax, 0);
+    if(!Hlp_IsValidHandle(eBar_hndl)) { MEM_Warn("B4DI_eBar_SetValues failed"); return; };
+    var _extendedBar eBar; eBar = get(eBar_hndl);
+
+    if ( !eBar.npcRef ) {
+        B4DI_eBar_SetValuesBasic(eBar_hndl, index_value, index_valueMax);
+    } else {
+        var C_NPC npcRef_inst; npcRef_inst = MEM_PtrToInst(eBar.npcRef);
+        if ( !Hlp_IsValidNpc( npcRef_inst ) ) {
+            MEM_Warn("B4DI_eBar_SetValues failed wrong npcRef");
+            return;
+        };
+        B4DI_eBar_SetValuesAttributeBased(eBar_hndl, index_value, index_valueMax);
+        //MEM_Info("B4DI_eBar_Refresh NPC specific");
+    };
+};
+
+func void B4DI_eBar_SetValuesAnimated( var int eBar_hndl,var int index_value, var int index_valueMax, var int value_diff) {
+    //TODO: adjust PostView Create to allow negative value_diff with correct behavior
+    if(!Hlp_IsValidHandle(eBar_hndl)) { MEM_Warn("B4DI_eBar_SetValues failed"); return; };
+    var _extendedBar eBar; eBar = get(eBar_hndl);
+
+    if (value_diff == 0) {
+        //B4DI_Info1("B4DI_eBar_SetValuesAnimated: ", value_diff );
+        B4DI_eBar_SetValues(eBar_hndl, index_value, index_valueMax);
+    } else if ( value_diff < 0 ) {
+        //B4DI_Info1("B4DI_eBar_SetValuesAnimated: ", value_diff );
+        B4DI_eBar_SetValues(eBar_hndl, index_value, index_valueMax);
+
+        eBar.barPostview = B4DI_BarPostview_Create(eBar_hndl, abs(value_diff) );
+        B4DI_BarPostview_Show(eBar.barPostview);
+        B4DI_BarPostview_slide_size(eBar.barPostview, B4DI_BarPostview_SetSizeLeftsidedPercentX);
+    } else if ( value_diff > 0 ) {
+        //B4DI_Info1("B4DI_eBar_SetValuesAnimated: ", value_diff );
+        eBar.barPostview = B4DI_BarPostview_Create(eBar_hndl, abs(value_diff) );
+        B4DI_BarPostview_Show(eBar.barPostview);
+        B4DI_BarPostview_slide_size(eBar.barPostview, B4DI_BarPostview_SetSizeLeftsidedPercentX);
+
+        B4DI_eBar_SetValues(eBar_hndl, index_value, index_valueMax);
+    };
 };
 
 
@@ -432,30 +490,50 @@ func void B4DI_eBar_SetValues(var int ebar_hndl, var int index_value, var int in
 // eBar Refresh
 //========================================
 //TODO generalize maybe with pointer to npc in extenedbar,...to allow xpbar to use refresh the same way and refresh be simpler
-func void B4DI_eBar_RefreshNPC(var int eBar_hndl, var int index_value, var int index_valueMax, var int C_NPC_ptr) {
-    if(!Hlp_IsValidHandle(eBar_hndl)) { MEM_Warn("B4DI_eBar_RefreshNPC failed"); return; };
+//func void B4DI_eBar_RefreshNPC(var int eBar_hndl, var int index_value, var int index_valueMax, var int C_NPC_ptr) {
+//    if(!Hlp_IsValidHandle(eBar_hndl)) { MEM_Warn("B4DI_eBar_RefreshNPC failed"); return; };
+//    var _extendedBar eBar; eBar = get(eBar_hndl);
+
+//    if ( C_NPC_ptr < 1 ) {
+//        B4DI_eBar_SetValues(eBar_hndl, index_value, index_valueMax);
+//    } else {
+//        var C_NPC my_npc; my_npc = MEM_PtrToInst(C_NPC_ptr);
+//        if ( !Hlp_IsValidNpc( my_npc ) ) {
+//            MEM_Warn("B4DI_eBar_RefreshNPC failed wrong NPC_ptr");
+//            return;
+//        };
+//        B4DI_eBar_SetValuesNPC(eBar_hndl, index_value, index_valueMax, C_NPC_ptr);
+//        //MEM_Info("B4DI_eBar_Refresh NPC specific");
+//    };
+
+//    B4DI_eBar_RefreshLabel(eBar_hndl);
+//    var _bar bar; bar = get(eBar.bar);
+
+//    //MEM_Info("B4DI_eBar_Refresh");
+//    B4DI_debugSpy("B4DI_eBar_Refresh ", View_GetTexture(bar.v1) );
+//};
+
+
+func void B4DI_eBar_RefreshAnimated(var int eBar_hndl, var int index_value, var int index_valueMax, var int animated_value_diff) {
+    if(!Hlp_IsValidHandle(eBar_hndl)) { MEM_Warn("B4DI_eBar_RefreshAnimated failed"); return; };
     var _extendedBar eBar; eBar = get(eBar_hndl);
 
-    if ( C_NPC_ptr < 1 ) {
+    if ( !animated_value_diff ) {
         B4DI_eBar_SetValues(eBar_hndl, index_value, index_valueMax);
     } else {
-        var C_NPC my_npc; my_npc = MEM_PtrToInst(C_NPC_ptr);
-        if ( !Hlp_IsValidNpc( my_npc ) ) {
-            MEM_Warn("B4DI_eBar_RefreshNPC failed wrong NPC_ptr");
-            return;
-        };
-        B4DI_eBar_SetValuesNPC(eBar_hndl, index_value, index_valueMax, C_NPC_ptr);
-        //MEM_Info("B4DI_eBar_Refresh NPC specific");
+        MEM_Info("B4DI_eBar_RefreshAnimated Animation specific");
+        B4DI_eBar_SetValuesAnimated(eBar_hndl, index_value, index_valueMax, animated_value_diff);
     };
 
     B4DI_eBar_RefreshLabel(eBar_hndl);
     var _bar bar; bar = get(eBar.bar);
 
-    //MEM_Info("B4DI_eBar_Refresh");
-    B4DI_debugSpy("B4DI_eBar_Refresh ", View_GetTexture(bar.v1) );
+    //MEM_Info("B4DI_eBar_RefreshAnimated");
+    B4DI_debugSpy("B4DI_eBar_RefreshAnimated finished ", View_GetTexture(bar.v1) );
 };
 
 func void B4DI_eBar_Refresh(var int eBar_hndl, var int index_value, var int index_valueMax) {
-    B4DI_eBar_RefreshNPC( eBar_hndl, index_value, index_valueMax, 0);
+    B4DI_eBar_RefreshAnimated( eBar_hndl, index_value, index_valueMax, false);
 };
+
 

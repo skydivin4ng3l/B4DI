@@ -209,7 +209,7 @@ func void B4DI_oCNpc__SetWeaponMode2__zSTRING(){
 // HpBar/FocusBar
 //========================================
 func void B4DI_oCNpc__OnDamage_Hit(){
-	MEM_Info("B4DI_oCNpc__OnDamage_Hit");
+	//MEM_Info("B4DI_oCNpc__OnDamage_Hit");
 	var C_NPC caller; caller = MEM_PtrToInst(ECX);
 	//Setting Variables for HP/Focus Bar update in B4DI_oCNpc__OnDamage_Hit_return
 	if (Npc_IsPlayer(caller)) {
@@ -217,26 +217,26 @@ func void B4DI_oCNpc__OnDamage_Hit(){
 	} else {
 		heroGotHit = false;
 		var int callerID; callerID = Npc_GetID(caller);
-		B4DI_Info1("callerID: ",callerID);
-		if (callerID == idOfCurrentFocus){
+		//B4DI_Info1("callerID: ",callerID);
+		if (callerID == last_ID_ofFocus){
 			enemyInFocusGotHit = true;
 		};
 	};
-	B4DI_debugSpy("B4DI_oCNpc__OnDamage_Hit called by: ", caller.name);
+	//B4DI_debugSpy("B4DI_oCNpc__OnDamage_Hit called by: ", caller.name);
 };
 
 func void B4DI_oCNpc__OnDamage_Hit_return(){
-	MEM_Info("B4DI_oCNpc__OnDamage_Hit_return");
+	//MEM_Info("B4DI_oCNpc__OnDamage_Hit_return");
 	//TODO else part for Focusbar update?
 	if (heroGotHit) {
 		//B4DI_update_fight_mode();
 		B4DI_Bars_update();
-		MEM_Info("B4DI_oCNpc__OnDamage_Hit_return called after hero got hit");
+		//MEM_Info("B4DI_oCNpc__OnDamage_Hit_return called after hero got hit");
 		heroGotHit = false;
 	};
 	if(enemyInFocusGotHit) { 
 		B4DI_focusBar_update(); //Maybe just refresh the bar instead?
-		MEM_Info("B4DI_oCNpc__OnDamage_Hit_return called after enemy in Focus got hit");
+		//MEM_Info("B4DI_oCNpc__OnDamage_Hit_return called after enemy in Focus got hit");
 		enemyInFocusGotHit = false;
 	};
 };

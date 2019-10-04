@@ -12,6 +12,7 @@ class _extendedBar {
     var int isFadedOut;                   // Bool
     var int anim8FadeOut;               // A8Head(h)
     var int anim8PulseSize;               // A8Head(h)
+    var int npcRef;                    // C_NPC_PTR
 };
 
 instance _extendedBar@(_extendedBar);
@@ -35,7 +36,7 @@ func void _extendedBar_Delete(var _extendedBar eBar) {
 };
 
 /***********************************\
-                BARPREVIW
+                BARPREVIEW
 \***********************************/
 //========================================
 // [intern] Klasse für PermMem
@@ -66,6 +67,31 @@ func void _barPreview_Delete(var _barPreview bp) {
     };
 };
 
+/***********************************\
+                BARPOSTVIEW
+\***********************************/
+//========================================
+// [intern] Klasse für PermMem
+//========================================
+class _barPostview {
+    
+    var int vPostView;                    // zCView(h)
+    var int val;
+    var int anim8SlideSize;               // A8Head(h)
+    var int eBar_parent;               // _extentedBar(h)
+    var int isFadedOutPostview;                 // Boolean
+};
+
+instance _barPostview@(_barPostview);
+
+func void _barPostview_Delete(var _barPostview bp) {
+    if(Hlp_IsValidHandle(bp.vPostView)) {
+        delete(bp.vPostView);
+    };
+    if(Hlp_IsValidHandle(bp.anim8SlideSize)) {
+        Anim8_Delete(bp.anim8SlideSize);
+    };
+};
 /***********************************\
             BAR Constructors
 \***********************************/
@@ -110,6 +136,7 @@ instance B4DI_FocusBar(GothicBar){
     y = Print_Screen[PS_Y] -100;
     barTop = 2;     // 2 is almost too small
     barTex = "Bar_Health.tga";
+    value = 0;
 };
 
 /***********************************\

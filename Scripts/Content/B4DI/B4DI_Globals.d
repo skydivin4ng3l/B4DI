@@ -19,7 +19,7 @@ var int areItemPreviewsHidden;
 //var int anyFightModeActive;
 var int FocusBar_update_CallbackActive;
 
-var int idOfCurrentFocus;
+var int last_ID_ofFocus;
 var int lastAttitudeOfCurrentFocus;
 
 var int heroGotHit;
