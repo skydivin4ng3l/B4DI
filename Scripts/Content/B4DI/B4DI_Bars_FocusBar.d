@@ -77,7 +77,7 @@ func void B4DI_focusBar_update(){
 			if (current_ID_ofFocus != last_ID_ofFocus ) {
 				B4DI_debugSpy("npc_inFocus Name: ", npc_inFocus.name);
 				B4DI_focusBar_BindNPC(oHero.focus_vob);
-				B4DI_focusBar_Refresh(B4DI_FOCUSBAR_INITIAL_REFRESH);
+				B4DI_focusBar_Refresh(B4DI_eBAR_INTITIAL_REFRESH);
 				last_ID_ofFocus = Npc_GetID(npc_inFocus);
 				B4DI_focusedNpcHP_setLastHP();
 			} else if ( current_ID_ofFocus == last_ID_ofFocus ) {

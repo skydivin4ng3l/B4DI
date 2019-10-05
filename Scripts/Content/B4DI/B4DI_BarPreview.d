@@ -181,7 +181,7 @@ func void B4DI_BarPreview_CalcPosScale( var int barPreview_hndl, var int value) 
         SB("+");
     };
     var int diffValueToBarValMax; diffValueToBarValMax = bar.valMax - bar.val;
-    MEM_Info(IntToString(diffValueToBarValMax));
+    //MEM_Info(IntToString(diffValueToBarValMax));
     
     var int preview_vsizex;
     //value(preview) with overshoot

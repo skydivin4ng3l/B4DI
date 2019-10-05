@@ -21,7 +21,7 @@ const int    B4DI_INITIALIZED        = 0;                    // Indicator whethe
 // _barPreview Options
 //========================================
 
-const int B4DI_BARPREVIEW_HAS_OWN_LABEL = 0;
+const int B4DI_BARPREVIEW_HAS_OWN_LABEL = 1;
 
 const string B4DI_LABEL_FONT = "Font_old_10_white.tga";
 
@@ -45,9 +45,11 @@ const int B4DI_FOCUSBAR_SHOW_ATT_HOSTILE 	= 1;
 
 const int B4DI_FOCUSBAR_SHOW_LABLE			= 1;
 
-//Const
+//========================================
+// eBar CONST DONOT CHANGE
+//========================================
 
-const int B4DI_FOCUSBAR_INITIAL_REFRESH = 0;
+const int B4DI_eBAR_INTITIAL_REFRESH = 0;
 
 
 //========================================

@@ -1,7 +1,9 @@
 /***********************************\
                 BARPOSTVIEW
 \***********************************/
-
+//========================================
+// BarPostview Create
+//========================================
 func int B4DI_BarPostview_Create( var int eBar_hndl, var int value){
     //B4DI_Info1("B4DI_BarPostview_Create called with value: ", value);
     if(!Hlp_IsValidHandle(eBar_hndl)) {
@@ -28,8 +30,46 @@ func int B4DI_BarPostview_Create( var int eBar_hndl, var int value){
     return new_bp_hndl;
 };
 
+//========================================
+// BarPostview Size percentagebased
+//========================================
+func void B4DI_BarPostview_SetSizeRightsidedPercent( var int barPostview_hndl, var int x_percentage, var int y_percentage) {
+    //Print_GetScreenSize();
+    //------------------
+    if(!Hlp_IsValidHandle(barPostview_hndl)) { MEM_Warn("B4DI_BarPostview_SetSizeLeftsidedPercent failed"); return; };
+    var _barPostview bp; bp = get(barPostview_hndl);
+    var zCView vPostView; vPostView = View_Get(bp.vPostView);
+    var _extendedBar eBar_parent; eBar_parent = get(bp.eBar_parent);
+    var _bar bar; bar = get(eBar_parent.bar);
+    //save the size before the resize
+    var int sizex_pre; sizex_pre = roundf( mulf( fracf( bp.val , bar.valMax), mulf( mkf(bar.initialDynamicVSizes[IDS_VBAR_X]), dynScalingFactor ) ) ) ; 
+    var int sizey_pre; sizey_pre = roundf( mulf( mkf(bar.initialDynamicVSizes[IDS_VBAR_Y]), dynScalingFactor ) ) ; 
+
+    //scale on all axis
+    View_ResizeRightsided(bp.vPostView, sizex_pre * x_percentage / 100 , sizey_pre * y_percentage / 100); 
+        
+    //Debug
+    //B4DI_debugSpy("B4DI_BarPostview_SetSizeRightsidedPercent PositionX",IntToString(vPostView.vposx));
+    //B4DI_debugSpy("B4DI_BarPostview_SetSizeRightsidedPercent PositionY",IntToString(vPostView.vposy));
+    //B4DI_debugSpy("B4DI_BarPostview_SetSizeRightsidedPercent SizeX",IntToString(vPostView.vsizex));
+    //B4DI_debugSpy("B4DI_BarPostview_SetSizeRightsidedPercent SizeY",IntToString(vPostView.vsizey));
+
+};
+
+func void B4DI_BarPostview_SetSizeRightsidedPercentXY( var int barPostview_hndl, var int xy_percentage ) {
+    B4DI_BarPostview_SetSizeRightsidedPercent(barPostview_hndl, xy_percentage, xy_percentage);
+};
+
+func void B4DI_BarPostview_SetSizeRightsidedPercentX( var int barPostview_hndl, var int x_percentage ) {
+    B4DI_BarPostview_SetSizeRightsidedPercent(barPostview_hndl, x_percentage, 100);
+};
+
+func void B4DI_BarPostview_SetSizeRightsidedPercentY( var int barPostview_hndl, var int y_percentage ) {
+    B4DI_BarPostview_SetSizeRightsidedPercent(barPostview_hndl, 100, y_percentage);
+};
+
 func void B4DI_BarPostview_SetSizeLeftsidedPercent( var int barPostview_hndl, var int x_percentage, var int y_percentage) {
-    Print_GetScreenSize();
+    //Print_GetScreenSize();
     //------------------
     if(!Hlp_IsValidHandle(barPostview_hndl)) { MEM_Warn("B4DI_BarPostview_SetSizeLeftsidedPercent failed"); return; };
     var _barPostview bp; bp = get(barPostview_hndl);
@@ -63,6 +103,10 @@ func void B4DI_BarPostview_SetSizeLeftsidedPercentY( var int barPostview_hndl, v
     B4DI_BarPostview_SetSizeLeftsidedPercent(barPostview_hndl, 100, y_percentage);
 };
 
+
+//========================================
+// BarPostview Animation
+//========================================
 func void B4DI_BarPostview_slide_size(var int barPostview_hndl, var func slideFunc) {
     //MEM_Info("B4DI_BarPostview_slide_size called");
     if ( !Hlp_IsValidHandle(barPostview_hndl) ) { return; };
@@ -77,6 +121,9 @@ func void B4DI_BarPostview_slide_size(var int barPostview_hndl, var func slideFu
     //MEM_Info("B4DI_BarPostview_slide_size finshed");
 };
 
+//========================================
+// BarPostview Show
+//========================================
 func void B4DI_BarPostview_Show( var int barPostview_hndl) {
     //MEM_Info("B4DI_BarPostview_Show Called");
     if(!Hlp_IsValidHandle(barPostview_hndl)) {
@@ -85,16 +132,19 @@ func void B4DI_BarPostview_Show( var int barPostview_hndl) {
     };
     var _barPostview bp; bp = get(barPostview_hndl);
     var _extendedBar eBar_parent; eBar_parent = get(bp.eBar_parent);
-    if( !eBar_parent.isFadedOut ) { //TODO isFadedOut may be to early set and prevent display of Postview
+    //if( !eBar_parent.isFadedOut ) { //TODO isFadedOut may be to early set and prevent display of Postview
         //TODO: Check Value and adjust for value increase bar and label have to be top
         bp.isFadedOutPostview = 0;
         View_Open(bp.vPostView);
         View_SetAlpha(bp.vPostView, 127);
         View_Top(bp.vPostView);
         //MEM_Info("B4DI_BarPostview_Show finished");
-    };
+    //};
 };
 
+//========================================
+// BarPostview Delete instead of hide cause nonpersitance
+//========================================
 func void B4DI_BarPostview_delete( var int barPostview_hndl) {
     if(!Hlp_IsValidHandle(barPostview_hndl)) {
         MEM_Info("B4DI_BarPostview_delete failed ");
@@ -104,6 +154,9 @@ func void B4DI_BarPostview_delete( var int barPostview_hndl) {
     _barPostview_Delete(bp);
 };
 
+//========================================
+// BarPostview WIP?
+//========================================
 func void B4DI_BarPostView_show_decrease( var int barPostview_hndl, var int value ) {
     if(!Hlp_IsValidHandle(barPostview_hndl)) {
         MEM_Warn("B4DI_BarPostView_show_decrease failed ");

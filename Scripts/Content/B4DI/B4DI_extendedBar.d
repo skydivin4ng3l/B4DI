@@ -110,8 +110,9 @@ func void B4DI_eBar_SetAlpha(var int eBar_hndl, var int alpha) {
     var _bar bar; bar = get(eBar.bar);
 
     View_SetAlpha(bar.v0, alpha);
-    View_SetAlphaAll(bar.vMiddle, alpha);
+    View_SetAlpha(bar.vMiddle, alpha);
     View_SetAlpha(bar.v1, alpha);
+    View_SetAlphaAll(bar.vLabel, alpha);
     
 };
 
@@ -210,7 +211,6 @@ func void B4DI_eBar_pulse_size(var int eBar_hndl, var func pulseFunc) {
 //========================================
 // eBar Label
 //========================================
-//TODO Fix??? Label gets not shown after bar fades out and inventory gets opended
 func string B4DI_eBar_generateLabelTextSimple(var int ebar_hndl) {
     if(!Hlp_IsValidHandle(ebar_hndl)) { MEM_Warn("B4DI_eBar_generateLabelTextSimple failed"); return ""; };
 
@@ -248,36 +248,38 @@ func string B4DI_eBar_generateLabelTextSimple(var int ebar_hndl) {
     var string label; label = SB_ToString();
     SB_Destroy();
     SB_Use(B4DI_preserve_current_StringBuilder);
-    //B4DI_debugSpy("B4DI_eBar_generateLabelTextSimple: ", label);
+    B4DI_debugSpy("B4DI_eBar_generateLabelTextSimple: ", label);
     return label;
 };
 
 //========================================
 // eBar RefreshLabel
 //========================================
+//TODO Fix??? Label gets not shown after bar fades out and inventory gets opended with previewable item selected
 func void B4DI_eBar_RefreshLabel(var int eBar_hndl) {
     //TODO make optional
     if(!Hlp_IsValidHandle(eBar_hndl)) { MEM_Warn("B4DI_eBar_RefreshLabel failed"); return; };
     var _extendedBar eBar; eBar = get(eBar_hndl);
     
     var _bar bar; bar = get(eBar.bar);
-    var zCView vLabel; vLabel = View_Get(bar.vMiddle);
+    //var zCView vLabel; vLabel = View_Get(bar.vMiddle);
     var string label; label = B4DI_eBar_generateLabelTextSimple(eBar_hndl);
 
-    var int lLenght; lLenght = Print_ToVirtual( Print_GetStringWidth(label, B4DI_LABEL_FONT), PS_X );
-    var int fHeight; fHeight = Print_ToVirtual( Print_GetFontHeight(B4DI_LABEL_FONT), PS_Y );
+    //var int lLenght; lLenght = Print_ToVirtual( Print_GetStringWidth(label, B4DI_LABEL_FONT), PS_X );
+    //var int fHeight; fHeight = Print_ToVirtual( Print_GetFontHeight(B4DI_LABEL_FONT), PS_Y );
 
-    var int xPos; xPos = (PS_VMAX / 2) - ( Print_ToVirtual(lLenght, vLabel.vsizex) / 2 ); // >>1 == / 2
-    var int yPos; yPos = (PS_VMAX / 2) - ( Print_ToVirtual(fHeight, vLabel.vsizey) / 2 ); // >>1 == / 2
-    //B4DI_Info2("Label xPos: ", xPos, " yPos: ", yPos );
+    //var int xPos; xPos = (PS_VMAX / 2) - ( Print_ToVirtual(lLenght, vLabel.vsizex) / 2 ); // >>1 == / 2
+    //var int yPos; yPos = (PS_VMAX / 2) - ( Print_ToVirtual(fHeight, vLabel.vsizey) / 2 ); // >>1 == / 2
+    ////B4DI_Info2("Label xPos: ", xPos, " yPos: ", yPos );
 
-    View_DeleteText(bar.vMiddle);
-    View_AddText(bar.vMiddle, xPos, yPos , label , B4DI_LABEL_FONT);
+    //View_DeleteText(bar.vMiddle);
+    //View_AddText(bar.vMiddle, xPos, yPos , label , B4DI_LABEL_FONT);
+    Bar_SetLabelText(eBar.bar, label, B4DI_LABEL_FONT );
     if(eBar.isFadedOut) {
         B4DI_eBar_SetAlpha(eBar_hndl, 0);
     };
 
-    //B4DI_Info1("B4DI_eBar_RefreshLabel call while isFadedOut: ", eBar.isFadedOut);
+    B4DI_Info1("B4DI_eBar_RefreshLabel call while isFadedOut: ", eBar.isFadedOut);
 };
 
 //========================================
@@ -324,6 +326,7 @@ func void B4DI_eBar_show( var int eBar_hndl){
         };
         eBar_inst.isFadedOut = 0;
         B4DI_eBar_SetAlpha(eBar_hndl, 255);
+
         //Bar_Show(eBar_inst.bar);
         MEM_Info("B4DI_eBar_show successful");
     } else {
@@ -347,6 +350,7 @@ func void B4DI_eBar_HidePreview(var int eBar_hndl){
     if(!Hlp_IsValidHandle(eBar_hndl)) { MEM_Warn("B4DI_eBar_HidePreview failed"); return; };
     var _extendedBar eBar; eBar = get(eBar_hndl);
     B4DI_BarPreview_hide(eBar.barPreview);
+    B4DI_eBar_RefreshLabel(eBar_hndl);
 
     MEM_Info("B4DI_eBar_HidePreview successful");
 };
@@ -461,7 +465,7 @@ func void B4DI_eBar_SetValuesAnimated( var int eBar_hndl,var int index_value, va
         //B4DI_Info1("B4DI_eBar_SetValuesAnimated: ", value_diff );
         eBar.barPostview = B4DI_BarPostview_Create(eBar_hndl, abs(value_diff) );
         B4DI_BarPostview_Show(eBar.barPostview);
-        B4DI_BarPostview_slide_size(eBar.barPostview, B4DI_BarPostview_SetSizeLeftsidedPercentX);
+        B4DI_BarPostview_slide_size(eBar.barPostview, B4DI_BarPostview_SetSizeRightsidedPercentX);
 
         B4DI_eBar_SetValues(eBar_hndl, index_value, index_valueMax);
     };

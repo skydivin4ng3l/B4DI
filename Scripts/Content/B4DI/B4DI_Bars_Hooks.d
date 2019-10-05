@@ -46,7 +46,9 @@ func void B4DI_oCSpell__Cast_return(){
 
 func void B4DI_oCGame__UpdatePlayerStatus_manaBar() {
 	//MEM_Info("B4DI_oCGame__UpdatePlayerStatus_manaBar");
-	B4DI_Bars_update();	
+	if (!isInventoryOpen) {
+		B4DI_Bars_update();	
+	};
 };
 
 //========================================
@@ -81,18 +83,26 @@ func void B4DI_inventory_opend(){
 	if (Npc_IsPlayer(caller)) {
 		isInventoryOpen = true;
 		lastSelectedItemName = "none";
-		FF_ApplyOnceExtGT(B4DI_Bars_update,0,-1);
+		//B4DI_Bars_update();
+		B4DI_eBar_show(MEM_eBar_HP_handle);
+		B4DI_eBar_show(MEM_eBar_MANA_handle);
+		//FF_ApplyOnceExtGT(B4DI_Bars_update,50,-1);
+		FF_ApplyOnceExtGT(B4DI_Bars_Inventory_update, 50,-1);
 		MEM_Info("B4DI_inventory_opend");
 	};
 };
 
 func void B4DI_inventory_closeHelper() {
+	FF_Remove(B4DI_Bars_Inventory_update);
+	//FF_Remove(B4DI_Bars_update);
 	isInventoryOpen = false;
-	B4DI_Bars_update(); // call again to make sure status get updated, not necessary i think caus of the FF?
 	lastSelectedItemName = "none";
-	B4DI_Bars_hideItemPreview(); //maybe redundant?!
+	B4DI_Bars_Inventory_update();
+	//B4DI_Bars_update(); // call again to make sure status get updated, not necessary i think caus of the FF?
+	B4DI_eBar_hideFaded(MEM_eBar_HP_handle);
+	B4DI_eBar_hideFaded(MEM_eBar_MANA_handle);
+	//B4DI_Bars_hideItemPreview(); //maybe redundant?!
 
-	FF_Remove(B4DI_Bars_update);
 	MEM_Info("B4DI_inventory_closed");
 };
 

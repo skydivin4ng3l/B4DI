@@ -20,6 +20,15 @@
 
 //};
 
+func void B4DI_heroInstance_InitAlways() {
+	var int oCNpc_hero_ptr; oCNpc_hero_ptr = MEM_InstToPtr(oHero);
+	if(!Hlp_Is_oCNpc( oCNpc_hero_ptr ) ) {
+		var int hero_ptr; hero_ptr = MEM_InstToPtr(hero);
+	  	oHero = MEM_PtrToInst(hero_ptr);
+	};
+	
+};
+
 func void B4DI_Bar_pulse_size(var int bar_hndl, var func pulseFunc) {
 	var int a8_Bar_pulse; a8_Bar_pulse = Anim8_NewExt(100 , pulseFunc, bar_hndl, false); //height input
 	Anim8_RemoveIfEmpty(a8_Bar_pulse, true);

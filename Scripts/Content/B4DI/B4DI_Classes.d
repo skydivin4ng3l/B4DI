@@ -7,12 +7,12 @@
 class _extendedBar {
     
     var int bar;                    // _bar(h)
-    var int barPreview;               // _barPreview(h)
-    var int barPostview;                // _barPreview(h)
-    var int isFadedOut;                   // Bool
-    var int anim8FadeOut;               // A8Head(h)
-    var int anim8PulseSize;               // A8Head(h)
-    var int npcRef;                    // C_NPC_PTR
+    var int barPreview;             // _barPreview(h)
+    var int barPostview;            // _barPreview(h)
+    var int isFadedOut;             // Bool
+    var int anim8FadeOut;           // A8Head(h)
+    var int anim8PulseSize;         // A8Head(h)
+    var int npcRef;                 // C_NPC_PTR
 };
 
 instance _extendedBar@(_extendedBar);
