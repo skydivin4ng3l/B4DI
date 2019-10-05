@@ -27,6 +27,20 @@ const int ALIGN_RIGHT  = 2;
 const int ALIGN_TOP    = 3;
 const int ALIGN_BOTTOM = 4;
 
+//========================================
+// Anchor (benutzt in View)
+//========================================
+const int ANCHOR_LEFT_TOP 		= 0;
+const int ANCHOR_LEFT_BOTTOM   	= 1;
+const int ANCHOR_RIGHT_TOP 		= 2;
+const int ANCHOR_RIGHT_BOTTOM	= 3;
+const int ANCHOR_CENTER    		= 4;
+
+//========================================
+// ValidScreenSpace (benutzt in View)
+//========================================
+const int NON_VALIDSCREENSPACE	= 0;
+const int VALIDSCREENSPACE   	= 1;
 
 //========================================
 // Interface

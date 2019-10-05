@@ -286,8 +286,8 @@ func void View_Delete(var int hndl) {
 
 
 //========================================
-// Gr��e �ndern
-//Skaliert einen View auf eine virtuelle Gr��e. Dabei bleibt die linke, obere Position des Views fest.
+// Groesse aendern
+//Skaliert einen View auf eine virtuelle Groesse. Dabei bleibt die linke, obere Position des Views fest.
 //========================================
 func void ViewPtr_Resize(var int ptr, var int x, var int y) {
     var zCView v; v = _^(ptr);
@@ -308,12 +308,13 @@ func void ViewPtr_Resize(var int ptr, var int x, var int y) {
     v.psizex = Print_ToPixel(v.vsizex, PS_X);
     v.psizey = Print_ToPixel(v.vsizey, PS_Y);
 };
+
 func void View_Resize(var int hndl, var int x, var int y) {
     ViewPtr_Resize(getPtr(hndl), x, y);
 };
 
 //========================================
-// Gr��e �ndern (pxl)
+// Groesse aendern (pxl)
 //========================================
 func void ViewPtr_ResizePxl(var int ptr, var int x, var int y) {
     ViewPtr_Resize(ptr, Print_ToVirtual(x, PS_X), Print_ToVirtual(y, PS_Y));
@@ -404,10 +405,131 @@ func void View_MoveToPxlValidScreen(var int hndl, var int x, var int y) {
 };
 
 //========================================
+// Change Size depending on anchorpoint and if view should remain completly within the screen 
+//========================================
+func void ViewPtr_ResizeAdvanced(var int ptr, var int x, var int y, var int anchor_mode, var int validScreenSpace) {
+    var zCView v; v = _^(ptr);
+    var int sizex_pre; sizex_pre = v.vsizex;
+    var int sizey_pre; sizey_pre = v.vsizey;
+    var int leftside_posx_pre; leftside_posx_pre = v.vposx;
+    var int rightside_posx_pre; rightside_posx_pre = v.vposx + v.vsizex;
+    var int top_posy_pre; top_posy_pre = v.vposy;
+    var int bottom_posy_pre; bottom_posy_pre = v.vposy + v.vsizey;
+
+    ViewPtr_Resize(ptr, x, y);
+
+    var int posx_new; posx_new = v.vposx;
+    var int posy_new; posy_new = v.vposy;
+
+    if ( anchor_mode == ANCHOR_LEFT_TOP || anchor_mode == ANCHOR_LEFT_BOTTOM ) {
+        //ViewPtr_Resize(ptr, x, y);
+    } else if ( anchor_mode == ANCHOR_RIGHT_TOP || anchor_mode == ANCHOR_RIGHT_BOTTOM ) {
+        posx_new = rightside_posx_pre - v.vsizex;
+
+    } else if ( anchor_mode == ANCHOR_CENTER ) {
+        //Calc the size difference caused by the resize all in virtual space
+        var int posDifY; posDifY = (v.vsizey - sizey_pre)/2;
+        //B4DI_debugSpy("posDifY", IntToString(posDifY));
+        //positive difference means View is now bigger than before
+        //  therefore needs to be moved into the opposite direction
+        posDifY *= -1;
+        
+        var int posDifX; posDifX = (v.vsizex - sizex_pre)/2;
+        //B4DI_debugSpy("posDifX", IntToString(posDifX));
+        posDifX *= -1;
+
+        posx_new = v.vposx + posDifX;
+        posy_new = v.vposy + posDifY;
+    };
+
+    if ( anchor_mode == ANCHOR_LEFT_BOTTOM || anchor_mode == ANCHOR_RIGHT_BOTTOM ) {
+        posy_new = bottom_posy_pre - v.vsizey;
+    };
+
+    if(validScreenSpace) {
+        ViewPtr_MoveToValidScreenSpace(ptr, posx_new, posy_new );
+    } else {
+        ViewPtr_MoveTo(ptr, posx_new, posy_new);
+    };
+};
+
+func void View_ResizeAdvanced( var int hndl, var int x, var int y, var int anchor_mode, var int validScreenSpace ) {
+    ViewPtr_ResizeAdvanced( getPtr(hndl), x, y, anchor_mode, validScreenSpace);
+};
+
+func void ViewPtr_ResizePxlAdvanced( var int ptr, var int x, var int y, var int anchor_mode, var int validScreenSpace ) {
+    x = Print_ToVirtual(x, PS_X);
+    y = Print_ToVirtual(y, PS_Y);
+    ViewPtr_ResizeAdvanced( ptr, x, y, anchor_mode, validScreenSpace);
+};
+
+func void View_ResizePxlAdvanced( var int hndl, var int x, var int y, var int anchor_mode, var int validScreenSpace ) {
+    ViewPtr_ResizePxlAdvanced( getPtr(hndl), x, y, anchor_mode, validScreenSpace);
+};
+
+//========================================
+// Change Size Rightsided
+//========================================
+func void ViewPtr_ResizeRightsided(var int ptr, var int x, var int y, var int validScreenSpace, var int lowerCorner) {
+    /*var zCView v; v = _^(ptr);
+
+    var int rightside_posx_pre; rightside_posx_pre = v.vposx + v.vsizex;
+    var int lower_posy_pre; lower_posy_pre = v.vposy + v.vsizey;
+
+    ViewPtr_Resize(ptr, x, y);
+
+    var int posx_new; posx_new = rightside_posx_pre - v.vsizex;
+    var int posy_new; posy_new = v.vposy;
+
+    if (lowerCorner) {
+        posy_new = lower_posy_pre - v.vsizey;
+    };
+
+    if (validScreenSpace) {
+        ViewPtr_MoveToValidScreenSpace(ptr, posx_new, posy_new);
+    } else {
+        ViewPtr_MoveTo(ptr, posx_new, posy_new );
+    };*/
+
+    ViewPtr_ResizeAdvanced(ptr, x, y, ANCHOR_RIGHT_TOP, NON_VALIDSCREENSPACE);
+};
+
+func void View_ResizeRightsided(var int hndl, var int x, var int y) {
+    View_ResizeAdvanced(hndl, x, y, ANCHOR_RIGHT_TOP, NON_VALIDSCREENSPACE);
+};
+
+func void ViewPtr_ResizeRightsidedValidscreenspace(var int ptr, var int x, var int y) {
+    ViewPtr_ResizeAdvanced(ptr, x, y, ANCHOR_RIGHT_TOP, VALIDSCREENSPACE);
+};
+
+func void View_ResizeRightsidedValidscreenspace(var int hndl, var int x, var int y) {
+    View_ResizeAdvanced(hndl, x, y, ANCHOR_RIGHT_TOP, VALIDSCREENSPACE);
+};
+
+func void View_ResizeRightsidedBottom(var int hndl, var int x, var int y) {
+    View_ResizeAdvanced(hndl, x, y, ANCHOR_RIGHT_BOTTOM, NON_VALIDSCREENSPACE);
+};
+
+func void View_ResizeRightsidedBottomValidscreenspace(var int hndl, var int x, var int y) {
+    View_ResizeAdvanced(hndl, x, y, ANCHOR_RIGHT_BOTTOM, VALIDSCREENSPACE);
+};
+
+func void View_ResizeLeftsidedValidscreenspace(var int hndl, var int x, var int y) {
+    View_ResizeAdvanced(hndl, x, y, ANCHOR_LEFT_TOP, VALIDSCREENSPACE);
+};
+
+func void View_ResizeLeftsidedBottom(var int hndl, var int x, var int y) {
+    View_ResizeAdvanced(hndl, x, y, ANCHOR_LEFT_BOTTOM, NON_VALIDSCREENSPACE);
+};
+
+func void View_ResizeLeftsidedBottomValidscreenspace(var int hndl, var int x, var int y) {
+    View_ResizeAdvanced(hndl, x, y, ANCHOR_LEFT_BOTTOM, VALIDSCREENSPACE);
+};
+//========================================
 // Change Size Centered
 //========================================
 func void ViewPtr_ResizeCentered(var int ptr, var int x, var int y) {
-    var zCView v; v = _^(ptr);
+    /*var zCView v; v = _^(ptr);
     var int sizex_pre; sizex_pre = v.vsizex;
     var int sizey_pre; sizey_pre = v.vsizey;
 
@@ -423,15 +545,17 @@ func void ViewPtr_ResizeCentered(var int ptr, var int x, var int y) {
     //B4DI_debugSpy("posDifX", IntToString(posDifX));
     posDifX *= -1;
     
-    ViewPtr_MoveTo(ptr, v.vposx+posDifX, v.vposy+posDifY);
+    ViewPtr_MoveTo(ptr, v.vposx+posDifX, v.vposy+posDifY);*/
+    ViewPtr_ResizeAdvanced(ptr, x, y, ANCHOR_CENTER, NON_VALIDSCREENSPACE);
 };
 
 func void View_ResizeCentered(var int hndl, var int x, var int y) {
-    ViewPtr_ResizeCentered(getPtr(hndl),x,y);
+    //ViewPtr_ResizeCentered(getPtr(hndl),x,y);
+    View_ResizeAdvanced(hndl, x, y, ANCHOR_CENTER, NON_VALIDSCREENSPACE);
 };
 
 func void ViewPtr_ResizeCenteredValidScreenSpace(var int ptr, var int x, var int y) {
-    var zCView v; v = _^(ptr);
+    /*var zCView v; v = _^(ptr);
     var int sizex_pre; sizex_pre = v.vsizex;
     var int sizey_pre; sizey_pre = v.vsizey;
 
@@ -447,12 +571,16 @@ func void ViewPtr_ResizeCenteredValidScreenSpace(var int ptr, var int x, var int
     //B4DI_debugSpy("posDifX", IntToString(posDifX));
     posDifX *= -1;
     
-    ViewPtr_MoveToValidScreenSpace(ptr, v.vposx+posDifX, v.vposy+posDifY);
+    ViewPtr_MoveToValidScreenSpace(ptr, v.vposx+posDifX, v.vposy+posDifY);*/
+    ViewPtr_ResizeAdvanced(ptr, x, y, ANCHOR_CENTER, VALIDSCREENSPACE);
 };
 
 func void View_ResizeCenteredValidScreenSpace(var int hndl, var int x, var int y) {
-    ViewPtr_ResizeCenteredValidScreenSpace(getPtr(hndl),x,y);
+    View_ResizeAdvanced(hndl, x, y, ANCHOR_CENTER, VALIDSCREENSPACE);
+    //ViewPtr_ResizeCenteredValidScreenSpace(getPtr(hndl),x,y);
 };
+
+
 
 //========================================
 // Text entfernen
@@ -476,7 +604,7 @@ func void View_DeleteText(var int hndl) {
 //========================================
 // Text hinzufuegen
 //
-// Positions are Virtuel, relativ to the size of the parent View
+// Positions are Virtual, relativ to the size of the parent View
 // top left of the view: 0,0 right buttom of the view: PS_VMAX, PS_VMAX
 // the assigned Position of the added TextView its top left corner
 //========================================

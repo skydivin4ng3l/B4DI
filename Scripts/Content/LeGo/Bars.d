@@ -49,12 +49,13 @@ class _bar {
     var int val;
     var int barW;
     var int v0;                         // zCView(h)
-    var int v1;                         // zCView(h)
     var int vMiddle;                    // zCView(h)
-    var int initialDynamicVSizes[4];    
-    var int initialVPositions[8];
-    var int isFadedOut;                   // Bool
-    var int anim8FadeOut;               // A8Head(h)
+    var int v1;                         // zCView(h)
+    var int vLabel;                     // zCView(h)
+    var int initialDynamicVSizes[4];    // Array<int>
+    var int initialVPositions[8];       // Array<int>
+    var int isFadedOut;                 // Bool
+    //var int anim8FadeOut;               // A8Head(h)
 };
 
 instance _bar@(_bar);
@@ -63,15 +64,18 @@ func void _bar_Delete(var _bar b) {
     if(Hlp_IsValidHandle(b.v0)) {
         delete(b.v0);
     };
-    if(Hlp_IsValidHandle(b.v1)) {
-        delete(b.v1);
-    };
     if(Hlp_IsValidHandle(b.vMiddle)) {
         delete(b.vMiddle);
     };
-    if(Hlp_IsValidHandle(b.anim8FadeOut)) {
-        Anim8_Delete(b.anim8FadeOut);
+    if(Hlp_IsValidHandle(b.v1)) {
+        delete(b.v1);
     };
+    if(Hlp_IsValidHandle(b.vLabel)) {
+        delete(b.vLabel);
+    };
+    //if(Hlp_IsValidHandle(b.anim8FadeOut)) {
+    //    Anim8_Delete(b.anim8FadeOut);
+    //};
 }; 
 
 //========================================
@@ -90,7 +94,7 @@ func void Bar_storePosSize(var int bar_hndl){
     b.initialDynamicVSizes[IDS_VBACK_X] = v.vsizex;
     b.initialDynamicVSizes[IDS_VBACK_Y] = v.vsizey;
     
-    v = View_Get(b.v1); //same as vmiddle
+    v = View_Get(b.v1); //same as vMiddle and vLabel
 
     b.initialVPositions[IP_VBAR_LEFT] = v.vposx;
     b.initialVPositions[IP_VBAR_TOP] = v.vposy;
@@ -160,7 +164,7 @@ func int Bar_GetValue( var int bar_hndl ) {
 };
 
 //========================================
-// [Intern] Resizes bars in valid space (untested)
+// [Intern] Resizes bars in valid space 
 //
 // if back reaches screen borders before scaling is finished
 //  it will be moved, middle and bar will be moved according to delta before resizing.
@@ -170,6 +174,7 @@ func void Bar_ResizeCenteredPercent(var int bar_hndl, var int relativScalingFact
     var _bar b; b = get(bar_hndl);
     var zCView vBack; vBack = View_Get(b.v0);
     var zCView vMiddle; vMiddle = View_Get(b.vMiddle);
+    var zCView vLabel; vLabel = View_Get(b.vLabel);
     var zCView vBar; vBar = View_Get(b.v1);
     
     b.barW = roundf( mulf( mkf( b.barW ) , relativScalingFactor ) );
@@ -181,9 +186,11 @@ func void Bar_ResizeCenteredPercent(var int bar_hndl, var int relativScalingFact
     //to keep the margin valid if scaled back touches screen border
     View_MoveTo(b.vMiddle, vBack.vposx + barLeft, vBack.vposy + barTop );
     View_MoveTo(b.v1, vBack.vposx + barLeft, vBack.vposy + barTop );
+    View_MoveTo(b.vLabel, vBack.vposx + barLeft, vBack.vposy + barTop );
         
     View_Resize(b.vMiddle, roundf( mulf( mkf(vMiddle.vsizex) , relativScalingFactor) ), roundf( mulf( mkf(vMiddle.vsizey) , relativScalingFactor) ) );
     View_Resize(b.v1, roundf( mulf( mkf(vBar.vsizex) , relativScalingFactor) ), roundf( mulf( mkf(vBar.vsizey) , relativScalingFactor) ) );
+    View_Resize(b.vLabel, roundf( mulf( mkf(vLabel.vsizex) , relativScalingFactor) ), roundf( mulf( mkf(vLabel.vsizey) , relativScalingFactor) ) );
     Bar_SetValue(bar_hndl, b.val);
 };
 
@@ -202,6 +209,8 @@ func void Bar_ResizeCenteredPercentFromInitial(var int bar_hndl, var int abolute
 
     View_SetMargin(b.vMiddle, b.v0, ALIGN_CENTER, barTopBottomMargin, barLeftRightMargin, barTopBottomMargin, barLeftRightMargin ); 
     View_SetMargin(b.v1, b.v0, ALIGN_CENTER, barTopBottomMargin, barLeftRightMargin, barTopBottomMargin, barLeftRightMargin );
+    View_SetMargin(b.vLabel, b.v0, ALIGN_CENTER, barTopBottomMargin, barLeftRightMargin, barTopBottomMargin, barLeftRightMargin ); 
+
     Bar_SetValue(bar_hndl, b.val );
 };
 
@@ -239,9 +248,11 @@ func int Bar_Create(var int inst) {
     buhh -= bu.barTop;
     buwh -= bu.barLeft;
     b.barW = Print_ToVirtual(bu.width - bu.barLeft * 2 + aw, PS_X);
-    b.v1 = View_CreatePxl(bu.x - buwh, bu.y - buhh, bu.x + buwh + aw, bu.y + buhh + ah);
     b.vMiddle = View_CreatePxl(bu.x - buwh, bu.y - buhh, bu.x + buwh + aw, bu.y + buhh + ah);
+    b.v1 =      View_CreatePxl(bu.x - buwh, bu.y - buhh, bu.x + buwh + aw, bu.y + buhh + ah);
+    b.vLabel =  View_CreatePxl(bu.x - buwh, bu.y - buhh, bu.x + buwh + aw, bu.y + buhh + ah);
     View_SetTexture(b.v0, bu.backTex);
+    View_SetTexture(b.vMiddle, bu.middleTex);
     View_SetTexture(b.v1, bu.barTex);
     
     Bar_storePosSize(bh);
@@ -272,8 +283,9 @@ func int Bar_CreateCenterDynamic(var int constructor_instance) {
     //TODO change to virtual? dynamic Resultionbased scale in Prototype?
     bar.v0 = View_CreateCenterPxl(bar_constr.x, bar_constr.y, bar_constr.width, bar_constr.height);
     bar.barW = bar_constr.width - bar_constr.barLeft *2;
-    bar.v1 = View_CreateCenterPxl(bar_constr.x, bar_constr.y, bar.barW, bar_constr.height- bar_constr.barTop *2);
-    bar.vMiddle = View_CreateCenterPxl(bar_constr.x, bar_constr.y, bar.barW, bar_constr.height- bar_constr.barTop *2);
+    bar.vMiddle =   View_CreateCenterPxl(bar_constr.x, bar_constr.y, bar.barW, bar_constr.height- bar_constr.barTop *2);
+    bar.v1 =        View_CreateCenterPxl(bar_constr.x, bar_constr.y, bar.barW, bar_constr.height- bar_constr.barTop *2);
+    bar.vLabel =   View_CreateCenterPxl(bar_constr.x, bar_constr.y, bar.barW, bar_constr.height- bar_constr.barTop *2);
     //TODO remove? vMiddle is Range
     bar.barW = Print_ToVirtual(bar.barW, PS_X);
     //^^
@@ -287,13 +299,14 @@ func int Bar_CreateCenterDynamic(var int constructor_instance) {
     var zCView v; v = View_Get(bar.v0);
     //v.alphafunc = zRND_ALPHA_FUNC_ADD;
     v = View_Get(bar.vMiddle);
-    v.alphafunc = zRND_ALPHA_FUNC_SUB;
+    //v.alphafunc = zRND_ALPHA_FUNC_SUB;
     v = View_Get(bar.v1);
     //v.alphafunc = zRND_ALPHA_FUNC_ADD;
 
     View_Open(bar.v0);
+    View_Open(bar.vMiddle);
     View_Open(bar.v1);
-    View_Open(bar.vMiddle); //this order that vMiddle can hold text label, therefore alphafunc
+    View_Open(bar.vLabel); //this order that vMiddle can hold text label, therefore alphafunc
     bar.isFadedOut = 0;
     
     free(ptr, constructor_instance);
@@ -319,6 +332,7 @@ func void Bar_Hide(var int bar) {
 	View_Close(b.v0);
     View_Close(b.vMiddle);
 	View_Close(b.v1);
+    View_Close(b.vLabel);
 };
 
 //========================================
@@ -328,8 +342,9 @@ func void Bar_Show(var int bar) {
 	if(!Hlp_IsValidHandle(bar)) { return; };
 	var _bar b; b = get(bar);
 	View_Open(b.v0);
+    View_Open(b.vMiddle);
 	View_Open(b.v1);
-    View_Open(b.vMiddle); //Label reasons
+    View_Open(b.vLabel);
 };
 
 //========================================
@@ -346,6 +361,7 @@ func void Bar_MoveTo(var int bar, var int x, var int y) {
 	View_Move(b.v0, x, y);
     View_Move(b.vMiddle, x, y);
 	View_Move(b.v1, x, y);
+    View_Move(b.vLabel, x, y);
 };
 
 //========================================
@@ -359,6 +375,7 @@ func void Bar_MoveLeftUpperTo(var int bar, var int x, var int y) {
     View_MoveTo(b.v0, x, y);
     View_MoveTo(b.vMiddle, x, y);
     View_MoveTo(b.v1, x, y);
+    View_MoveTo(b.vLabel, x, y);
 };
 
 //========================================
@@ -377,6 +394,7 @@ func void Bar_MoveLeftUpperToValidScreenSpace(var int bar, var int x, var int y)
     //to keep the margin valid if movement would surpass screen border
     View_MoveTo(b.vMiddle, vBack.vposx + barLeft, vBack.vposy + barTop );
     View_MoveTo(b.v1, vBack.vposx + barLeft, vBack.vposy + barTop );
+    View_MoveTo(b.vLabel, vBack.vposx + barLeft, vBack.vposy + barTop );
     
 };
 
@@ -386,15 +404,10 @@ func void Bar_MoveLeftUpperToValidScreenSpace(var int bar, var int x, var int y)
 func void Bar_SetAlpha(var int bar, var int alpha) {
 	if(!Hlp_IsValidHandle(bar)) { return; };
 	var _bar b; b = get(bar);
-	//var zCView v0; v0 = View_Get(b.v0);
-	//v0.alpha = alpha;
     View_SetAlpha(b.v0, alpha);
-    //var zCView vMiddle; vMiddle = View_Get(b.vMiddle);
-    //vMiddle.alpha = alpha;
-    View_SetAlphaAll(b.vMiddle, alpha);
-	//var zCView v1; v1 = View_Get(b.v1);
-	//v1.alpha = alpha;
+    View_SetAlpha(b.vMiddle, alpha);
     View_SetAlpha(b.v1, alpha);
+    View_SetAlphaAll(b.vLabel, alpha);
 };
 
 //========================================
@@ -421,8 +434,32 @@ func void Bar_SetBarTexture(var int bar, var string barTex)
     View_SetTexture(b.v1, barTex);
 };
 
+//========================================
+// Bar Set Label Text (centered)
+//========================================
+func void Bar_SetLabelText(var int bar_hndl, var string labelText, var string font) {
+    if(!Hlp_IsValidHandle(bar_hndl)) { return; };
+    var _bar bar; bar = get(bar_hndl);
+    var zCView vLabel; vLabel = View_Get(bar.vLabel);
 
+    var int lLenght; lLenght = Print_ToVirtual( Print_GetStringWidth(labelText, font), PS_X );
+    var int fHeight; fHeight = Print_ToVirtual( Print_GetFontHeight(font), PS_Y );
 
+    var int xPos; xPos = (PS_VMAX / 2) - ( Print_ToVirtual(lLenght, vLabel.vsizex) / 2 ); 
+    var int yPos; yPos = (PS_VMAX / 2) - ( Print_ToVirtual(fHeight, vLabel.vsizey) / 2 ); 
+    //B4DI_Info2("Label xPos: ", xPos, " yPos: ", yPos );
+
+    View_DeleteText(bar.vLabel);
+    View_AddText(bar.vLabel, xPos, yPos , labelText , font);
+
+};
+
+func void Bar_DeleteLabelText(var int bar_hndl) {
+    if(!Hlp_IsValidHandle(bar_hndl)) { return; };
+    var _bar bar; bar = get(bar_hndl);
+
+    View_DeleteText(bar.vLabel);
+};
 
 
 
