@@ -214,6 +214,38 @@ func void View_SetAlphaAll(var int hndl, var int val) {
 	ViewPtr_SetAlphaAll(getPtr(hndl), val);
 };
 
+    /*zRND_ALPHA_FUNC_MAT_DEFAULT,
+                                zRND_ALPHA_FUNC_NONE,           
+                                zRND_ALPHA_FUNC_BLEND,          
+                                zRND_ALPHA_FUNC_ADD,                    
+                                zRND_ALPHA_FUNC_SUB,                    
+                                zRND_ALPHA_FUNC_MUL,                    
+                                zRND_ALPHA_FUNC_MUL2,                   
+                                zRND_ALPHA_FUNC_TEST,           
+                                zRND_ALPHA_FUNC_BLEND_TEST*/
+func void ViewPtr_SetAlphaFunc( var int ptr, var int new_alphafunc ) {
+    var zCView v; v = _^(ptr);
+    if( new_alphafunc < zRND_ALPHA_FUNC_MAT_DEFAULT || new_alphafunc > zRND_ALPHA_FUNC_BLEND_TEST) {
+        return;
+    };
+    v.alphafunc = new_alphafunc;
+};
+
+func void View_SetAlphaFunc( var int hndl, var int new_alphafunc ) {
+    ViewPtr_SetAlphaFunc( getPtr(hndl), new_alphafunc );
+};
+
+func int ViewPtr_GetAlphaFunc( var int ptr ) {
+    var zCView v; v = _^(ptr);
+    
+    return v.alphafunc;
+};
+
+func int View_GetAlphaFunc( var int hndl ) {
+    return ViewPtr_GetAlphaFunc( getPtr(hndl) );
+};
+
+
 //========================================
 // View einf�rben
 //========================================
@@ -324,6 +356,46 @@ func void View_ResizePxl(var int hndl, var int x, var int y) {
 };
 
 //========================================
+// Groesse mit ScreenSpace oder customsize limitieren
+//========================================
+func void ViewPtr_ResizeToScreenSpaceLimits( var int ptr, var int x_size_customLimit, var int y_size_customLimit ) {
+    // No negative Size Limits 
+    var int x_vmax; var int y_vmax;
+    x_vmax = PS_VMAX;
+    y_vmax = PS_VMAX;
+
+    if (x_size_customLimit >= 0) {
+        x_vmax = min( x_size_customLimit, PS_VMAX );    
+    };
+    if (y_size_customLimit >= 0 ) {
+        y_vmax = min( y_size_customLimit, PS_VMAX );    
+    };
+
+    var zCView v; v = _^(ptr);
+    var int new_vsizex; new_vsizex = v.vsizex;
+    var int new_vsizey; new_vsizey = v.vsizey;
+    var int needsResizing; needsResizing = false;
+
+    if ( x_vmax < new_vsizex && (x_size_customLimit > VIEW_NO_SIZE_LIMIT) ) {
+        new_vsizex = min( x_vmax, new_vsizex );
+        needsResizing = true;
+    };
+
+    if ( y_vmax < new_vsizey  && (y_size_customLimit > VIEW_NO_SIZE_LIMIT) ) {
+        new_vsizey = min(  y_vmax, new_vsizey );
+        needsResizing = true;
+    };
+
+    if ( needsResizing ) {
+        ViewPtr_Resize( ptr, new_vsizex, new_vsizey );
+    };
+};
+
+func void View_ResizeToScreenSpaceLimits( var int hndl, var int x_size_customLimit, var int y_size_customLimit ) {
+    ViewPtr_ResizeToScreenSpaceLimits( getPtr(hndl), x_size_customLimit, y_size_customLimit );
+};
+
+//========================================
 // Bewegen
 //========================================
 func void ViewPtr_Move(var int ptr, var int x, var int y) {
@@ -405,66 +477,88 @@ func void View_MoveToPxlValidScreen(var int hndl, var int x, var int y) {
 };
 
 //========================================
-// Change Size depending on anchorpoint and if view should remain completly within the screen 
+// Change Size depending on anchorPoint_mode and if view should remain completly within the screen 
 //========================================
-func void ViewPtr_ResizeAdvanced(var int ptr, var int x, var int y, var int anchor_mode, var int validScreenSpace) {
+func void ViewPtr_ResizeAdvanced(var int ptr, var int x, var int y, var int anchorPoint_mode, var int validScreenSpace, var int x_size_limit, var int y_size_limit ) {
     var zCView v; v = _^(ptr);
-    var int sizex_pre; sizex_pre = v.vsizex;
-    var int sizey_pre; sizey_pre = v.vsizey;
-    var int leftside_posx_pre; leftside_posx_pre = v.vposx;
-    var int rightside_posx_pre; rightside_posx_pre = v.vposx + v.vsizex;
-    var int top_posy_pre; top_posy_pre = v.vposy;
-    var int bottom_posy_pre; bottom_posy_pre = v.vposy + v.vsizey;
+    var int sizex_pre; var int sizey_pre; 
+    var int center_posx_pre; var int center_posy_pre;
+    var int leftside_posx_pre; 
+    var int rightside_posx_pre;
+    var int top_posy_pre; 
+    var int bottom_posy_pre; 
+    sizex_pre          = v.vsizex;
+    sizey_pre          = v.vsizey;
+    leftside_posx_pre  = v.vposx;
+    rightside_posx_pre = v.vposx + v.vsizex;
+    center_posx_pre    = (v.vposx + v.vsizex)/2;
+    center_posy_pre    = (v.vposy + v.vsizey)/2;
+    top_posy_pre       = v.vposy;
+    bottom_posy_pre    = v.vposy + v.vsizey;
 
     ViewPtr_Resize(ptr, x, y);
 
     var int posx_new; posx_new = v.vposx;
     var int posy_new; posy_new = v.vposy;
 
-    if ( anchor_mode == ANCHOR_LEFT_TOP || anchor_mode == ANCHOR_LEFT_BOTTOM ) {
-        //ViewPtr_Resize(ptr, x, y);
-    } else if ( anchor_mode == ANCHOR_RIGHT_TOP || anchor_mode == ANCHOR_RIGHT_BOTTOM ) {
+    if ( anchorPoint_mode == ANCHOR_LEFT_TOP ) {
+        //Default
+    } else if ( anchorPoint_mode == ANCHOR_RIGHT_TOP || anchorPoint_mode == ANCHOR_RIGHT_BOTTOM ) {
         posx_new = rightside_posx_pre - v.vsizex;
 
-    } else if ( anchor_mode == ANCHOR_CENTER ) {
+    } else if ( anchorPoint_mode >= ANCHOR_CENTER ) {
         //Calc the size difference caused by the resize all in virtual space
-        var int posDifY; posDifY = (v.vsizey - sizey_pre)/2;
+        var int posDifY; posDifY = ( sizey_pre - v.vsizey )/2;
         //B4DI_debugSpy("posDifY", IntToString(posDifY));
         //positive difference means View is now bigger than before
         //  therefore needs to be moved into the opposite direction
-        posDifY *= -1;
+        /*posDifY *= -1;*/
         
-        var int posDifX; posDifX = (v.vsizex - sizex_pre)/2;
+        var int posDifX; posDifX = ( sizex_pre - v.vsizex )/2;
         //B4DI_debugSpy("posDifX", IntToString(posDifX));
-        posDifX *= -1;
+        //posDifX *= -1;
 
         posx_new = v.vposx + posDifX;
         posy_new = v.vposy + posDifY;
+
+        if ( anchorPoint_mode == ANCHOR_CENTER_LEFT ) {
+            posx_new = leftside_posx_pre;
+
+        } else if ( anchorPoint_mode == ANCHOR_CENTER_RIGHT ) {
+            posx_new = rightside_posx_pre - v.vsizex;
+
+        } else if ( anchorPoint_mode == ANCHOR_CENTER_TOP ){
+            posy_new = top_posy_pre;
+        };
     };
 
-    if ( anchor_mode == ANCHOR_LEFT_BOTTOM || anchor_mode == ANCHOR_RIGHT_BOTTOM ) {
+
+    if ( anchorPoint_mode == ANCHOR_LEFT_BOTTOM || anchorPoint_mode == ANCHOR_RIGHT_BOTTOM || anchorPoint_mode == ANCHOR_CENTER_BOTTOM ) {
         posy_new = bottom_posy_pre - v.vsizey;
     };
 
     if(validScreenSpace) {
+        ViewPtr_ResizeToScreenSpaceLimits(ptr, x_size_limit, y_size_limit);
         ViewPtr_MoveToValidScreenSpace(ptr, posx_new, posy_new );
     } else {
         ViewPtr_MoveTo(ptr, posx_new, posy_new);
     };
 };
 
-func void View_ResizeAdvanced( var int hndl, var int x, var int y, var int anchor_mode, var int validScreenSpace ) {
-    ViewPtr_ResizeAdvanced( getPtr(hndl), x, y, anchor_mode, validScreenSpace);
+func void View_ResizeAdvanced( var int hndl, var int x, var int y, var int anchorPoint_mode, var int validScreenSpace, var int x_size_limit, var int y_size_limit ) {
+    ViewPtr_ResizeAdvanced( getPtr(hndl), x, y, anchorPoint_mode, validScreenSpace, x_size_limit, y_size_limit );
 };
 
-func void ViewPtr_ResizePxlAdvanced( var int ptr, var int x, var int y, var int anchor_mode, var int validScreenSpace ) {
+func void ViewPtr_ResizePxlAdvanced( var int ptr, var int x, var int y, var int anchorPoint_mode, var int validScreenSpace, var int x_size_limit, var int y_size_limit ) {
     x = Print_ToVirtual(x, PS_X);
     y = Print_ToVirtual(y, PS_Y);
-    ViewPtr_ResizeAdvanced( ptr, x, y, anchor_mode, validScreenSpace);
+    x_size_limit = Print_ToVirtual(x_size_limit, PS_X);
+    y_size_limit = Print_ToVirtual(y_size_limit, PS_Y);
+    ViewPtr_ResizeAdvanced( ptr, x, y, anchorPoint_mode, validScreenSpace, x_size_limit, y_size_limit );
 };
 
-func void View_ResizePxlAdvanced( var int hndl, var int x, var int y, var int anchor_mode, var int validScreenSpace ) {
-    ViewPtr_ResizePxlAdvanced( getPtr(hndl), x, y, anchor_mode, validScreenSpace);
+func void View_ResizePxlAdvanced( var int hndl, var int x, var int y, var int anchorPoint_mode, var int validScreenSpace, var int x_size_limit, var int y_size_limit ) {
+    ViewPtr_ResizePxlAdvanced( getPtr(hndl), x, y, anchorPoint_mode, validScreenSpace, x_size_limit, y_size_limit );
 };
 
 //========================================
@@ -491,39 +585,39 @@ func void ViewPtr_ResizeRightsided(var int ptr, var int x, var int y, var int va
         ViewPtr_MoveTo(ptr, posx_new, posy_new );
     };*/
 
-    ViewPtr_ResizeAdvanced(ptr, x, y, ANCHOR_RIGHT_TOP, NON_VALIDSCREENSPACE);
+    ViewPtr_ResizeAdvanced(ptr, x, y, ANCHOR_RIGHT_TOP, NON_VALIDSCREENSPACE, VIEW_NO_SIZE_LIMIT, VIEW_NO_SIZE_LIMIT );
 };
 
 func void View_ResizeRightsided(var int hndl, var int x, var int y) {
-    View_ResizeAdvanced(hndl, x, y, ANCHOR_RIGHT_TOP, NON_VALIDSCREENSPACE);
+    View_ResizeAdvanced(hndl, x, y, ANCHOR_RIGHT_TOP, NON_VALIDSCREENSPACE, VIEW_NO_SIZE_LIMIT, VIEW_NO_SIZE_LIMIT);
 };
 
 func void ViewPtr_ResizeRightsidedValidscreenspace(var int ptr, var int x, var int y) {
-    ViewPtr_ResizeAdvanced(ptr, x, y, ANCHOR_RIGHT_TOP, VALIDSCREENSPACE);
+    ViewPtr_ResizeAdvanced(ptr, x, y, ANCHOR_RIGHT_TOP, VALIDSCREENSPACE, VIEW_NO_SIZE_LIMIT, VIEW_NO_SIZE_LIMIT);
 };
 
 func void View_ResizeRightsidedValidscreenspace(var int hndl, var int x, var int y) {
-    View_ResizeAdvanced(hndl, x, y, ANCHOR_RIGHT_TOP, VALIDSCREENSPACE);
+    View_ResizeAdvanced(hndl, x, y, ANCHOR_RIGHT_TOP, VALIDSCREENSPACE, VIEW_NO_SIZE_LIMIT, VIEW_NO_SIZE_LIMIT);
 };
 
 func void View_ResizeRightsidedBottom(var int hndl, var int x, var int y) {
-    View_ResizeAdvanced(hndl, x, y, ANCHOR_RIGHT_BOTTOM, NON_VALIDSCREENSPACE);
+    View_ResizeAdvanced(hndl, x, y, ANCHOR_RIGHT_BOTTOM, NON_VALIDSCREENSPACE, VIEW_NO_SIZE_LIMIT, VIEW_NO_SIZE_LIMIT);
 };
 
 func void View_ResizeRightsidedBottomValidscreenspace(var int hndl, var int x, var int y) {
-    View_ResizeAdvanced(hndl, x, y, ANCHOR_RIGHT_BOTTOM, VALIDSCREENSPACE);
+    View_ResizeAdvanced(hndl, x, y, ANCHOR_RIGHT_BOTTOM, VALIDSCREENSPACE, VIEW_NO_SIZE_LIMIT, VIEW_NO_SIZE_LIMIT);
 };
 
 func void View_ResizeLeftsidedValidscreenspace(var int hndl, var int x, var int y) {
-    View_ResizeAdvanced(hndl, x, y, ANCHOR_LEFT_TOP, VALIDSCREENSPACE);
+    View_ResizeAdvanced(hndl, x, y, ANCHOR_LEFT_TOP, VALIDSCREENSPACE, VIEW_NO_SIZE_LIMIT, VIEW_NO_SIZE_LIMIT);
 };
 
 func void View_ResizeLeftsidedBottom(var int hndl, var int x, var int y) {
-    View_ResizeAdvanced(hndl, x, y, ANCHOR_LEFT_BOTTOM, NON_VALIDSCREENSPACE);
+    View_ResizeAdvanced(hndl, x, y, ANCHOR_LEFT_BOTTOM, NON_VALIDSCREENSPACE, VIEW_NO_SIZE_LIMIT, VIEW_NO_SIZE_LIMIT);
 };
 
 func void View_ResizeLeftsidedBottomValidscreenspace(var int hndl, var int x, var int y) {
-    View_ResizeAdvanced(hndl, x, y, ANCHOR_LEFT_BOTTOM, VALIDSCREENSPACE);
+    View_ResizeAdvanced(hndl, x, y, ANCHOR_LEFT_BOTTOM, VALIDSCREENSPACE, VIEW_NO_SIZE_LIMIT, VIEW_NO_SIZE_LIMIT);
 };
 //========================================
 // Change Size Centered
@@ -546,12 +640,12 @@ func void ViewPtr_ResizeCentered(var int ptr, var int x, var int y) {
     posDifX *= -1;
     
     ViewPtr_MoveTo(ptr, v.vposx+posDifX, v.vposy+posDifY);*/
-    ViewPtr_ResizeAdvanced(ptr, x, y, ANCHOR_CENTER, NON_VALIDSCREENSPACE);
+    ViewPtr_ResizeAdvanced(ptr, x, y, ANCHOR_CENTER, NON_VALIDSCREENSPACE, 0, 0);
 };
 
 func void View_ResizeCentered(var int hndl, var int x, var int y) {
     //ViewPtr_ResizeCentered(getPtr(hndl),x,y);
-    View_ResizeAdvanced(hndl, x, y, ANCHOR_CENTER, NON_VALIDSCREENSPACE);
+    View_ResizeAdvanced(hndl, x, y, ANCHOR_CENTER, NON_VALIDSCREENSPACE, 0, 0);
 };
 
 func void ViewPtr_ResizeCenteredValidScreenSpace(var int ptr, var int x, var int y) {
@@ -572,14 +666,13 @@ func void ViewPtr_ResizeCenteredValidScreenSpace(var int ptr, var int x, var int
     posDifX *= -1;
     
     ViewPtr_MoveToValidScreenSpace(ptr, v.vposx+posDifX, v.vposy+posDifY);*/
-    ViewPtr_ResizeAdvanced(ptr, x, y, ANCHOR_CENTER, VALIDSCREENSPACE);
+    ViewPtr_ResizeAdvanced(ptr, x, y, ANCHOR_CENTER, VALIDSCREENSPACE, 0, 0);
 };
 
 func void View_ResizeCenteredValidScreenSpace(var int hndl, var int x, var int y) {
-    View_ResizeAdvanced(hndl, x, y, ANCHOR_CENTER, VALIDSCREENSPACE);
+    View_ResizeAdvanced(hndl, x, y, ANCHOR_CENTER, VALIDSCREENSPACE, 0, 0);
     //ViewPtr_ResizeCenteredValidScreenSpace(getPtr(hndl),x,y);
 };
-
 
 
 //========================================

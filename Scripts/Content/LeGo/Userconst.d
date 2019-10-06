@@ -30,17 +30,32 @@ const int ALIGN_BOTTOM = 4;
 //========================================
 // Anchor (benutzt in View)
 //========================================
-const int ANCHOR_LEFT_TOP 		= 0;
+const int ANCHOR_LEFT_TOP 		= 0; //Default
 const int ANCHOR_LEFT_BOTTOM   	= 1;
 const int ANCHOR_RIGHT_TOP 		= 2;
 const int ANCHOR_RIGHT_BOTTOM	= 3;
 const int ANCHOR_CENTER    		= 4;
+const int ANCHOR_CENTER_TOP		= 5;
+const int ANCHOR_CENTER_BOTTOM	= 6;
+const int ANCHOR_CENTER_LEFT	= 7;
+const int ANCHOR_CENTER_RIGHT	= 8;
 
 //========================================
 // ValidScreenSpace (benutzt in View)
 //========================================
 const int NON_VALIDSCREENSPACE	= 0;
 const int VALIDSCREENSPACE   	= 1;
+
+//========================================
+// Size_LIMIT (benutzt in View)
+//========================================
+const int VIEW_NO_SIZE_LIMIT		= -1;
+
+//========================================
+// PercentagedScaling Modes (benutzt in Bars)
+//========================================
+const int SCALING_ABSOLUTE		= 0;
+const int SCALING_RELATIVE  	= 1;
 
 //========================================
 // Interface
@@ -84,9 +99,13 @@ const int IP_VBACK_CENTER_Y	= 1;
 const int IP_VBAR_CENTER_X	= 2;
 const int IP_VBAR_CENTER_Y	= 3;
 const int IP_VBACK_LEFT		= 4;
-const int IP_VBACK_TOP		= 5;
-const int IP_VBAR_LEFT		= 6;
-const int IP_VBAR_TOP		= 7;
+//const int IP_VBACK_RIGHT	= 5;
+const int IP_VBACK_TOP		= 6;
+//const int IP_VBACK_BOTTOM	= 7;
+const int IP_VBAR_LEFT		= 8;
+//const int IP_VBAR_RIGHT		= 9;
+const int IP_VBAR_TOP		= 10;
+//const int IP_VBAR_BOTTOM	= 11;
 
 //// interpretations of ini Setting
 //const int B4DI_BarScale_off		= 100; // will not be used?

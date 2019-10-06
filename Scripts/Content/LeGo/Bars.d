@@ -17,6 +17,7 @@ class Bar {
     var string middleTex;
     var int value;
     var int valueMax;
+    var int anchorPoint_mode;   //0-8 See Anchor Const
 };
 
 //========================================
@@ -34,6 +35,7 @@ prototype GothicBar(Bar) {
     middleTex = "Bar_TempMax.tga";
     value = 100;
     valueMax = 100;
+    anchorPoint_mode = ANCHOR_LEFT_TOP;
 };
 
 //========================================
@@ -52,9 +54,10 @@ class _bar {
     var int vMiddle;                    // zCView(h)
     var int v1;                         // zCView(h)
     var int vLabel;                     // zCView(h)
-    var int initialDynamicVSizes[4];    // Array<int>
-    var int initialVPositions[8];       // Array<int>
+    var int initVSizes[4];    // Array<int>
+    var int initVPos[12];       // Array<int>
     var int isFadedOut;                 // Bool
+    var int anchorPoint_mode;               // Anchor for advanced resizing
     //var int anim8FadeOut;               // A8Head(h)
 };
 
@@ -87,26 +90,30 @@ func void Bar_storePosSize(var int bar_hndl){
     var _bar b; b = get(bar_hndl);
     var zCView v; v = View_Get(b.v0);
 
-    b.initialVPositions[IP_VBACK_LEFT] = v.vposx;
-    b.initialVPositions[IP_VBACK_TOP] = v.vposy;
-    b.initialVPositions[IP_VBACK_CENTER_X] = v.vposx - v.vsizex>>1; // >>1 durch 2
-    b.initialVPositions[IP_VBACK_CENTER_Y] = v.vposy - v.vsizey>>1;
-    b.initialDynamicVSizes[IDS_VBACK_X] = v.vsizex;
-    b.initialDynamicVSizes[IDS_VBACK_Y] = v.vsizey;
+    b.initVPos[IP_VBACK_LEFT]     = v.vposx;
+    //b.initVPos[IP_VBACK_RIGHT] = v.vposx + v.vsizex;
+    b.initVPos[IP_VBACK_TOP]      = v.vposy;
+    //b.initVPos[IP_VBACK_BOTTOM] = v.vposy + v.vsizey;
+    b.initVPos[IP_VBACK_CENTER_X] = v.vposx + v.vsizex>>1; // >>1 durch 2
+    b.initVPos[IP_VBACK_CENTER_Y] = v.vposy + v.vsizey>>1;
+    b.initVSizes[IDS_VBACK_X]     = v.vsizex;
+    b.initVSizes[IDS_VBACK_Y]     = v.vsizey;
     
     v = View_Get(b.v1); //same as vMiddle and vLabel
 
-    b.initialVPositions[IP_VBAR_LEFT] = v.vposx;
-    b.initialVPositions[IP_VBAR_TOP] = v.vposy;
-    b.initialVPositions[IP_VBAR_CENTER_X] = v.vposx - v.vsizex>>1; // >>1 durch 2
-    b.initialVPositions[IP_VBAR_CENTER_Y] = v.vposy - v.vsizey>>1;
-    b.initialDynamicVSizes[IDS_VBAR_X] = v.vsizex;
-    b.initialDynamicVSizes[IDS_VBAR_Y] = v.vsizey;
+    b.initVPos[IP_VBAR_LEFT]     = v.vposx;
+    //b.initVPos[IP_VBAR_RIGHT] = v.vposx + v.vsizex;
+    b.initVPos[IP_VBAR_TOP]      = v.vposy;
+    //b.initVPos[IP_VBAR_BOTTOM] = v.vposy + v.vsizey;
+    b.initVPos[IP_VBAR_CENTER_X] = v.vposx + v.vsizex>>1; // >>1 durch 2
+    b.initVPos[IP_VBAR_CENTER_Y] = v.vposy + v.vsizey>>1;
+    b.initVSizes[IDS_VBAR_X]     = v.vsizex;
+    b.initVSizes[IDS_VBAR_Y]     = v.vsizey;
 
-    B4DI_debugSpy("Bar PositionX",IntToString(v.vposx));
-    B4DI_debugSpy("Bar PositionY",IntToString(v.vposy));
-    B4DI_debugSpy("Bar SizeX",IntToString(v.vsizex));
-    B4DI_debugSpy("Bar SizeY",IntToString(v.vsizey));
+    //B4DI_debugSpy("Bar PositionX",IntToString(v.vposx));
+    //B4DI_debugSpy("Bar PositionY",IntToString(v.vposy));
+    //B4DI_debugSpy("Bar SizeX",IntToString(v.vsizex));
+    //B4DI_debugSpy("Bar SizeY",IntToString(v.vsizey));
     
 };
 
@@ -163,69 +170,157 @@ func int Bar_GetValue( var int bar_hndl ) {
     return b.val;
 };
 
-//========================================
-// [Intern] Resizes bars in valid space 
-//
-// if back reaches screen borders before scaling is finished
-//  it will be moved, middle and bar will be moved according to delta before resizing.
-//========================================
-func void Bar_ResizeCenteredPercent(var int bar_hndl, var int relativScalingFactor){ //float relativScalingFactor
+func void Bar_SetAnchor( var int bar_hndl, var int new_anchorPoint_mode ) {
     if(!Hlp_IsValidHandle(bar_hndl)) { return; };
     var _bar b; b = get(bar_hndl);
+
+    b.anchorPoint_mode = new_anchorPoint_mode;
+};
+
+func int Bar_GetAnchor( var int bar_hndl ) {
+    if(!Hlp_IsValidHandle(bar_hndl)) { return 0; };
+    var _bar b; b = get(bar_hndl);
+    var int curr_anchor; curr_anchor = b.anchorPoint_mode;
+    if ( curr_anchor < ANCHOR_LEFT_TOP || curr_anchor > ANCHOR_CENTER_RIGHT ) {
+        curr_anchor = ANCHOR_LEFT_TOP;
+        b.anchorPoint_mode = curr_anchor;
+    };
+
+    return curr_anchor;
+};
+
+//========================================
+// [Intern] Resize bars  
+//  ValidSpace means
+//  if back reaches screen borders before scaling is finished
+//  it will be moved to allow scaling, anchors might be ignored to stay within screenborders.
+//  ScreenLimits might force deformation if scaled beyond screensize before finished scaling
+//========================================
+//func void Bar_ResizeCenteredPercent(var int bar_hndl, var int relativScalingFactor){ //float relativScalingFactor
+//    if(!Hlp_IsValidHandle(bar_hndl)) { return; };
+//    var _bar b; b = get(bar_hndl);
+//    var zCView vBack; vBack = View_Get(b.v0);
+//    var zCView vMiddle; vMiddle = View_Get(b.vMiddle);
+//    var zCView vLabel; vLabel = View_Get(b.vLabel);
+//    var zCView vBar; vBar = View_Get(b.v1);
+    
+//    b.barW = roundf( mulf( mkf( b.barW ) , relativScalingFactor ) );
+
+//    var int barTop; barTop = roundf(  mulf( mkf(  vBar.vposy - vBack.vposy ), relativScalingFactor ));
+//    var int barLeft; barLeft = roundf(  mulf( mkf( vBar.vposx - vBack.vposx ), relativScalingFactor ) );
+
+//    View_ResizeCenteredValidScreenSpace(b.v0, roundf( mulf( mkf(vBack.vsizex) , relativScalingFactor) ), roundf( mulf( mkf(vBack.vsizey) , relativScalingFactor ) ) );
+//    //to keep the margin valid if scaled back touches screen border
+//    View_MoveTo(b.vMiddle, vBack.vposx + barLeft, vBack.vposy + barTop );
+//    View_MoveTo(b.v1, vBack.vposx + barLeft, vBack.vposy + barTop );
+//    View_MoveTo(b.vLabel, vBack.vposx + barLeft, vBack.vposy + barTop );
+        
+//    View_Resize(b.vMiddle, roundf( mulf( mkf(vMiddle.vsizex) , relativScalingFactor) ), roundf( mulf( mkf(vMiddle.vsizey) , relativScalingFactor) ) );
+//    View_Resize(b.v1, roundf( mulf( mkf(vBar.vsizex) , relativScalingFactor) ), roundf( mulf( mkf(vBar.vsizey) , relativScalingFactor) ) );
+//    View_Resize(b.vLabel, roundf( mulf( mkf(vLabel.vsizex) , relativScalingFactor) ), roundf( mulf( mkf(vLabel.vsizey) , relativScalingFactor) ) );
+//    Bar_SetValue(bar_hndl, b.val);
+//};
+
+//func void Bar_ResizeCenteredPercentFromInitial(var int bar_hndl, var int aboluteScalingFactor){ //float aboluteScalingFactor
+//    if(!Hlp_IsValidHandle(bar_hndl)) { return; };
+//    var _bar b; b = get(bar_hndl);
+
+//    b.barW = roundf( mulf( mkf( b.initVSizes[IDS_VBAR_X] ) , aboluteScalingFactor ) );
+
+//    View_ResizeCenteredValidScreenSpace(b.v0, roundf( mulf( mkf(b.initVSizes[IDS_VBACK_X] ) , aboluteScalingFactor) ), roundf( mulf( mkf(b.initVSizes[IDS_VBACK_Y]) , aboluteScalingFactor ) ) );
+
+//    var int barTopBottomMargin;
+//    barTopBottomMargin = roundf( mulf( mkf(b.initVPos[IP_VBAR_TOP] - b.initVPos[IP_VBACK_TOP]  ) , aboluteScalingFactor) );
+//    var int barLeftRightMargin;
+//    barLeftRightMargin = roundf( mulf( mkf(b.initVPos[IP_VBAR_LEFT] - b.initVPos[IP_VBACK_LEFT]  ) , aboluteScalingFactor) );
+
+//    View_SetMargin(b.vMiddle, b.v0, ALIGN_CENTER, barTopBottomMargin, barLeftRightMargin, barTopBottomMargin, barLeftRightMargin ); 
+//    View_SetMargin(b.v1, b.v0, ALIGN_CENTER, barTopBottomMargin, barLeftRightMargin, barTopBottomMargin, barLeftRightMargin );
+//    View_SetMargin(b.vLabel, b.v0, ALIGN_CENTER, barTopBottomMargin, barLeftRightMargin, barTopBottomMargin, barLeftRightMargin ); 
+
+//    Bar_SetValue(bar_hndl, b.val );
+//};
+
+//scalingFactor is a float
+func void Bar_ResizePercentagedAdvanced(var int bar_hndl, var int scalingFactor , var int scaling_mode, var int anchorPoint_mode, var int validScreenSpace, var int x_size_limit, var int y_size_limit ) {
+    if(!Hlp_IsValidHandle(bar_hndl)) { return; };
+    var _bar b; b = get(bar_hndl);
+
+    var int base_barW; 
+    var int base_Back_vsizex; 
+    var int base_Back_vsizey; 
+    var int base_TopMargin; 
+    var int base_BottomMargin; 
+    var int base_LeftMargin; 
+    var int base_RightMargin; 
+    // scaling_mode == SCALING_ABSOLUTE --------
+    base_barW         = mkf( b.initVSizes[IDS_VBAR_X] );
+    base_Back_vsizex  = mkf( b.initVSizes[IDS_VBACK_X] );
+    base_Back_vsizey  = mkf( b.initVSizes[IDS_VBACK_Y] );
+    base_TopMargin    = mkf( b.initVPos[IP_VBAR_TOP] - b.initVPos[IP_VBACK_TOP] );
+    base_BottomMargin = mkf((b.initVPos[IP_VBACK_TOP] + b.initVSizes[IDS_VBACK_Y]) - (b.initVPos[IP_VBAR_TOP] + b.initVSizes[IDS_VBAR_Y]) );
+    base_LeftMargin   = mkf( b.initVPos[IP_VBAR_LEFT] - b.initVPos[IP_VBACK_LEFT] );
+    base_RightMargin  = mkf((b.initVPos[IP_VBACK_LEFT] + b.initVSizes[IDS_VBACK_X]) - (b.initVPos[IP_VBAR_LEFT] + b.initVSizes[IDS_VBAR_X]) );
+    //------------------------------------------
+
     var zCView vBack; vBack = View_Get(b.v0);
     var zCView vMiddle; vMiddle = View_Get(b.vMiddle);
     var zCView vLabel; vLabel = View_Get(b.vLabel);
     var zCView vBar; vBar = View_Get(b.v1);
-    
-    b.barW = roundf( mulf( mkf( b.barW ) , relativScalingFactor ) );
 
-    var int barTop; barTop = roundf(  mulf( mkf(  vBar.vposy - vBack.vposy ), relativScalingFactor ));
-    var int barLeft; barLeft = roundf(  mulf( mkf( vBar.vposx - vBack.vposx ), relativScalingFactor ) );
+    if( scaling_mode == SCALING_RELATIVE ) {
+        base_barW         = mkf( b.barW );
+        base_Back_vsizex  = mkf( vBack.vsizex );
+        base_Back_vsizey  = mkf( vBack.vsizey );
+        base_TopMargin    = mkf( vBar.vposy - vBack.vposy );
+        base_BottomMargin = mkf( (vBar.vposy + vBar.vsizey) - (vBack.vposy + vBack.vsizey) );
+        base_LeftMargin   = mkf( vBar.vposx - vBack.vposx );
+        base_RightMargin  = mkf( (vBar.vposx + vBar.vsizex) - (vBack.vposx  + vBack.vsizex) );   
+    };
 
-    View_ResizeCenteredValidScreenSpace(b.v0, roundf( mulf( mkf(vBack.vsizex) , relativScalingFactor) ), roundf( mulf( mkf(vBack.vsizey) , relativScalingFactor ) ) );
-    //to keep the margin valid if scaled back touches screen border
-    View_MoveTo(b.vMiddle, vBack.vposx + barLeft, vBack.vposy + barTop );
-    View_MoveTo(b.v1, vBack.vposx + barLeft, vBack.vposy + barTop );
-    View_MoveTo(b.vLabel, vBack.vposx + barLeft, vBack.vposy + barTop );
-        
-    View_Resize(b.vMiddle, roundf( mulf( mkf(vMiddle.vsizex) , relativScalingFactor) ), roundf( mulf( mkf(vMiddle.vsizey) , relativScalingFactor) ) );
-    View_Resize(b.v1, roundf( mulf( mkf(vBar.vsizex) , relativScalingFactor) ), roundf( mulf( mkf(vBar.vsizey) , relativScalingFactor) ) );
-    View_Resize(b.vLabel, roundf( mulf( mkf(vLabel.vsizex) , relativScalingFactor) ), roundf( mulf( mkf(vLabel.vsizey) , relativScalingFactor) ) );
-    Bar_SetValue(bar_hndl, b.val);
+    b.barW = roundf( mulf( base_barW , scalingFactor ) );
+
+    var int new_Back_vsizex; new_Back_vsizex = roundf( mulf( base_Back_vsizex , scalingFactor) );
+    var int new_Back_vsizey; new_Back_vsizey = roundf( mulf( base_Back_vsizey , scalingFactor) );
+
+    View_ResizeAdvanced(b.v0,  new_Back_vsizex, new_Back_vsizey, anchorPoint_mode, validScreenSpace, x_size_limit, y_size_limit );
+
+    var int new_TopMargin; new_TopMargin       = roundf( mulf( base_TopMargin, scalingFactor ) );
+    var int new_RightMargin; new_RightMargin   = roundf( mulf( base_RightMargin, scalingFactor ) );
+    var int new_BottomMargin; new_BottomMargin = roundf( mulf( base_BottomMargin, scalingFactor ) );
+    var int new_LeftMargin; new_LeftMargin     = roundf( mulf( base_LeftMargin, scalingFactor ) );
+
+    View_SetMargin( b.vMiddle, b.v0, ALIGN_CENTER, new_TopMargin, new_RightMargin, new_BottomMargin, new_LeftMargin ); 
+    View_SetMargin( b.v1     , b.v0, ALIGN_CENTER, new_TopMargin, new_RightMargin, new_BottomMargin, new_LeftMargin ); 
+    View_SetMargin( b.vLabel , b.v0, ALIGN_CENTER, new_TopMargin, new_RightMargin, new_BottomMargin, new_LeftMargin ); 
+
+    Bar_SetValue(bar_hndl, b.val );
+
 };
 
 func void Bar_ResizeCenteredPercentFromInitial(var int bar_hndl, var int aboluteScalingFactor){ //float aboluteScalingFactor
-    if(!Hlp_IsValidHandle(bar_hndl)) { return; };
-    var _bar b; b = get(bar_hndl);
-
-    b.barW = roundf( mulf( mkf( b.initialDynamicVSizes[IDS_VBAR_X] ) , aboluteScalingFactor ) );
-
-    View_ResizeCenteredValidScreenSpace(b.v0, roundf( mulf( mkf(b.initialDynamicVSizes[IDS_VBACK_X] ) , aboluteScalingFactor) ), roundf( mulf( mkf(b.initialDynamicVSizes[IDS_VBACK_Y]) , aboluteScalingFactor ) ) );
-
-    var int barTopBottomMargin;
-    barTopBottomMargin = roundf( mulf( mkf(b.initialVPositions[IP_VBAR_TOP] - b.initialVPositions[IP_VBACK_TOP]  ) , aboluteScalingFactor) );
-    var int barLeftRightMargin;
-    barLeftRightMargin = roundf( mulf( mkf(b.initialVPositions[IP_VBAR_LEFT] - b.initialVPositions[IP_VBACK_LEFT]  ) , aboluteScalingFactor) );
-
-    View_SetMargin(b.vMiddle, b.v0, ALIGN_CENTER, barTopBottomMargin, barLeftRightMargin, barTopBottomMargin, barLeftRightMargin ); 
-    View_SetMargin(b.v1, b.v0, ALIGN_CENTER, barTopBottomMargin, barLeftRightMargin, barTopBottomMargin, barLeftRightMargin );
-    View_SetMargin(b.vLabel, b.v0, ALIGN_CENTER, barTopBottomMargin, barLeftRightMargin, barTopBottomMargin, barLeftRightMargin ); 
-
-    Bar_SetValue(bar_hndl, b.val );
+    Bar_ResizePercentagedAdvanced(bar_hndl, aboluteScalingFactor, SCALING_ABSOLUTE, ANCHOR_CENTER, VALIDSCREENSPACE, VIEW_NO_SIZE_LIMIT, VIEW_NO_SIZE_LIMIT );
 };
 
+func void Bar_ResizeCenteredPercent(var int bar_hndl, var int relativScalingFactor){ //float relativScalingFactor
+    Bar_ResizePercentagedAdvanced(bar_hndl, relativScalingFactor, SCALING_RELATIVE, ANCHOR_CENTER, VALIDSCREENSPACE, VIEW_NO_SIZE_LIMIT, VIEW_NO_SIZE_LIMIT );
+};
 //========================================
 // Resizes bar according to Resolution height
 //
 //========================================
-func void Bar_dynamicResolutionBasedScale(var int bar_hndl){
+func void Bar_dynamicResolutionBasedScale(var int bar_hndl, var int scalingFactor){
     if(!Hlp_IsValidHandle(bar_hndl)) { return; };
     
     Print_GetScreenSize();
 
     var int dynScalingFactor; dynScalingFactor = fracf( Print_Screen[PS_Y] ,512 );
+    if( scalingFactor ) {
+        dynScalingFactor = scalingFactor;
+    };
 
-    Bar_ResizeCenteredPercentFromInitial(bar_hndl, dynScalingFactor);
+    //Bar_ResizeCenteredPercentFromInitial(bar_hndl, dynScalingFactor);
+    Bar_ResizePercentagedAdvanced(bar_hndl, dynScalingFactor, SCALING_ABSOLUTE, Bar_GetAnchor(bar_hndl), VALIDSCREENSPACE, VIEW_NO_SIZE_LIMIT, VIEW_NO_SIZE_LIMIT );
 };
 
 //========================================
@@ -255,6 +350,8 @@ func int Bar_Create(var int inst) {
     View_SetTexture(b.vMiddle, bu.middleTex);
     View_SetTexture(b.v1, bu.barTex);
     
+    b.anchorPoint_mode = bu.anchorPoint_mode;
+
     Bar_storePosSize(bh);
     Bar_SetValue(bh, bu.value);
     //Redundant ->_ViewPtr_CreateIntoPtr
@@ -281,11 +378,11 @@ func int Bar_CreateCenterDynamic(var int constructor_instance) {
     var _bar bar; bar = get(new_bar_hndl);
     bar.valMax = bar_constr.valueMax;
     //TODO change to virtual? dynamic Resultionbased scale in Prototype?
-    bar.v0 = View_CreateCenterPxl(bar_constr.x, bar_constr.y, bar_constr.width, bar_constr.height);
-    bar.barW = bar_constr.width - bar_constr.barLeft *2;
-    bar.vMiddle =   View_CreateCenterPxl(bar_constr.x, bar_constr.y, bar.barW, bar_constr.height- bar_constr.barTop *2);
-    bar.v1 =        View_CreateCenterPxl(bar_constr.x, bar_constr.y, bar.barW, bar_constr.height- bar_constr.barTop *2);
-    bar.vLabel =   View_CreateCenterPxl(bar_constr.x, bar_constr.y, bar.barW, bar_constr.height- bar_constr.barTop *2);
+    bar.v0      = View_CreateCenterPxl(bar_constr.x, bar_constr.y, bar_constr.width, bar_constr.height);
+    bar.barW    = bar_constr.width - bar_constr.barLeft *2;
+    bar.vMiddle = View_CreateCenterPxl(bar_constr.x, bar_constr.y, bar.barW, bar_constr.height- bar_constr.barTop *2);
+    bar.v1      = View_CreateCenterPxl(bar_constr.x, bar_constr.y, bar.barW, bar_constr.height- bar_constr.barTop *2);
+    bar.vLabel  = View_CreateCenterPxl(bar_constr.x, bar_constr.y, bar.barW, bar_constr.height- bar_constr.barTop *2);
     //TODO remove? vMiddle is Range
     bar.barW = Print_ToVirtual(bar.barW, PS_X);
     //^^
@@ -295,6 +392,8 @@ func int Bar_CreateCenterDynamic(var int constructor_instance) {
 
     Bar_storePosSize(new_bar_hndl);
     Bar_SetValue(new_bar_hndl, bar_constr.value);
+
+    bar.anchorPoint_mode = bar_constr.anchorPoint_mode;
 
     var zCView v; v = View_Get(bar.v0);
     //v.alphafunc = zRND_ALPHA_FUNC_ADD;
@@ -358,10 +457,10 @@ func void Bar_MoveTo(var int bar, var int x, var int y) {
 	y -= v.vsizey>>1;
 	x -= v.vposx;
 	y -= v.vposy;
-	View_Move(b.v0, x, y);
-    View_Move(b.vMiddle, x, y);
-	View_Move(b.v1, x, y);
-    View_Move(b.vLabel, x, y);
+    View_Move( b.v0     , x, y );
+    View_Move( b.vMiddle, x, y );
+    View_Move( b.v1     , x, y );
+    View_Move( b.vLabel , x, y );
 };
 
 //========================================
@@ -372,10 +471,10 @@ func void Bar_MoveLeftUpperTo(var int bar, var int x, var int y) {
     if(!Hlp_IsValidHandle(bar)) { return; };
     var _bar b; b = get(bar);
     var zCView v; v = View_Get(b.v0);
-    View_MoveTo(b.v0, x, y);
-    View_MoveTo(b.vMiddle, x, y);
-    View_MoveTo(b.v1, x, y);
-    View_MoveTo(b.vLabel, x, y);
+    View_MoveTo( b.v0     , x, y );
+    View_MoveTo( b.vMiddle, x, y );
+    View_MoveTo( b.v1     , x, y );
+    View_MoveTo( b.vLabel , x, y );
 };
 
 //========================================
@@ -385,16 +484,16 @@ func void Bar_MoveLeftUpperTo(var int bar, var int x, var int y) {
 func void Bar_MoveLeftUpperToValidScreenSpace(var int bar, var int x, var int y) {
     if(!Hlp_IsValidHandle(bar)) { return; };
     var _bar b; b = get(bar);
-    var zCView vBack; vBack = View_Get(b.v0);
-    var zCView vBar; vBar = View_Get(b.v1);
-    var int barTop; barTop = vBar.vposy - vBack.vposy ;
+    var zCView vBack; vBack  = View_Get(b.v0);
+    var zCView vBar; vBar    = View_Get(b.v1);
+    var int barTop; barTop   = vBar.vposy - vBack.vposy ;
     var int barLeft; barLeft = vBar.vposx - vBack.vposx;
 
     View_MoveToValidScreenSpace(b.v0, x, y);
     //to keep the margin valid if movement would surpass screen border
-    View_MoveTo(b.vMiddle, vBack.vposx + barLeft, vBack.vposy + barTop );
-    View_MoveTo(b.v1, vBack.vposx + barLeft, vBack.vposy + barTop );
-    View_MoveTo(b.vLabel, vBack.vposx + barLeft, vBack.vposy + barTop );
+    View_MoveTo( b.vMiddle, vBack.vposx + barLeft, vBack.vposy + barTop );
+    View_MoveTo( b.v1     , vBack.vposx + barLeft, vBack.vposy + barTop );
+    View_MoveTo( b.vLabel , vBack.vposx + barLeft, vBack.vposy + barTop );
     
 };
 
@@ -404,9 +503,9 @@ func void Bar_MoveLeftUpperToValidScreenSpace(var int bar, var int x, var int y)
 func void Bar_SetAlpha(var int bar, var int alpha) {
 	if(!Hlp_IsValidHandle(bar)) { return; };
 	var _bar b; b = get(bar);
-    View_SetAlpha(b.v0, alpha);
-    View_SetAlpha(b.vMiddle, alpha);
-    View_SetAlpha(b.v1, alpha);
+    View_SetAlpha(b.v0       , alpha);
+    View_SetAlpha(b.vMiddle  , alpha);
+    View_SetAlpha(b.v1       , alpha);
     View_SetAlphaAll(b.vLabel, alpha);
 };
 
