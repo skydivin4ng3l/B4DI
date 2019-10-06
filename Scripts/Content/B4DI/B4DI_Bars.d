@@ -201,17 +201,26 @@ func void B4DI_Bars_update(){
 //#################################################################
 func void B4DI_Bars_applySettings() {
 	B4DI_InitBarScale(); // for resolution dependant scaling
-	dynScalingFactor = B4DI_Bars_getDynamicScaleOptionValuef();
+	//dynScalingFactor = B4DI_Bars_getDynamicScaleOptionValuef();
+	if( Hlp_IsValidHandle(MEM_eBar_HP_handle) ){
+		B4DI_eBar_dynamicMenuBasedScale(MEM_eBar_HP_handle);
+		B4DI_HpBar_Refresh(B4DI_eBAR_INTITIAL_REFRESH);
+	};
 
-	//B4DI_Bar_dynamicMenuBasedScale(MEM_dBar_HP_handle);
-	B4DI_Bar_dynamicMenuBasedScale(MEM_eBar_HP.bar);
-	B4DI_HpBar_Refresh(B4DI_eBAR_INTITIAL_REFRESH);
+	if( Hlp_IsValidHandle(MEM_eBar_MANA_handle) ){
+		B4DI_eBar_dynamicMenuBasedScale(MEM_eBar_MANA_handle);
+		B4DI_manaBar_Refresh(B4DI_eBAR_INTITIAL_REFRESH);
+	};
 
-	B4DI_Bar_dynamicMenuBasedScale(MEM_eBar_MANA.bar);
-	B4DI_manaBar_Refresh(B4DI_eBAR_INTITIAL_REFRESH);
+	if( Hlp_IsValidHandle(MEM_eBar_FOCUS_handle) ){
+		B4DI_eBar_dynamicMenuBasedScale(MEM_eBar_FOCUS_handle);
+		B4DI_focusBar_Refresh(B4DI_eBAR_INTITIAL_REFRESH);
+	};
 
-	B4DI_Bar_dynamicMenuBasedScale(MEM_eBar_FOCUS.bar);
-	B4DI_focusBar_Refresh(B4DI_eBAR_INTITIAL_REFRESH);
+	if( Hlp_IsValidHandle(MEM_eBar_XP_handle) ){
+		B4DI_eBar_dynamicMenuBasedScale(MEM_eBar_XP_handle);
+		B4DI_XpBar_calcXp();
+	};
 
 	MEM_Info("B4DI_Bars_applySettings");
 };

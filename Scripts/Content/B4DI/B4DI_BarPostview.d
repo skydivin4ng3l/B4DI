@@ -42,8 +42,8 @@ func void B4DI_BarPostview_SetSizeRightsidedPercent( var int barPostview_hndl, v
     var _extendedBar eBar_parent; eBar_parent = get(bp.eBar_parent);
     var _bar bar; bar = get(eBar_parent.bar);
     //save the size before the resize
-    var int sizex_pre; sizex_pre = roundf( mulf( fracf( bp.val , bar.valMax), mulf( mkf(bar.initialDynamicVSizes[IDS_VBAR_X]), dynScalingFactor ) ) ) ; 
-    var int sizey_pre; sizey_pre = roundf( mulf( mkf(bar.initialDynamicVSizes[IDS_VBAR_Y]), dynScalingFactor ) ) ; 
+    var int sizex_pre; sizex_pre = roundf( mulf( fracf( bp.val , bar.valMax), mulf( mkf(bar.initVSizes[IDS_VBAR_X]), dynScalingFactor ) ) ) ; 
+    var int sizey_pre; sizey_pre = roundf( mulf( mkf(bar.initVSizes[IDS_VBAR_Y]), dynScalingFactor ) ) ; 
 
     //scale on all axis
     View_ResizeRightsided(bp.vPostView, sizex_pre * x_percentage / 100 , sizey_pre * y_percentage / 100); 
@@ -77,11 +77,12 @@ func void B4DI_BarPostview_SetSizeLeftsidedPercent( var int barPostview_hndl, va
     var _extendedBar eBar_parent; eBar_parent = get(bp.eBar_parent);
     var _bar bar; bar = get(eBar_parent.bar);
     //save the size before the resize
-    var int sizex_pre; sizex_pre = roundf( mulf( fracf( bp.val , bar.valMax), mulf( mkf(bar.initialDynamicVSizes[IDS_VBAR_X]), dynScalingFactor ) ) ) ; 
-    var int sizey_pre; sizey_pre = roundf( mulf( mkf(bar.initialDynamicVSizes[IDS_VBAR_Y]), dynScalingFactor ) ) ; 
+    var int sizex_pre; sizex_pre = roundf( mulf( fracf( bp.val , bar.valMax), mulf( mkf(bar.initVSizes[IDS_VBAR_X]), dynScalingFactor ) ) ) ; 
+    var int sizey_pre; sizey_pre = roundf( mulf( mkf(bar.initVSizes[IDS_VBAR_Y]), dynScalingFactor ) ) ; 
 
     //scale on all axis
-    View_Resize(bp.vPostView, sizex_pre * x_percentage / 100 , sizey_pre * y_percentage / 100 ); 
+    //View_Resize(bp.vPostView, sizex_pre * x_percentage / 100 , sizey_pre * y_percentage / 100 ); 
+    View_ResizeAdvanced(bp.vPostView, sizex_pre * x_percentage / 100 , sizey_pre * y_percentage / 100, ANCHOR_CENTER_LEFT, NON_VALIDSCREENSPACE, VIEW_NO_SIZE_LIMIT, VIEW_NO_SIZE_LIMIT ); 
         
     //Debug
     //B4DI_debugSpy("B4DI_BarPostview_SetSizeLeftsidedPercent PositionX",IntToString(vPostView.vposx));
@@ -132,14 +133,25 @@ func void B4DI_BarPostview_Show( var int barPostview_hndl) {
     };
     var _barPostview bp; bp = get(barPostview_hndl);
     var _extendedBar eBar_parent; eBar_parent = get(bp.eBar_parent);
+    var _bar bar; bar = get(eBar_parent.bar);
     //if( !eBar_parent.isFadedOut ) { //TODO isFadedOut may be to early set and prevent display of Postview
         //TODO: Check Value and adjust for value increase bar and label have to be top
         bp.isFadedOutPostview = 0;
         View_Open(bp.vPostView);
         View_SetAlpha(bp.vPostView, 127);
         View_Top(bp.vPostView);
+        View_Top(bar.vLabel);
         //MEM_Info("B4DI_BarPostview_Show finished");
     //};
+};
+
+func void B4DI_BarPostview_SetAlphaFunc( var int barPostview_hndl, var int new_alphafunc ) {
+    if(!Hlp_IsValidHandle(barPostview_hndl)) {
+        MEM_Warn("B4DI_BarPostview_Show failed ");
+        return;
+    };
+    var _barPostview bp; bp = get(barPostview_hndl);
+    View_SetAlphaFunc( bp.vPostView, new_alphafunc );
 };
 
 //========================================

@@ -49,7 +49,8 @@ const int B4DI_FOCUSBAR_SHOW_LABLE			= 1;
 // eBar CONST DONOT CHANGE
 //========================================
 
-const int B4DI_eBAR_INTITIAL_REFRESH = 0;
+const int B4DI_eBAR_INTITIAL_REFRESH 	= 0;
+const int B4DI_eBAR_NO_REPLACEMENT 		= 0;
 
 
 //========================================

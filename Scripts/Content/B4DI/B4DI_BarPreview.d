@@ -69,8 +69,8 @@ func void B4DI_BarPreview_SetSizeLeftsidedPercent( var int barPreview_hndl, var 
     var _bar bar; bar = get(eBar_parent.bar);
     //save the size before the resize
     //var int sizex_pre; sizex_pre = Print_ToVirtual(b.val,PS_X); 
-    var int sizex_pre; sizex_pre = roundf( mulf( fracf( bp.val , bar.valMax), mulf( mkf(bar.initialDynamicVSizes[IDS_VBAR_X]), dynScalingFactor ) ) ) ; 
-    var int sizey_pre; sizey_pre = roundf( mulf( mkf(bar.initialDynamicVSizes[IDS_VBAR_Y]), dynScalingFactor ) ) ; 
+    var int sizex_pre; sizex_pre = roundf( mulf( fracf( bp.val , bar.valMax), mulf( mkf(bar.initVSizes[IDS_VBAR_X]), dynScalingFactor ) ) ) ; 
+    var int sizey_pre; sizey_pre = roundf( mulf( mkf(bar.initVSizes[IDS_VBAR_Y]), dynScalingFactor ) ) ; 
 
     //scale on all axis
     View_Resize(bp.vPreView, sizex_pre * x_percentage / 100 , sizey_pre * y_percentage / 100 ); 

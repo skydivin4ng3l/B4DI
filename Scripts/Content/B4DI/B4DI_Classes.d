@@ -115,6 +115,7 @@ prototype B4DI_MyXpBar(Bar) {
 instance B4DI_XpBar(B4DI_MyXpBar){
     //x = 10+128;
     //y = 20+16;
+    anchorPoint_mode = ANCHOR_CENTER_BOTTOM;
 };
 
 instance B4DI_HpBar(GothicBar){
@@ -122,6 +123,7 @@ instance B4DI_HpBar(GothicBar){
     y = Print_Screen[PS_Y] -100;
     barTop = 2;     // 2 is almost too small
     barTex = "Bar_Health.tga";
+    anchorPoint_mode = ANCHOR_LEFT_BOTTOM;
 };
 
 instance B4DI_ManaBar(GothicBar){
@@ -129,6 +131,7 @@ instance B4DI_ManaBar(GothicBar){
     y = Print_Screen[PS_Y] -100;
     barTop = 2;     // 2 is almost too small
     barTex = "Bar_Mana.tga";
+    anchorPoint_mode = ANCHOR_RIGHT_BOTTOM;
 };
 
 instance B4DI_FocusBar(GothicBar){
@@ -136,7 +139,8 @@ instance B4DI_FocusBar(GothicBar){
     y = Print_Screen[PS_Y] -100;
     barTop = 2;     // 2 is almost too small
     barTex = "Bar_Health.tga";
-    value = 0;
+    //value = 0;
+    anchorPoint_mode = ANCHOR_CENTER_TOP;
 };
 
 /***********************************\

@@ -15,8 +15,8 @@ func void B4DI_Bar_SetBarSizeCenteredPercent(var int bar_hndl, var int x_percent
     var zCView vBar; vBar = View_Get(b.v1);
     //save the size before the resize
     //var int sizex_pre; sizex_pre = Print_ToVirtual(b.val,PS_X); 
-    var int sizex_pre; sizex_pre = roundf( mulf( fracf( b.val , b.valMax), mulf( mkf(b.initialDynamicVSizes[IDS_VBAR_X]), dynScalingFactor ) ) ) ; 
-    var int sizey_pre; sizey_pre = roundf( mulf( mkf(b.initialDynamicVSizes[IDS_VBAR_Y]), dynScalingFactor ) ) ; // Dynamic Test +1 is missing, but needed?
+    var int sizex_pre; sizex_pre = roundf( mulf( fracf( b.val , b.valMax), mulf( mkf(b.initVSizes[IDS_VBAR_X]), dynScalingFactor ) ) ) ; 
+    var int sizey_pre; sizey_pre = roundf( mulf( mkf(b.initVSizes[IDS_VBAR_Y]), dynScalingFactor ) ) ; // Dynamic Test +1 is missing, but needed?
 
     //scale on all axis
     View_ResizeCentered(b.v1, sizex_pre * x_percentage / 100 , sizey_pre * y_percentage / 100 ); 
@@ -41,58 +41,20 @@ func void B4DI_Bar_SetBarSizeCenteredPercentXY(var int bar_hndl, var int xy_perc
     B4DI_Bar_SetBarSizeCenteredPercent(bar_hndl, xy_percentage, xy_percentage );
 };
 
-//========================================
-// [intern] Helper Scales depenting on Resolution
-//========================================
-var int B4DI_BarScale[6];
-func void B4DI_InitBarScale(){
-    Print_GetScreenSize();
-    B4DI_BarScale[0]= B4DI_BarScale_off;
-    // auto scale inspired by systempack.ini
-    B4DI_BarScale[1]= roundf( mulf( mkf(100) ,fracf( Print_Screen[PS_Y] ,512 ) ) );
-    B4DI_BarScale[2]= B4DI_BarScale_50;
-    B4DI_BarScale[3]= B4DI_BarScale_100;
-    B4DI_BarScale[4]= B4DI_BarScale_150;
-    B4DI_BarScale[5]= B4DI_BarScale_200;
-};
 
-//========================================
-// [Intern] Get Dynamic Scale according of Menu value (gothic.ini) asFloat
-//
-//========================================
-func int B4DI_Bars_getDynamicScaleOptionValuef(){
-    B4DI_InitBarScale();
-    var int scaleOption; scaleOption = STR_ToInt(MEM_GetGothOpt("B4DI", "B4DI_barScale"));
-    var int scalingFactor; //scalingFactor = B4DI_BarScale_auto; //Default
-    MEM_Info( ConcatStrings( "Bar scaleOption = ", IntToString( scaleOption ) ) );
-    if(!scaleOption) {
-        MEM_Error("Bar Scale Option not set using Default Auto instead!");
-        scalingFactor = MEM_ReadStatArr(B4DI_BarScale,1);
-        MEM_Info( ConcatStrings( "Bar Scalingfactor = ", IntToString(scalingFactor) ) );
-    } else{
-        scalingFactor = MEM_ReadStatArr(B4DI_BarScale,scaleOption);
-        MEM_Info( ConcatStrings( "Bar Scalingfactor = ", IntToString(scalingFactor) ) );
-    };
-
-    var int percScalingFactor; percScalingFactor = fracf( scalingFactor, 100 );
-    MEM_Info( ConcatStrings( "percScalingFactor = ", toStringf(percScalingFactor) ) );
-
-    return percScalingFactor;
-};
 
 //========================================
 // [Intern] Resizes bars according of Menu value (gothic.ini)
 //========================================
-func void B4DI_Bar_dynamicMenuBasedScale(var int bar_hndl){
-    if(!Hlp_IsValidHandle(bar_hndl)) { MEM_Warn("B4DI_Bar_dynamicMenuBasedScale failed"); return; };
-    var _bar b; b = get(bar_hndl);
+func void B4DI_eBar_dynamicMenuBasedScale(var int eBar_hndl){
+    if(!Hlp_IsValidHandle(eBar_hndl)) { MEM_Warn("B4DI_eBar_dynamicMenuBasedScale failed"); return; };
+    var _extendedBar eBar; eBar = get(eBar_hndl);
     
-    var zCView vBack; vBack = View_Get(b.v0);
-    var zCView vBar; vBar = View_Get(b.v1);
-
     /*var int dynScalingFactor;*/ dynScalingFactor = B4DI_Bars_getDynamicScaleOptionValuef();
 
-    Bar_ResizeCenteredPercentFromInitial(bar_hndl, dynScalingFactor);
+
+    //Bar_ResizeCenteredPercentFromInitial(bar_hndl, dynScalingFactor);
+    Bar_ResizePercentagedAdvanced(eBar.bar, dynScalingFactor, SCALING_ABSOLUTE, Bar_GetAnchor(eBar.bar), VALIDSCREENSPACE, VIEW_NO_SIZE_LIMIT, VIEW_NO_SIZE_LIMIT );
     //TODO Implement different customizeable alignments, maybe per set margin within the Resize process
 
     // Keep Left aligned
@@ -141,16 +103,22 @@ func int B4DI_eBar_GetNpcRef(var int eBar_hndl) {
 //========================================
 // eBar Create
 //========================================
-func int B4DI_eBar_Create(var int Bar_constructor_instance) {
+//TODO Fix initial position after creation?
+func int B4DI_eBar_CreateCustomXY(var int Bar_constructor_instance, var int left_vposx, var int top_vposy ) {
     var int new_eBar_hndl; new_eBar_hndl = new(_extendedBar@);
     var _extendedBar eBar; eBar = get(new_eBar_hndl);
     
     eBar.bar = Bar_CreateCenterDynamic(Bar_constructor_instance);
-    B4DI_Bar_dynamicMenuBasedScale(eBar.bar);
+    
+    if( left_vposx >= 0 || top_vposy >= 0) {
+        Bar_MoveLeftUpperToValidScreenSpace(eBar.bar, left_vposx, top_vposy);
+    };
+
+    B4DI_eBar_dynamicMenuBasedScale(new_eBar_hndl);
 
     eBar.barPreview = B4DI_BarPreview_Create(new_eBar_hndl);
     if(!Hlp_IsValidHandle(eBar.barPreview)) {
-        MEM_Warn("B4DI_eBar_Create failed at B4DI_BarPreview_Create"); 
+        MEM_Warn("B4DI_eBar_CreateCustomXY failed at B4DI_BarPreview_Create"); 
         return 0;
     };
     //eBar.barPostview = B4DI_BarPreview_Create(new_eBar_hndl);
@@ -162,7 +130,29 @@ func int B4DI_eBar_Create(var int Bar_constructor_instance) {
 
     eBar.npcRef = 0;
 
+    MEM_Info("B4DI_eBar_CreateCustomXY finished <----------------------------"); 
     return new_eBar_hndl;
+};
+
+func int B4DI_eBar_CreateAsReplacement(var int Bar_constructor_instance, var int oCViewStatusBar_ptr) {
+    var int new_eBar_hndl; new_eBar_hndl = new(_extendedBar@);
+    
+    var int new_vposx; new_vposx = -1;    
+    var int new_vposy; new_vposy = -1;
+
+    if(oCViewStatusBar_ptr) {
+        var oCViewStatusBar oBar; oBar = MEM_PtrToInst(oCViewStatusBar_ptr);
+        //B4DI_originalBar_hide(oCViewStatusBar_ptr); //needs to be called in int always
+        new_vposx = oBar.zCView_vposx;
+        new_vposy = oBar.zCView_vposy;
+    };
+
+    return B4DI_eBar_CreateCustomXY(Bar_constructor_instance, new_vposx, new_vposy);
+};
+
+
+func int B4DI_eBar_Create(var int Bar_constructor_instance ) {
+    return B4DI_eBar_CreateAsReplacement(Bar_constructor_instance, B4DI_eBAR_NO_REPLACEMENT);
 };
 
 //========================================
@@ -325,7 +315,7 @@ func void B4DI_eBar_show( var int eBar_hndl){
             Anim8_Delete(eBar_inst.anim8FadeOut);
         };
         eBar_inst.isFadedOut = 0;
-        B4DI_eBar_SetAlpha(eBar_hndl, 255);
+        B4DI_eBar_SetAlpha(eBar_hndl, 155);
 
         //Bar_Show(eBar_inst.bar);
         MEM_Info("B4DI_eBar_show successful");
@@ -460,11 +450,13 @@ func void B4DI_eBar_SetValuesAnimated( var int eBar_hndl,var int index_value, va
 
         eBar.barPostview = B4DI_BarPostview_Create(eBar_hndl, abs(value_diff) );
         B4DI_BarPostview_Show(eBar.barPostview);
+        B4DI_BarPostview_SetAlphaFunc(eBar.barPostview, zRND_ALPHA_FUNC_BLEND);
         B4DI_BarPostview_slide_size(eBar.barPostview, B4DI_BarPostview_SetSizeLeftsidedPercentX);
     } else if ( value_diff > 0 ) {
         //B4DI_Info1("B4DI_eBar_SetValuesAnimated: ", value_diff );
         eBar.barPostview = B4DI_BarPostview_Create(eBar_hndl, abs(value_diff) );
         B4DI_BarPostview_Show(eBar.barPostview);
+        B4DI_BarPostview_SetAlphaFunc(eBar.barPostview, zRND_ALPHA_FUNC_SUB);
         B4DI_BarPostview_slide_size(eBar.barPostview, B4DI_BarPostview_SetSizeRightsidedPercentX);
 
         B4DI_eBar_SetValues(eBar_hndl, index_value, index_valueMax);
@@ -540,4 +532,12 @@ func void B4DI_eBar_Refresh(var int eBar_hndl, var int index_value, var int inde
     B4DI_eBar_RefreshAnimated( eBar_hndl, index_value, index_valueMax, false);
 };
 
+func void B4DI_Bars_SetLabelTop(var int eBar_hndl) {
+    var _extendedBar eBar; eBar = get(eBar_hndl);
+    var _bar bar; bar = get(eBar.bar);
+    var zCView vLabel; vLabel = View_Get(bar.vLabel);
+
+    View_Top(bar.vLabel);
+    //View_MoveToValidScreenSpace(bar.vLabel, vLabel.vposx, vLabel.vposy - 100);
+};
 

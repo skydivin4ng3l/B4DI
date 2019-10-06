@@ -21,10 +21,10 @@ func void B4DI_manaBar_Refresh(var int animated_value_diff){
 func void B4DI_manaBar_InitAlways(){
 	//original bars
 	MEM_oBar_Mana = MEM_PtrToInst (MEM_GAME.manaBar); //original
-	B4DI_originalBar_hide(MEM_GAME.manaBar);
+	//B4DI_originalBar_hide(MEM_GAME.manaBar);
 	// new dBars dynamic
 	if(!Hlp_IsValidHandle(MEM_eBar_MANA_handle)){
-		MEM_eBar_MANA_handle = B4DI_eBar_Create(B4DI_ManaBar);
+		MEM_eBar_MANA_handle = B4DI_eBar_CreateAsReplacement(B4DI_ManaBar, MEM_GAME.manaBar);
 		B4DI_eBar_SetNpcRef(MEM_eBar_MANA_handle, MEM_InstToPtr(hero));
 	};
 	MEM_eBar_MANA = get(MEM_eBar_MANA_handle);
@@ -35,7 +35,7 @@ func void B4DI_manaBar_InitAlways(){
 	//TODO: Update on option change of Barsize
 	//TODO: implement customizable Positions Left Right Top bottom,...
 	//TODO: implement a Screen margin
-	Bar_MoveLeftUpperToValidScreenSpace(MEM_eBar_MANA.bar, MEM_oBar_Mana.zCView_vposx, MEM_oBar_Mana.zCView_vposy );
+	//Bar_MoveLeftUpperToValidScreenSpace(MEM_eBar_MANA.bar, MEM_oBar_Mana.zCView_vposx, MEM_oBar_Mana.zCView_vposy );
 
 
 	MEM_Info("B4DI_manaBar_InitAlways");

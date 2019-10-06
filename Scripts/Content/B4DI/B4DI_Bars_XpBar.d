@@ -47,7 +47,7 @@ func void B4DI_xpBar_update(var int add_xp) {
 
 func void B4DI_xpBar_InitAlways(){
 	if(!Hlp_IsValidHandle(MEM_eBar_XP_handle)){
-		MEM_eBar_XP_handle = B4DI_eBar_Create(B4DI_XpBar);
+		MEM_eBar_XP_handle = B4DI_eBar_CreateCustomXY(B4DI_XpBar, MEM_oBar_Focus.zCView_vposx, MEM_oBar_Hp.zCView_vposy);
 	};
 	MEM_eBar_XP = get(MEM_eBar_XP_handle);
 	B4DI_XpBar_calcXp();
@@ -55,7 +55,7 @@ func void B4DI_xpBar_InitAlways(){
 	//TODO: Update on option change of Barsize
 	//TODO: implement customizable Positions Left Right Top bottom,...
 	//TODO: implement a Screen margin
-	Bar_MoveLeftUpperToValidScreenSpace(MEM_eBar_XP.bar, MEM_oBar_Focus.zCView_vposx, MEM_oBar_Hp.zCView_vposy );
+	//Bar_MoveLeftUpperToValidScreenSpace(MEM_eBar_XP.bar, MEM_oBar_Focus.zCView_vposx, MEM_oBar_Hp.zCView_vposy );
 
 	MEM_Info("B4DI_xpBar_InitAlways");
 };

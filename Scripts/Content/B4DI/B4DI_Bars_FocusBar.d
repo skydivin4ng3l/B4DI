@@ -128,10 +128,10 @@ func void B4DI_focusBar_update(){
 func void B4DI_focusBar_InitAlways(){
 	//original bars
 	MEM_oBar_Focus = MEM_PtrToInst (MEM_GAME.focusBar); //original
-	B4DI_originalBar_hide(MEM_GAME.focusBar);
+	//B4DI_originalBar_hide(MEM_GAME.focusBar);
 	// new dBars dynamic
 	if(!Hlp_IsValidHandle(MEM_eBar_FOCUS_handle)){
-		MEM_eBar_FOCUS_handle = B4DI_eBar_Create(B4DI_FocusBar);
+		MEM_eBar_FOCUS_handle = B4DI_eBar_CreateAsReplacement(B4DI_FocusBar, MEM_GAME.focusBar );
 	};
 	MEM_eBar_FOCUS = get(MEM_eBar_FOCUS_handle);
 	//B4DI_focusBar_Refresh();
@@ -140,7 +140,7 @@ func void B4DI_focusBar_InitAlways(){
 	//TODO: Update on option change of Barsize
 	//TODO: implement customizable Positions Left Right Top bottom,...
 	//TODO: implement a Screen margin
-	Bar_MoveLeftUpperToValidScreenSpace(MEM_eBar_FOCUS.bar, MEM_oBar_Focus.zCView_vposx, MEM_oBar_Focus.zCView_vposy );
+	//Bar_MoveLeftUpperToValidScreenSpace(MEM_eBar_FOCUS.bar, MEM_oBar_Focus.zCView_vposx, MEM_oBar_Focus.zCView_vposy );
 
 	last_ID_ofFocus = 0;
 	lastNpcHP = 0;
