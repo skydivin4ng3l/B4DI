@@ -24,6 +24,7 @@ func void B4DI_manaBar_InitAlways(){
 	//B4DI_originalBar_hide(MEM_GAME.manaBar);
 	// new dBars dynamic
 	if(!Hlp_IsValidHandle(MEM_eBar_MANA_handle)){
+		MEM_Info("B4DI_manaBar_InitAlways: Creating an MAMA Bar Handle");
 		MEM_eBar_MANA_handle = B4DI_eBar_CreateAsReplacement(B4DI_ManaBar, MEM_GAME.manaBar);
 		B4DI_eBar_SetNpcRef(MEM_eBar_MANA_handle, MEM_InstToPtr(hero));
 	};

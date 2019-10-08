@@ -99,6 +99,15 @@ func int B4DI_eBar_GetNpcRef(var int eBar_hndl) {
     };
 };
 
+//========================================
+// eBar add to alignment lists
+//========================================
+func void B4DI_eBar_AddToAligmentlist(var int eBar_hndl) {
+    if(!Hlp_IsValidHandle(eBar_hndl)) { MEM_Warn("B4DI_eBar_AddToAligmentlist failed: invalid eBar_hndl"); return; };
+    var _extendedBar eBar; eBar = get(eBar_hndl);
+    
+
+};
 
 //========================================
 // eBar Create
@@ -145,6 +154,8 @@ func int B4DI_eBar_CreateAsReplacement(var int Bar_constructor_instance, var int
         //B4DI_originalBar_hide(oCViewStatusBar_ptr); //needs to be called in int always
         new_vposx = oBar.zCView_vposx;
         new_vposy = oBar.zCView_vposy;
+        B4DI_Info1("oBar.zCView_vposx: ", oBar.zCView_vposx);
+        B4DI_Info1("oBar.zCView_vposy: ", oBar.zCView_vposy);
     };
 
     return B4DI_eBar_CreateCustomXY(Bar_constructor_instance, new_vposx, new_vposy);

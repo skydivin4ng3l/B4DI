@@ -1,11 +1,20 @@
 /***********************************\
          B4DI Global Variables
 \***********************************/
+//========================================
+// [intern] inibased Vars
+//========================================
+
+var int dynScalingFactor; //float
+
+var int B4DI_vMargin_top;
+var int B4DI_vMargin_bottom;
+var int B4DI_vMargin_left;
+var int B4DI_vMargin_right;
 
 //========================================
 // [intern] Global Vars
 //========================================
-var int dynScalingFactor; //float
 
 var int lastHeroHP;
 var int lastHeroMaxHP;
@@ -24,3 +33,5 @@ var int lastAttitudeOfCurrentFocus;
 
 var int heroGotHit;
 var int enemyInFocusGotHit;
+
+

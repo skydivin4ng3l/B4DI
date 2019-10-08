@@ -131,6 +131,7 @@ func void B4DI_focusBar_InitAlways(){
 	//B4DI_originalBar_hide(MEM_GAME.focusBar);
 	// new dBars dynamic
 	if(!Hlp_IsValidHandle(MEM_eBar_FOCUS_handle)){
+		MEM_Info("B4DI_focusBar_InitAlways: Creating an FOCUS Bar Handle");
 		MEM_eBar_FOCUS_handle = B4DI_eBar_CreateAsReplacement(B4DI_FocusBar, MEM_GAME.focusBar );
 	};
 	MEM_eBar_FOCUS = get(MEM_eBar_FOCUS_handle);

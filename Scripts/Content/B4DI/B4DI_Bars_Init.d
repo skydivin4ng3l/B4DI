@@ -78,7 +78,6 @@ func void B4DI_Bars_InitOnce() {
 
 func void B4DI_Bars_InitAlways() {
 	isInventoryOpen = false;
-	//anyFightModeActive = false; //check if possible to save and load active fight mode then swap to intit once
 	areItemPreviewsHidden = true;
 	B4DI_heroInstance_InitAlways();
 

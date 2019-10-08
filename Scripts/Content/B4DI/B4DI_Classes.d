@@ -1,4 +1,28 @@
 /***********************************\
+         B4DI eBARSList for Aligments
+\***********************************/
+//========================================
+// [intern] Klasse für PermMem
+//========================================
+class _alleBarsLists {
+
+    var int eBarList_Top_Left;      //@zCList<_extendedBar*hndl>
+    var int eBarList_Top_Center;    //@zCList<_extendedBar*hndl>
+    var int eBarList_Top_Right;     //@zCList<_extendedBar*hndl>
+    
+    var int eBarList_Center_Left;   //@zCList<_extendedBar*hndl>
+    var int eBarList_Center_Center; //@zCList<_extendedBar*hndl>
+    var int eBarList_Center_Right;  //@zCList<_extendedBar*hndl>
+    
+    var int eBarList_Bottom_Left;   //@zCList<_extendedBar*hndl>
+    var int eBarList_Bottom_Center; //@zCList<_extendedBar*hndl>
+    var int eBarList_Bottom_Right;  //@zCList<_extendedBar*hndl>
+
+};
+
+instance _alleBarsLists@(_alleBarsLists);
+
+/***********************************\
          B4DI extended BARS
 \***********************************/
 //========================================
@@ -166,6 +190,13 @@ instance MEM_eBar_FOCUS(_extendedBar);
 
 var int MEM_eBar_XP_handle;
 instance MEM_eBar_XP(_extendedBar);
+
+/***********************************\
+        eBars Alignment lists
+\***********************************/
+
+var int MEM_alleBarsLists_handle;
+instance MEM_alleBarsLists(_alleBarsLists);
 
 /***********************************\
       Selected Inventory Item
