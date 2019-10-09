@@ -52,6 +52,42 @@ const int B4DI_FOCUSBAR_SHOW_LABLE			= 1;
 const int B4DI_eBAR_INTITIAL_REFRESH 	= 0;
 const int B4DI_eBAR_NO_REPLACEMENT 		= 0;
 
+//========================================
+// Margin (benutzt in AlignmentManager)
+//========================================
+
+const int B4DI_ALIGNMENT_MARGIN_USE_DEFAULT			= -1;
+const int B4DI_ALIGNMENT_MARGIN_DEFAULT_VALUE		= 64;
+
+const int B4DI_ALIGNMENT_SLOT_MARGIN_TOP			= 0;
+const int B4DI_ALIGNMENT_SLOT_MARGIN_BOTTOM			= 1;
+const int B4DI_ALIGNMENT_SLOT_MARGIN_LEFT			= 2;
+const int B4DI_ALIGNMENT_SLOT_MARGIN_RIGHT			= 3;
+const int B4DI_ALIGNMENT_SLOT_MARGIN_BETWEENOBJECTS	= 4;
+
+const int B4DI_ALIGNMENT_SLOT_MARGIN_ARRAY_SIZE		= 5;
+
+//========================================
+// Sizelimits (benutzt in AlignmentManager)
+//========================================
+
+const int B4DI_ALIGNMENT_SLOT_OBJECTSIZE_NO_LIMIT  	= -1;
+
+//========================================
+// Aligmentlists (benutzt in AlignmentManager) This should mirror the Anchors of Bars
+//========================================
+const int B4DI_ALIGNMENT_LEFT_TOP			= 0; //Default
+const int B4DI_ALIGNMENT_LEFT_BOTTOM		= 1;
+const int B4DI_ALIGNMENT_RIGHT_TOP			= 2;
+const int B4DI_ALIGNMENT_RIGHT_BOTTOM		= 3;
+const int B4DI_ALIGNMENT_CENTER				= 4;
+const int B4DI_ALIGNMENT_CENTER_TOP			= 5;
+const int B4DI_ALIGNMENT_CENTER_BOTTOM		= 6;
+const int B4DI_ALIGNMENT_CENTER_LEFT		= 7;
+const int B4DI_ALIGNMENT_CENTER_RIGHT		= 8;
+
+const int B4DI_ALIGNMENT_SLOT_ARRAY_SIZE	= 9;
+
 
 //========================================
 // Animation Modes

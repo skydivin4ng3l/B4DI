@@ -1,26 +1,23 @@
 /***********************************\
-         B4DI eBARSList for Aligments
+        B4DI AligmentManager
 \***********************************/
 //========================================
 // [intern] Klasse für PermMem
 //========================================
-class _alleBarsLists {
+class _alignmentManager {
 
-    var int eBarList_Top_Left;      //@zCList<_extendedBar*hndl>
-    var int eBarList_Top_Center;    //@zCList<_extendedBar*hndl>
-    var int eBarList_Top_Right;     //@zCList<_extendedBar*hndl>
+    var int alignmentSlots[B4DI_ALIGNMENT_SLOT_ARRAY_SIZE];         //@zCArray<@zCList<_extendedBar*hndl>>
     
-    var int eBarList_Center_Left;   //@zCList<_extendedBar*hndl>
-    var int eBarList_Center_Center; //@zCList<_extendedBar*hndl>
-    var int eBarList_Center_Right;  //@zCList<_extendedBar*hndl>
+    var int margins_perSlot[B4DI_ALIGNMENT_SLOT_ARRAY_SIZE];        //@zCArray<@zCArray<int>[]>
     
-    var int eBarList_Bottom_Left;   //@zCList<_extendedBar*hndl>
-    var int eBarList_Bottom_Center; //@zCList<_extendedBar*hndl>
-    var int eBarList_Bottom_Right;  //@zCList<_extendedBar*hndl>
+    var int dynamic_sizelimits;                                  // Bool
+    var int x_sizelimit_ofObjects_perSlot[B4DI_ALIGNMENT_SLOT_ARRAY_SIZE]; //@zCArray<int> <-virtual
+    var int y_sizelimit_ofObjects_perSlot[B4DI_ALIGNMENT_SLOT_ARRAY_SIZE]; //@zCArray<int> <-virtual
+
 
 };
 
-instance _alleBarsLists@(_alleBarsLists);
+instance _alignmentManager@(_alignmentManager);
 
 /***********************************\
          B4DI extended BARS
@@ -195,8 +192,8 @@ instance MEM_eBar_XP(_extendedBar);
         eBars Alignment lists
 \***********************************/
 
-var int MEM_alleBarsLists_handle;
-instance MEM_alleBarsLists(_alleBarsLists);
+var int MEM_mainAlignmentManager_handle;
+instance MEM_mainAlignmentManager(_alignmentManager);
 
 /***********************************\
       Selected Inventory Item
