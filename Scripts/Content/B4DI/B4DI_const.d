@@ -56,16 +56,16 @@ const int B4DI_eBAR_NO_REPLACEMENT 		= 0;
 // Margin (benutzt in AlignmentManager)
 //========================================
 
-const int B4DI_ALIGNMENT_MARGIN_USE_DEFAULT			= -1;
-const int B4DI_ALIGNMENT_MARGIN_DEFAULT_VALUE		= 64;
+const int B4DI_ALIGNMENT_MARGIN_USE_DEFAULT				= -1;
+const int B4DI_ALIGNMENT_MARGIN_DEFAULT_VALUE			= 64;
 
-const int B4DI_ALIGNMENT_SLOT_MARGIN_TOP			= 0;
-const int B4DI_ALIGNMENT_SLOT_MARGIN_BOTTOM			= 1;
-const int B4DI_ALIGNMENT_SLOT_MARGIN_LEFT			= 2;
-const int B4DI_ALIGNMENT_SLOT_MARGIN_RIGHT			= 3;
-const int B4DI_ALIGNMENT_SLOT_MARGIN_BETWEENOBJECTS	= 4;
+const int B4DI_ALIGNMENT_SLOT_MARGIN_TOP				= 0;
+const int B4DI_ALIGNMENT_SLOT_MARGIN_BOTTOM				= 1;
+const int B4DI_ALIGNMENT_SLOT_MARGIN_LEFT				= 2;
+const int B4DI_ALIGNMENT_SLOT_MARGIN_RIGHT				= 3;
+const int B4DI_ALIGNMENT_SLOT_MARGIN_Y_BETWEENOBJECTS	= 4;
 
-const int B4DI_ALIGNMENT_SLOT_MARGIN_ARRAY_SIZE		= 5;
+const int B4DI_ALIGNMENT_SLOT_MARGIN_ARRAY_SIZE			= 5;
 
 //========================================
 // Sizelimits (benutzt in AlignmentManager)
