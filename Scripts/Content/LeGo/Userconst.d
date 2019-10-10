@@ -28,8 +28,9 @@ const int ALIGN_TOP    = 3;
 const int ALIGN_BOTTOM = 4;
 
 //========================================
-// Anchor (benutzt in View)
+// Anchor (benutzt in View) anchorPoint_mode
 //========================================
+
 const int ANCHOR_LEFT_TOP 		= 0; //Default
 const int ANCHOR_LEFT_BOTTOM   	= 1;
 const int ANCHOR_RIGHT_TOP 		= 2;

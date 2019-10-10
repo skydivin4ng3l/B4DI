@@ -318,84 +318,6 @@ func void View_Delete(var int hndl) {
 
 
 //========================================
-// Groesse aendern
-//Skaliert einen View auf eine virtuelle Groesse. Dabei bleibt die linke, obere Position des Views fest.
-//========================================
-func void ViewPtr_Resize(var int ptr, var int x, var int y) {
-    var zCView v; v = _^(ptr);
-    if(y < 0) {
-        CALL_IntParam(v.vsizey);
-    }
-    else {
-        CALL_IntParam(y);
-    };
-    if(x < 0) {
-        CALL_IntParam(v.vsizex);
-    }
-    else {
-        CALL_IntParam(x);
-    };
-    CALL__thiscall(ptr, zCView__SetSize);
-
-    v.psizex = Print_ToPixel(v.vsizex, PS_X);
-    v.psizey = Print_ToPixel(v.vsizey, PS_Y);
-};
-
-func void View_Resize(var int hndl, var int x, var int y) {
-    ViewPtr_Resize(getPtr(hndl), x, y);
-};
-
-//========================================
-// Groesse aendern (pxl)
-//========================================
-func void ViewPtr_ResizePxl(var int ptr, var int x, var int y) {
-    ViewPtr_Resize(ptr, Print_ToVirtual(x, PS_X), Print_ToVirtual(y, PS_Y));
-};
-func void View_ResizePxl(var int hndl, var int x, var int y) {
-    ViewPtr_ResizePxl(getPtr(hndl), x, y);
-};
-
-//========================================
-// Groesse mit ScreenSpace oder customsize limitieren
-//========================================
-func void ViewPtr_ResizeToScreenSpaceLimits( var int ptr, var int x_size_customLimit, var int y_size_customLimit ) {
-    // No negative Size Limits 
-    var int x_vmax; var int y_vmax;
-    x_vmax = PS_VMAX;
-    y_vmax = PS_VMAX;
-
-    if (x_size_customLimit >= 0) {
-        x_vmax = min( x_size_customLimit, PS_VMAX );    
-    };
-    if (y_size_customLimit >= 0 ) {
-        y_vmax = min( y_size_customLimit, PS_VMAX );    
-    };
-
-    var zCView v; v = _^(ptr);
-    var int new_vsizex; new_vsizex = v.vsizex;
-    var int new_vsizey; new_vsizey = v.vsizey;
-    var int needsResizing; needsResizing = false;
-
-    if ( x_vmax < new_vsizex && (x_size_customLimit > VIEW_NO_SIZE_LIMIT) ) {
-        new_vsizex = min( x_vmax, new_vsizex );
-        needsResizing = true;
-    };
-
-    if ( y_vmax < new_vsizey  && (y_size_customLimit > VIEW_NO_SIZE_LIMIT) ) {
-        new_vsizey = min(  y_vmax, new_vsizey );
-        needsResizing = true;
-    };
-
-    if ( needsResizing ) {
-        ViewPtr_Resize( ptr, new_vsizex, new_vsizey );
-    };
-};
-
-func void View_ResizeToScreenSpaceLimits( var int hndl, var int x_size_customLimit, var int y_size_customLimit ) {
-    ViewPtr_ResizeToScreenSpaceLimits( getPtr(hndl), x_size_customLimit, y_size_customLimit );
-};
-
-//========================================
 // Bewegen
 //========================================
 func void ViewPtr_Move(var int ptr, var int x, var int y) {
@@ -476,6 +398,145 @@ func void View_MoveToPxlValidScreen(var int hndl, var int x, var int y) {
     ViewPtr_MoveToPxlValidScreen(getPtr(hndl), x, y);
 };
 
+//===============================================
+// MoveTo advanced anchor/validscreenSpace based
+//===============================================
+func void ViewPtr_MoveToAdvanced(var int ptr, var int x, var int y, var int anchorPoint_mode, var int validScreenSpace) {
+    var zCView v; v = _^(ptr);
+    var int sizex_pre; var int sizey_pre; 
+    
+    sizex_pre          = v.vsizex;
+    sizey_pre          = v.vsizey;
+    
+    var int posx_new; posx_new = x;
+    var int posy_new; posy_new = y;
+
+    if ( anchorPoint_mode == ANCHOR_LEFT_TOP ) {
+        //Default
+    } else if ( anchorPoint_mode == ANCHOR_RIGHT_TOP || anchorPoint_mode == ANCHOR_RIGHT_BOTTOM ) {
+        posx_new = x - sizex_pre;
+
+    } else if ( anchorPoint_mode >= ANCHOR_CENTER ) {
+        posx_new = x - ( sizex_pre )/2;
+        posy_new = y - ( sizey_pre )/2;
+
+        if ( anchorPoint_mode == ANCHOR_CENTER_LEFT ) {
+            posx_new = x;
+
+        } else if ( anchorPoint_mode == ANCHOR_CENTER_RIGHT ) {
+            posx_new = x - sizex_pre;
+
+        } else if ( anchorPoint_mode == ANCHOR_CENTER_TOP ){
+            posy_new = y;
+        };
+    };
+
+    if ( anchorPoint_mode == ANCHOR_LEFT_BOTTOM || anchorPoint_mode == ANCHOR_RIGHT_BOTTOM || anchorPoint_mode == ANCHOR_CENTER_BOTTOM ) {
+        posy_new = y - sizey_pre;
+    };
+
+    if(validScreenSpace) {
+        ViewPtr_MoveToValidScreenSpace(ptr, posx_new, posy_new );
+    } else {
+        ViewPtr_MoveTo(ptr, posx_new, posy_new);
+    };
+
+
+};
+
+func void View_MoveToAdvanced(var int hndl, var int x, var int y, var int anchorPoint_mode, var int validScreenSpace) {
+    ViewPtr_MoveToAdvanced(getPrt(hndl), x, y, anchorPoint_mode, validScreenSpace);
+};
+
+func void View_MoveToAdvancedPxl(var int ptr, var int x, var int y, var int anchorPoint_mode, var int validScreenSpace) {
+    x = Print_ToVirtual(x, PS_X);
+    y = Print_ToVirtual(y, PS_Y);
+    ViewPtr_MoveToAdvanced(ptr, x, y, anchorPoint_mode, validScreenSpace);
+};
+
+func void View_MoveToAdvancedPxl(var int hndl, var int x, var int y, var int anchorPoint_mode, var int validScreenSpace) {
+    ViewPtr_MoveToAdvancedPxl(getPrt(hndl), x, y, anchorPoint_mode, validScreenSpace);
+};
+
+//========================================
+// Groesse aendern
+//Skaliert einen View auf eine virtuelle Groesse. Dabei bleibt die linke, obere Position des Views fest.
+//========================================
+func void ViewPtr_Resize(var int ptr, var int x, var int y) {
+    var zCView v; v = _^(ptr);
+    if(y < 0) {
+        CALL_IntParam(v.vsizey);
+    }
+    else {
+        CALL_IntParam(y);
+    };
+    if(x < 0) {
+        CALL_IntParam(v.vsizex);
+    }
+    else {
+        CALL_IntParam(x);
+    };
+    CALL__thiscall(ptr, zCView__SetSize);
+
+    v.psizex = Print_ToPixel(v.vsizex, PS_X);
+    v.psizey = Print_ToPixel(v.vsizey, PS_Y);
+};
+
+func void View_Resize(var int hndl, var int x, var int y) {
+    ViewPtr_Resize(getPtr(hndl), x, y);
+};
+
+//========================================
+// Groesse aendern (pxl)
+//========================================
+func void ViewPtr_ResizePxl(var int ptr, var int x, var int y) {
+    ViewPtr_Resize(ptr, Print_ToVirtual(x, PS_X), Print_ToVirtual(y, PS_Y));
+};
+func void View_ResizePxl(var int hndl, var int x, var int y) {
+    ViewPtr_ResizePxl(getPtr(hndl), x, y);
+};
+
+
+//========================================
+// Groesse mit ScreenSpace oder customsize limitieren
+//========================================
+func void ViewPtr_LimitSizeToScreenSpaceLimits( var int ptr, var int x_size_customLimit, var int y_size_customLimit ) {
+    // No negative Size Limits 
+    var int x_vmax; var int y_vmax;
+    x_vmax = PS_VMAX;
+    y_vmax = PS_VMAX;
+
+    if (x_size_customLimit >= 0) {
+        x_vmax = min( x_size_customLimit, PS_VMAX );    
+    };
+    if (y_size_customLimit >= 0 ) {
+        y_vmax = min( y_size_customLimit, PS_VMAX );    
+    };
+
+    var zCView v; v = _^(ptr);
+    var int new_vsizex; new_vsizex = v.vsizex;
+    var int new_vsizey; new_vsizey = v.vsizey;
+    var int needsResizing; needsResizing = false;
+
+    if ( x_vmax < new_vsizex && (x_size_customLimit > VIEW_NO_SIZE_LIMIT) ) {
+        new_vsizex = min( x_vmax, new_vsizex );
+        needsResizing = true;
+    };
+
+    if ( y_vmax < new_vsizey  && (y_size_customLimit > VIEW_NO_SIZE_LIMIT) ) {
+        new_vsizey = min(  y_vmax, new_vsizey );
+        needsResizing = true;
+    };
+
+    if ( needsResizing ) {
+        ViewPtr_Resize( ptr, new_vsizex, new_vsizey );
+    };
+};
+
+func void View_LimitSizeToScreenSpaceLimits( var int hndl, var int x_size_customLimit, var int y_size_customLimit ) {
+    ViewPtr_LimitSizeToScreenSpaceLimits( getPtr(hndl), x_size_customLimit, y_size_customLimit );
+};
+
 //========================================
 // Change Size depending on anchorPoint_mode and if view should remain completly within the screen 
 //========================================
@@ -538,7 +599,7 @@ func void ViewPtr_ResizeAdvanced(var int ptr, var int x, var int y, var int anch
     };
 
     if(validScreenSpace) {
-        ViewPtr_ResizeToScreenSpaceLimits(ptr, x_size_limit, y_size_limit);
+        ViewPtr_LimitSizeToScreenSpaceLimits(ptr, x_size_limit, y_size_limit);
         ViewPtr_MoveToValidScreenSpace(ptr, posx_new, posy_new );
     } else {
         ViewPtr_MoveTo(ptr, posx_new, posy_new);

@@ -116,6 +116,19 @@ func void Bar_storePosSize(var int bar_hndl){
     //B4DI_debugSpy("Bar SizeY",IntToString(v.vsizey));
     
 };
+//========================================
+// [AlignmentManager Helper]Get initial vsize per axis
+//========================================
+func int Bar_GetSize(var int bar_hndl, var int axis) {
+    if(!Hlp_IsValidHandle(bar_hndl)) { return; };
+    var _bar bar; bar = get(bar_hndl);
+
+    if (axis == PS_X) {
+        return bar.initVSizes[IDS_VBACK_X];
+    } else if(axis == PS_Y) {
+        return bar.initVSizes[IDS_VBACK_Y];
+    };
+};
 
 //========================================
 // Höchstwert setzen
@@ -449,6 +462,7 @@ func void Bar_Show(var int bar) {
 //========================================
 // Bar Center bewegen 
 //========================================
+//TODO MoveTo advanced depending on anchors/custom
 func void Bar_MoveTo(var int bar, var int x, var int y) {
 	if(!Hlp_IsValidHandle(bar)) { return; };
 	var _bar b; b = get(bar);
