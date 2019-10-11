@@ -62,6 +62,8 @@ func void B4DI_xpBar_InitAlways(){
 };
 
 func void B4DI_xpBar_InitOnce(){
+	HookDaedalusFuncS("B_GivePlayerXP", "B4DI_xpBar_update"); 						// B4DI_xpBar_update(var int add_xp)
+
 	MEM_Info("B4DI_xpBar_InitOnce");
 
 };

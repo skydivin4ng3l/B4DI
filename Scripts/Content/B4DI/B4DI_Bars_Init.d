@@ -15,7 +15,7 @@ func void B4DI_Bars_InitOnce() {
 	B4DI_xpBar_InitOnce();
 
 	
-	HookDaedalusFuncS("B_GivePlayerXP", "B4DI_xpBar_update"); 						// B4DI_xpBar_update(var int add_xp)
+
 	//MEM_Game.pause_screen as a TODO condition
 	HookEngine(cGameManager__ApplySomeSettings_rtn, 6, "B4DI_Bars_applySettings");  // B4DI_Bars_applySettings()
 	HookEngine(oCNpc__OpenScreen_Status, 7 , "B4DI_OpenScreen_Status"); 					// B4DI_xpBar_show()
