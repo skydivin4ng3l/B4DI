@@ -74,8 +74,10 @@ const int B4DI_ALIGNMENT_SLOT_MARGIN_ARRAY_SIZE			= 5;
 const int B4DI_ALIGNMENT_SLOT_OBJECTSIZE_NO_LIMIT  	= -1;
 
 //========================================
-// Aligmentlists (benutzt in AlignmentManager) This should mirror the Anchors of Bars
+// Aligment Slot Lists (benutzt in AlignmentManager) This should mirror the Anchors of Bars
 //========================================
+const int B4DI_ALIGNMENT_USE_ANCHOR			= -1; //usable to add Object to suitable Slot based on its anchorpoint
+
 const int B4DI_ALIGNMENT_LEFT_TOP			= 0; //Default
 const int B4DI_ALIGNMENT_LEFT_BOTTOM		= 1;
 const int B4DI_ALIGNMENT_RIGHT_TOP			= 2;

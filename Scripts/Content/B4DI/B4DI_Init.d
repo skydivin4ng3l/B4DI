@@ -32,6 +32,7 @@ func int B4DI_InitOnce() {
 };
 
 func void B4DI_InitAlways(){
+    B4DI_AlignmentManager_InitAlways();
     B4DI_Bars_InitAlways();
 };
 

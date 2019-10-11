@@ -222,6 +222,10 @@ func void B4DI_Bars_applySettings() {
 		B4DI_XpBar_calcXp();
 	};
 
+	//if( Hlp_IsValidHandle(MEM_mainAlignmentManager_handle) ){
+	//	B4DI_AlignmentManager_UpdateAllSlots( MEM_mainAlignmentManager_handle );
+	//};
+
 	MEM_Info("B4DI_Bars_applySettings");
 };
 

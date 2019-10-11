@@ -6,17 +6,30 @@
 //========================================
 class _alignmentManager {
 
-    var int alignmentSlots[B4DI_ALIGNMENT_SLOT_ARRAY_SIZE];                //@zCArray<@zCList<_extendedBar*hndl>>
+    var int alignmentSlots[B4DI_ALIGNMENT_SLOT_ARRAY_SIZE];                //@zCArray<@zCList<_alignmentObject*hndl>>
     
     var int margins_perSlot[B4DI_ALIGNMENT_SLOT_ARRAY_SIZE];               //@zCArray<@zCArray<int>[B4DI_ALIGNMENT_SLOT_MARGIN_ARRAY_SIZE]>
     
     // TODO var int dynamic_sizelimits;                                            // Bool
     var int sizelimits_ofObjects_perSlot[B4DI_ALIGNMENT_SLOT_ARRAY_SIZE];  //@zCArray<@zCArray<int>[2]> <-virtual
 
-
 };
 
 instance _alignmentManager@(_alignmentManager);
+
+//========================================
+// [intern] Klasse für PermMem
+//========================================
+class _alignmentObject {
+
+    var int objectHandle;                //obj*hndl
+    
+    var int updateHandler;               //function ID which will be called to update the position (and size) of the obj_hndl
+    var int getSizeHandler;              //function ID which will be called to get the size of the obj_hndl
+    
+};
+
+instance _alignmentObject@(_alignmentObject);
 
 /***********************************\
          B4DI extended BARS

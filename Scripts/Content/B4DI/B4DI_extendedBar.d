@@ -100,19 +100,49 @@ func int B4DI_eBar_GetNpcRef(var int eBar_hndl) {
 };
 
 //========================================
+//  eBar Update Bar InitPositions for Animations
+//========================================
+//Actually only needed if sizelimit is exceeded
+func void B4DI_eBar_Bar_StorePosSize( var int eBar_hndl ) {
+    if(!Hlp_IsValidHandle(eBar_hndl)) { MEM_Warn("B4DI_eBar_Bar_StorePosSize failed: invalid eBar_hndl"); return; };
+    var _extendedBar eBar; eBar = get( eBar_hndl );
+    Bar_storePosSize(eBar.bar);
+};
+
+//========================================
+//  eBar Get Size per Axis
+//========================================
+func int B4DI_eBar_Bar_GetSize( var int eBar_hndl, var int axis ) {
+    if(!Hlp_IsValidHandle(eBar_hndl)) { MEM_Warn("B4DI_eBar_Bar_GetSize failed: invalid eBar_hndl"); return 0; };
+    var _extendedBar eBar; eBar = get( eBar_hndl );
+    
+    return Bar_GetSize(eBar.bar, axis);
+};
+
+
+//========================================
 // eBar add to alignment lists
 //========================================
-func void B4DI_eBar_AddToAligmentlist(var int eBar_hndl) {
-    if(!Hlp_IsValidHandle(eBar_hndl)) { MEM_Warn("B4DI_eBar_AddToAligmentlist failed: invalid eBar_hndl"); return; };
-    var _extendedBar eBar; eBar = get(eBar_hndl);
+func void B4DI_eBar_AddToAlignmentSlot( var int eBar_hndl, var int alignmentSlot ) {
+    MEM_Info("B4DI_eBar_AddToAlignmentSlot started");
+    if(!Hlp_IsValidHandle(eBar_hndl)) { MEM_Warn("B4DI_eBar_AddToAlignmentSlot failed: invalid eBar_hndl"); return; };
+    var _extendedBar eBar; eBar = get( eBar_hndl );
+    if (alignmentSlot == B4DI_ALIGNMENT_USE_ANCHOR) {
+        alignmentSlot = Bar_GetAnchor(eBar.bar);
+    };
+    B4DI_AlignmentManager_AddToSlot(MEM_mainAlignmentManager_handle, alignmentSlot, eBar_hndl, B4DI_eBar_AlignmentManager_Updatehandler, B4DI_eBar_Bar_GetSize );
     
-
+    //B4DI_eBar_Bar_StorePosSize(eBar_hndl);
+    //this will break dynScaling of initValues and maybe not necessay until sizelimits are introduced correctly
+    //interbar margins will remain the same although pos may change
+    MEM_Info("B4DI_eBar_AddToAlignmentSlot finished");
 };
+
 
 //========================================
 // eBar Create
 //========================================
-//TODO Fix initial position after creation?
+//TODO Fix initial position after creation? -> Cause maybe that creation gets called to early and widescreen pos fix may come too late.
 func int B4DI_eBar_CreateCustomXY(var int Bar_constructor_instance, var int left_vposx, var int top_vposy ) {
     var int new_eBar_hndl; new_eBar_hndl = new(_extendedBar@);
     var _extendedBar eBar; eBar = get(new_eBar_hndl);
@@ -138,7 +168,8 @@ func int B4DI_eBar_CreateCustomXY(var int Bar_constructor_instance, var int left
     eBar.isFadedOut = 1;
 
     eBar.npcRef = 0;
-
+    //TODO add alignmentSlot as parameter with default
+    //B4DI_eBar_AddToAlignmentSlot(new_eBar_hndl, Bar_GetAnchor(eBar.bar));
     MEM_Info("B4DI_eBar_CreateCustomXY finished <----------------------------"); 
     return new_eBar_hndl;
 };
@@ -149,7 +180,7 @@ func int B4DI_eBar_CreateAsReplacement(var int Bar_constructor_instance, var int
     var int new_vposx; new_vposx = -1;    
     var int new_vposy; new_vposy = -1;
 
-    if(oCViewStatusBar_ptr) {
+    if(oCViewStatusBar_ptr != B4DI_eBAR_NO_REPLACEMENT) {
         var oCViewStatusBar oBar; oBar = MEM_PtrToInst(oCViewStatusBar_ptr);
         //B4DI_originalBar_hide(oCViewStatusBar_ptr); //needs to be called in int always
         new_vposx = oBar.zCView_vposx;
@@ -381,8 +412,12 @@ func void B4DI_eBar_SetPreviewChangesMaximum(var int eBar_hndl){
 func void B4DI_Bar_SetValuesBasic(var int bar_hndl, var int value, var int valueMax) {
     if( !Hlp_IsValidHandle(bar_hndl) ) { MEM_Warn("B4DI_Bar_SetValuesBasic failed"); return; };
     
-    Bar_SetMax(bar_hndl, valueMax);
-    Bar_SetValue(bar_hndl, value);
+    if( value == BAR_REFRESH_NO_CHANGE || valueMax == BAR_REFRESH_NO_CHANGE) {
+        Bar_SetValue(bar_hndl, BAR_REFRESH_NO_CHANGE);
+    } else {
+        Bar_SetMax(bar_hndl, valueMax);
+        Bar_SetValue(bar_hndl, value);
+    };
 };
 
 
@@ -424,8 +459,11 @@ func void B4DI_eBar_SetValuesAttributeBased(var int eBar_hndl, var int index_val
         return;
     };
         //MEM_Info("B4DI_eBar_SetValuesAttributeBased");
-
-    B4DI_eBar_SetValuesBasic( eBar_hndl, MEM_ReadStatArr(npcRef_inst.attribute, index_value), MEM_ReadStatArr(npcRef_inst.attribute, index_valueMax) );    
+    if( index_value == BAR_REFRESH_NO_CHANGE || index_valueMax == BAR_REFRESH_NO_CHANGE) {
+        B4DI_eBar_SetValuesBasic( eBar_hndl, BAR_REFRESH_NO_CHANGE, BAR_REFRESH_NO_CHANGE );    
+    } else {
+        B4DI_eBar_SetValuesBasic( eBar_hndl, MEM_ReadStatArr(npcRef_inst.attribute, index_value), MEM_ReadStatArr(npcRef_inst.attribute, index_valueMax) );    
+    }; 
     
 };
 
@@ -541,6 +579,33 @@ func void B4DI_eBar_RefreshAnimated(var int eBar_hndl, var int index_value, var 
 
 func void B4DI_eBar_Refresh(var int eBar_hndl, var int index_value, var int index_valueMax) {
     B4DI_eBar_RefreshAnimated( eBar_hndl, index_value, index_valueMax, false);
+};
+
+func void B4DI_eBar_RefreshWithoutChange(var int eBar_hndl) {
+    B4DI_eBar_RefreshAnimated( eBar_hndl, BAR_REFRESH_NO_CHANGE, BAR_REFRESH_NO_CHANGE, false);
+};
+
+//========================================
+// [intern] eBar MoveTo part of updatehandler
+//========================================
+func void B4DI_eBar_MoveTo( var int eBar_hndl, var int x, var int y, var int anchorPoint_mode ) {
+    if(!Hlp_IsValidHandle(eBar_hndl)) { MEM_Warn("B4DI_eBar_MoveTo failed"); return; };
+    var _extendedBar eBar; eBar = get(eBar_hndl);
+    if (anchorPoint_mode == B4DI_ALIGNMENT_USE_ANCHOR) {
+        var _bar b; b = get(eBar.bar);
+        anchorPoint_mode = b.anchorPoint_mode;
+    };
+    Bar_MoveToAdvanced(eBar.bar, x, y, anchorPoint_mode, VALIDSCREENSPACE);
+
+};
+
+func void B4DI_eBar_AlignmentManager_Updatehandler( var int eBar_hndl, var int x, var int y, var int anchorPoint_mode ) {
+    if(!Hlp_IsValidHandle(eBar_hndl)) { MEM_Warn("B4DI_eBar_AlignmentManager_Updatehandler failed"); return; };
+    var _extendedBar eBar; eBar = get(eBar_hndl);
+
+    B4DI_eBar_MoveTo(eBar_hndl, x, y, anchorPoint_mode);
+    //TODO SIZE
+    B4DI_eBar_RefreshWithoutChange(eBar_hndl);
 };
 
 func void B4DI_Bars_SetLabelTop(var int eBar_hndl) {
