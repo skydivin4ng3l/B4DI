@@ -445,17 +445,34 @@ func void ViewPtr_MoveToAdvanced(var int ptr, var int x, var int y, var int anch
 };
 
 func void View_MoveToAdvanced(var int hndl, var int x, var int y, var int anchorPoint_mode, var int validScreenSpace) {
-    ViewPtr_MoveToAdvanced(getPrt(hndl), x, y, anchorPoint_mode, validScreenSpace);
+    ViewPtr_MoveToAdvanced(getPtr(hndl), x, y, anchorPoint_mode, validScreenSpace);
 };
 
-func void View_MoveToAdvancedPxl(var int ptr, var int x, var int y, var int anchorPoint_mode, var int validScreenSpace) {
+func void ViewPtr_MoveToAdvancedPxl(var int ptr, var int x, var int y, var int anchorPoint_mode, var int validScreenSpace) {
     x = Print_ToVirtual(x, PS_X);
     y = Print_ToVirtual(y, PS_Y);
     ViewPtr_MoveToAdvanced(ptr, x, y, anchorPoint_mode, validScreenSpace);
 };
 
 func void View_MoveToAdvancedPxl(var int hndl, var int x, var int y, var int anchorPoint_mode, var int validScreenSpace) {
-    ViewPtr_MoveToAdvancedPxl(getPrt(hndl), x, y, anchorPoint_mode, validScreenSpace);
+    ViewPtr_MoveToAdvancedPxl(getPtr(hndl), x, y, anchorPoint_mode, validScreenSpace);
+};
+
+//========================================
+// View GetSize per Axis
+//========================================
+func int ViewPtr_GetSize( var int ptr, var int axis ) {
+    var zCView v; v = _^(ptr);
+    if(axis == PS_X) { return v.vsizex; };
+    if(axis == PS_Y) { return v.vsizey; };
+
+    MEM_Warn("ViewPtr_GetSize failed");
+
+    return 0;
+};
+
+func int View_GetSize( var int hndl, var int axis ) {
+    ViewPtr_GetSize( getPtr(hndl), axis );
 };
 
 //========================================

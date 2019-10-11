@@ -27,19 +27,21 @@ const int ALIGN_RIGHT  = 2;
 const int ALIGN_TOP    = 3;
 const int ALIGN_BOTTOM = 4;
 
+
 //========================================
 // Anchor (benutzt in View) anchorPoint_mode
 //========================================
+const int ANCHOR_USE_OBJECTS_ANCHOR	= -1;
 
-const int ANCHOR_LEFT_TOP 		= 0; //Default
-const int ANCHOR_LEFT_BOTTOM   	= 1;
-const int ANCHOR_RIGHT_TOP 		= 2;
-const int ANCHOR_RIGHT_BOTTOM	= 3;
-const int ANCHOR_CENTER    		= 4;
-const int ANCHOR_CENTER_TOP		= 5;
-const int ANCHOR_CENTER_BOTTOM	= 6;
-const int ANCHOR_CENTER_LEFT	= 7;
-const int ANCHOR_CENTER_RIGHT	= 8;
+const int ANCHOR_LEFT_TOP			= 0; //Default
+const int ANCHOR_LEFT_BOTTOM		= 1;
+const int ANCHOR_RIGHT_TOP			= 2;
+const int ANCHOR_RIGHT_BOTTOM		= 3;
+const int ANCHOR_CENTER				= 4;
+const int ANCHOR_CENTER_TOP			= 5;
+const int ANCHOR_CENTER_BOTTOM		= 6;
+const int ANCHOR_CENTER_LEFT		= 7;
+const int ANCHOR_CENTER_RIGHT		= 8;
 
 //========================================
 // ValidScreenSpace (benutzt in View)
@@ -85,8 +87,12 @@ const int PS_Y = 1;
 const int PS_VMax = 8192;
 
 //========================================
-// Bars Extened
+// Bars (Extened)
 //========================================
+//for refresh of current set value/Max
+const int BAR_REFRESH_NO_CHANGE = -1;
+const int BAR_SIZE_LOCK_X_AXIS = -1;
+const int BAR_SIZE_LOCK_Y_AXIS = -1;
 
 //Access for initialDynamicVSize Array
 const int IDS_VBACK_X = 0;

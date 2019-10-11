@@ -84,7 +84,7 @@ func void _bar_Delete(var _bar b) {
 //========================================
 // [intern] Helper store VPos and VSize as reference for scale/position based animations
 //========================================
-
+//TODO protect write of values from active animations
 func void Bar_storePosSize(var int bar_hndl){
     if(!Hlp_IsValidHandle(bar_hndl)) { return; };
     var _bar b; b = get(bar_hndl);
@@ -119,8 +119,9 @@ func void Bar_storePosSize(var int bar_hndl){
 //========================================
 // [AlignmentManager Helper]Get initial vsize per axis
 //========================================
+// Do Not use View_GetSize( var int hndl, var int axis ) instead cause Animation may has influence
 func int Bar_GetSize(var int bar_hndl, var int axis) {
-    if(!Hlp_IsValidHandle(bar_hndl)) { return; };
+    if(!Hlp_IsValidHandle(bar_hndl)) { return 0; };
     var _bar bar; bar = get(bar_hndl);
 
     if (axis == PS_X) {
@@ -136,6 +137,10 @@ func int Bar_GetSize(var int bar_hndl, var int axis) {
 func void Bar_SetMax(var int bar, var int max) {
     if(!Hlp_IsValidHandle(bar)) { return; };
     var _bar b; b = get(bar);
+    // ignore max change - keep current max
+    if(max == BAR_REFRESH_NO_CHANGE) {
+        return;
+    };
     b.valMax = max;
     //MEM_Info(cs2("Bar_SetMax: ",i2s(max)));
 };
@@ -147,7 +152,12 @@ func void Bar_SetPromille(var int bar, var int pro) {
     if(!Hlp_IsValidHandle(bar)) { return; };
     var _bar b; b = get(bar);
     if(pro > 1000) { pro = 1000; };
-    View_Resize(b.v1, (pro * b.barW) / 1000, -1);
+    if(pro == BAR_REFRESH_NO_CHANGE) {
+        pro = (b.val * 1000) / b.valMax;
+        View_Resize(b.v1, (pro * b.barW) / 1000, BAR_SIZE_LOCK_Y_AXIS);
+        return;
+    };
+    View_Resize(b.v1, (pro * b.barW) / 1000, BAR_SIZE_LOCK_Y_AXIS);
     b.val = (pro * b.valMax) / 1000; //to keep both valMax | val in the same space
 };
 
@@ -157,6 +167,10 @@ func void Bar_SetPromille(var int bar, var int pro) {
 func void Bar_SetPercent(var int bar, var int perc) {
     if(!Hlp_IsValidHandle(bar)) { return; };
     var _bar b; b = get(bar);
+    if(perc == BAR_REFRESH_NO_CHANGE) {
+        Bar_SetPromille(bar, BAR_REFRESH_NO_CHANGE);
+        return;        
+    };
     Bar_SetPromille(bar, perc*10);
     b.val = (perc * 1000 * b.valMax) / 1000; 
 };
@@ -167,6 +181,10 @@ func void Bar_SetPercent(var int bar, var int perc) {
 func void Bar_SetValue(var int bar, var int val) {
     if(!Hlp_IsValidHandle(bar)) { return; };
     var _bar b; b = get(bar);
+    if(val == BAR_REFRESH_NO_CHANGE) {
+        Bar_SetPromille(bar, BAR_REFRESH_NO_CHANGE);
+        return;        
+    };
     if(val) {
         Bar_SetPromille(bar, (val * 1000) / b.valMax);
         b.val = val;
@@ -460,9 +478,50 @@ func void Bar_Show(var int bar) {
 };
 
 //========================================
+// Bar MoveToAdvanced anchorPoint_mode / validScreenSpace based 
+//========================================
+func void Bar_MoveToAdvanced( var int bar_hndl, var int x, var int y, var int anchorPoint_mode, var int validScreenSpace ) {
+    if(!Hlp_IsValidHandle(bar_hndl)) { return; };
+    var _bar b; b = get(bar_hndl);
+    var zCView vBack; vBack = View_Get(b.v0);
+    var zCView vBar; vBar = View_Get(b.v1);
+    
+    if( anchorPoint_mode == ANCHOR_USE_OBJECTS_ANCHOR ) {
+        anchorPoint_mode = Bar_GetAnchor(bar_hndl);  
+    };
+
+    View_MoveToAdvanced( b.v0 , x, y, anchorPoint_mode, validScreenSpace );
+
+    var int base_TopMargin; 
+    var int base_BottomMargin; 
+    var int base_LeftMargin; 
+    var int base_RightMargin;
+
+    base_TopMargin    = mkf( vBar.vposy - vBack.vposy );
+    base_RightMargin  = mkf( (vBar.vposx + vBar.vsizex) - (vBack.vposx  + vBack.vsizex) );
+    base_BottomMargin = mkf( (vBar.vposy + vBar.vsizey) - (vBack.vposy + vBack.vsizey) );
+    base_LeftMargin   = mkf( vBar.vposx - vBack.vposx );
+
+    View_SetMargin( b.vMiddle, b.v0, ALIGN_CENTER, base_TopMargin, base_RightMargin, base_BottomMargin, base_LeftMargin ); 
+    View_SetMargin( b.v1     , b.v0, ALIGN_CENTER, base_TopMargin, base_RightMargin, base_BottomMargin, base_LeftMargin ); 
+    View_SetMargin( b.vLabel , b.v0, ALIGN_CENTER, base_TopMargin, base_RightMargin, base_BottomMargin, base_LeftMargin ); 
+
+};
+
+//========================================
+// Bar AnchorPoint bewegen 
+//========================================
+func void Bar_Anchor_MoveTo( var int bar_hndl, var int x, var int y ) {
+    Bar_MoveToAdvanced( bar_hndl, x, y, ANCHOR_USE_OBJECTS_ANCHOR, NON_VALIDSCREENSPACE);
+};
+
+func void Bar_Anchor_MoveToValidScreenSpace( var int bar_hndl, var int x, var int y ) {
+    Bar_MoveToAdvanced( bar_hndl, x, y, ANCHOR_USE_OBJECTS_ANCHOR, VALIDSCREENSPACE);
+};
+
+//========================================
 // Bar Center bewegen 
 //========================================
-//TODO MoveTo advanced depending on anchors/custom
 func void Bar_MoveTo(var int bar, var int x, var int y) {
 	if(!Hlp_IsValidHandle(bar)) { return; };
 	var _bar b; b = get(bar);
@@ -477,38 +536,49 @@ func void Bar_MoveTo(var int bar, var int x, var int y) {
     View_Move( b.vLabel , x, y );
 };
 
+
+func void Bar_MoveToCenter( var int bar_hndl, var int x, var int y ) {
+    Bar_MoveToAdvanced( bar_hndl, x, y, ANCHOR_CENTER, NON_VALIDSCREENSPACE );
+};
+
+
+func void Bar_MoveToCenterValidScreenSpace( var int bar_hndl, var int x, var int y ) {
+    Bar_MoveToAdvanced( bar_hndl, x, y, ANCHOR_CENTER, VALIDSCREENSPACE );
+};
+
 //========================================
 // Bar Linke Obere Ecke bewegen 
 //========================================
 
-func void Bar_MoveLeftUpperTo(var int bar, var int x, var int y) {
-    if(!Hlp_IsValidHandle(bar)) { return; };
-    var _bar b; b = get(bar);
-    var zCView v; v = View_Get(b.v0);
-    View_MoveTo( b.v0     , x, y );
-    View_MoveTo( b.vMiddle, x, y );
-    View_MoveTo( b.v1     , x, y );
-    View_MoveTo( b.vLabel , x, y );
+func void Bar_MoveLeftUpperTo(var int bar_hndl, var int x, var int y) {
+    //if(!Hlp_IsValidHandle(bar)) { return; };
+    //var _bar b; b = get(bar);
+    //var zCView v; v = View_Get(b.v0);
+    //View_MoveTo( b.v0     , x, y );
+    //View_MoveTo( b.vMiddle, x, y );
+    //View_MoveTo( b.v1     , x, y );
+    //View_MoveTo( b.vLabel , x, y );
+    Bar_MoveToAdvanced( bar_hndl, x, y, ANCHOR_LEFT_TOP, NON_VALIDSCREENSPACE );
 };
 
 //========================================
 // Bar Linke Obere Ecke bewegen innerhalb Valid Screenspace
 //========================================
 
-func void Bar_MoveLeftUpperToValidScreenSpace(var int bar, var int x, var int y) {
-    if(!Hlp_IsValidHandle(bar)) { return; };
-    var _bar b; b = get(bar);
-    var zCView vBack; vBack  = View_Get(b.v0);
-    var zCView vBar; vBar    = View_Get(b.v1);
-    var int barTop; barTop   = vBar.vposy - vBack.vposy ;
-    var int barLeft; barLeft = vBar.vposx - vBack.vposx;
+func void Bar_MoveLeftUpperToValidScreenSpace(var int bar_hndl, var int x, var int y) {
+    //if(!Hlp_IsValidHandle(bar)) { return; };
+    //var _bar b; b = get(bar);
+    //var zCView vBack; vBack  = View_Get(b.v0);
+    //var zCView vBar; vBar    = View_Get(b.v1);
+    //var int barTop; barTop   = vBar.vposy - vBack.vposy ;
+    //var int barLeft; barLeft = vBar.vposx - vBack.vposx;
 
-    View_MoveToValidScreenSpace(b.v0, x, y);
-    //to keep the margin valid if movement would surpass screen border
-    View_MoveTo( b.vMiddle, vBack.vposx + barLeft, vBack.vposy + barTop );
-    View_MoveTo( b.v1     , vBack.vposx + barLeft, vBack.vposy + barTop );
-    View_MoveTo( b.vLabel , vBack.vposx + barLeft, vBack.vposy + barTop );
-    
+    //View_MoveToValidScreenSpace(b.v0, x, y);
+    ////to keep the margin valid if movement would surpass screen border
+    //View_MoveTo( b.vMiddle, vBack.vposx + barLeft, vBack.vposy + barTop );
+    //View_MoveTo( b.v1     , vBack.vposx + barLeft, vBack.vposy + barTop );
+    //View_MoveTo( b.vLabel , vBack.vposx + barLeft, vBack.vposy + barTop );
+    Bar_MoveToAdvanced( bar_hndl, x, y, ANCHOR_LEFT_TOP, VALIDSCREENSPACE );
 };
 
 //========================================
