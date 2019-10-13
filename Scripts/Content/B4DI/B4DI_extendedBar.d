@@ -72,7 +72,7 @@ func void B4DI_eBar_SetAlpha(var int eBar_hndl, var int alpha) {
     var _bar bar; bar = get(eBar.bar);
 
     View_SetAlpha(bar.v0, alpha);
-    View_SetAlpha(bar.vMiddle, alpha);
+    View_SetAlpha(bar.vRange, alpha);
     View_SetAlpha(bar.v1, alpha);
     View_SetAlphaAll(bar.vLabel, alpha);
     
@@ -294,7 +294,7 @@ func void B4DI_eBar_RefreshLabel(var int eBar_hndl) {
     var _extendedBar eBar; eBar = get(eBar_hndl);
     
     var _bar bar; bar = get(eBar.bar);
-    //var zCView vLabel; vLabel = View_Get(bar.vMiddle);
+    //var zCView vLabel; vLabel = View_Get(bar.vRange);
     var string label; label = B4DI_eBar_generateLabelTextSimple(eBar_hndl);
 
     //var int lLenght; lLenght = Print_ToVirtual( Print_GetStringWidth(label, B4DI_LABEL_FONT), PS_X );
@@ -304,8 +304,8 @@ func void B4DI_eBar_RefreshLabel(var int eBar_hndl) {
     //var int yPos; yPos = (PS_VMAX / 2) - ( Print_ToVirtual(fHeight, vLabel.vsizey) / 2 ); // >>1 == / 2
     ////B4DI_Info2("Label xPos: ", xPos, " yPos: ", yPos );
 
-    //View_DeleteText(bar.vMiddle);
-    //View_AddText(bar.vMiddle, xPos, yPos , label , B4DI_LABEL_FONT);
+    //View_DeleteText(bar.vRange);
+    //View_AddText(bar.vRange, xPos, yPos , label , B4DI_LABEL_FONT);
     Bar_SetLabelText(eBar.bar, label, B4DI_LABEL_FONT );
     if(eBar.isFadedOut) {
         B4DI_eBar_SetAlpha(eBar_hndl, 0);
@@ -369,9 +369,9 @@ func void B4DI_eBar_show( var int eBar_hndl){
     //B4DI_eBar_RefreshLabel(eBar_hndl);
 
     //var _bar bar; bar = get(eBar_inst.bar);
-    //View_DeleteText(bar.vMiddle); //experimental use of middle
+    //View_DeleteText(bar.vRange); //experimental use of middle
 
-    //View_AddText(bar.vMiddle, 0, 0, B4DI_eBar_generateLabelTextSimple(eBar_hndl), TEXT_FONT_Inventory);
+    //View_AddText(bar.vRange, 0, 0, B4DI_eBar_generateLabelTextSimple(eBar_hndl), TEXT_FONT_Inventory);
 
 };
 

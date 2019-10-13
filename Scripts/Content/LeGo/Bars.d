@@ -51,7 +51,7 @@ class _bar {
     var int val;
     var int barW;
     var int v0;               // zCView(h)
-    var int vMiddle;          // zCView(h)
+    var int vRange;          // zCView(h)
     var int v1;               // zCView(h)
     var int vLabel;           // zCView(h)
     var int initVSizes[4];    // Array<int>
@@ -67,8 +67,8 @@ func void _bar_Delete(var _bar b) {
     if(Hlp_IsValidHandle(b.v0)) {
         delete(b.v0);
     };
-    if(Hlp_IsValidHandle(b.vMiddle)) {
-        delete(b.vMiddle);
+    if(Hlp_IsValidHandle(b.vRange)) {
+        delete(b.vRange);
     };
     if(Hlp_IsValidHandle(b.v1)) {
         delete(b.v1);
@@ -97,7 +97,7 @@ func void Bar_storePosSize(var int bar_hndl){
     b.initVSizes[IDS_VBACK_X]     = v.vsizex;
     b.initVSizes[IDS_VBACK_Y]     = v.vsizey;
     
-    v = View_Get(b.vMiddle); //same as v1/vBar(at full state) and vLabel
+    v = View_Get(b.vRange); //same as v1/vBar(at full state) and vLabel
 
     b.initVPos[IP_VRANGE_LEFT]     = v.vposx;
     //b.initVPos[IP_VRANGE_RIGHT] = v.vposx + v.vsizex;
@@ -229,7 +229,7 @@ func int Bar_GetAnchor( var int bar_hndl ) {
 //    if(!Hlp_IsValidHandle(bar_hndl)) { return; };
 //    var _bar b; b = get(bar_hndl);
 //    var zCView vBack; vBack = View_Get(b.v0);
-//    var zCView vMiddle; vMiddle = View_Get(b.vMiddle);
+//    var zCView vRange; vRange = View_Get(b.vRange);
 //    var zCView vLabel; vLabel = View_Get(b.vLabel);
 //    var zCView vBar; vBar = View_Get(b.v1);
     
@@ -240,11 +240,11 @@ func int Bar_GetAnchor( var int bar_hndl ) {
 
 //    View_ResizeCenteredValidScreenSpace(b.v0, roundf( mulf( mkf(vBack.vsizex) , relativScalingFactor) ), roundf( mulf( mkf(vBack.vsizey) , relativScalingFactor ) ) );
 //    //to keep the margin valid if scaled back touches screen border
-//    View_MoveTo(b.vMiddle, vBack.vposx + barLeft, vBack.vposy + barTop );
+//    View_MoveTo(b.vRange, vBack.vposx + barLeft, vBack.vposy + barTop );
 //    View_MoveTo(b.v1, vBack.vposx + barLeft, vBack.vposy + barTop );
 //    View_MoveTo(b.vLabel, vBack.vposx + barLeft, vBack.vposy + barTop );
         
-//    View_Resize(b.vMiddle, roundf( mulf( mkf(vMiddle.vsizex) , relativScalingFactor) ), roundf( mulf( mkf(vMiddle.vsizey) , relativScalingFactor) ) );
+//    View_Resize(b.vRange, roundf( mulf( mkf(vRange.vsizex) , relativScalingFactor) ), roundf( mulf( mkf(vRange.vsizey) , relativScalingFactor) ) );
 //    View_Resize(b.v1, roundf( mulf( mkf(vBar.vsizex) , relativScalingFactor) ), roundf( mulf( mkf(vBar.vsizey) , relativScalingFactor) ) );
 //    View_Resize(b.vLabel, roundf( mulf( mkf(vLabel.vsizex) , relativScalingFactor) ), roundf( mulf( mkf(vLabel.vsizey) , relativScalingFactor) ) );
 //    Bar_SetValue(bar_hndl, b.val);
@@ -263,7 +263,7 @@ func int Bar_GetAnchor( var int bar_hndl ) {
 //    var int barLeftRightMargin;
 //    barLeftRightMargin = roundf( mulf( mkf(b.initVPos[IP_VRANGE_LEFT] - b.initVPos[IP_VBACK_LEFT]  ) , aboluteScalingFactor) );
 
-//    View_SetMargin(b.vMiddle, b.v0, ALIGN_CENTER, barTopBottomMargin, barLeftRightMargin, barTopBottomMargin, barLeftRightMargin ); 
+//    View_SetMargin(b.vRange, b.v0, ALIGN_CENTER, barTopBottomMargin, barLeftRightMargin, barTopBottomMargin, barLeftRightMargin ); 
 //    View_SetMargin(b.v1, b.v0, ALIGN_CENTER, barTopBottomMargin, barLeftRightMargin, barTopBottomMargin, barLeftRightMargin );
 //    View_SetMargin(b.vLabel, b.v0, ALIGN_CENTER, barTopBottomMargin, barLeftRightMargin, barTopBottomMargin, barLeftRightMargin ); 
 
@@ -293,7 +293,7 @@ func void Bar_ResizePercentagedAdvanced(var int bar_hndl, var int scalingFactor 
     //------------------------------------------
 
     var zCView vBack; vBack = View_Get(b.v0);
-    var zCView vMiddle; vMiddle = View_Get(b.vMiddle);
+    var zCView vRange; vRange = View_Get(b.vRange);
     var zCView vLabel; vLabel = View_Get(b.vLabel);
     var zCView vBar; vBar = View_Get(b.v1);
 
@@ -301,10 +301,10 @@ func void Bar_ResizePercentagedAdvanced(var int bar_hndl, var int scalingFactor 
         base_barW         = mkf( b.barW );
         base_Back_vsizex  = mkf( vBack.vsizex );
         base_Back_vsizey  = mkf( vBack.vsizey );
-        base_TopMargin    = mkf( vMiddle.vposy - vBack.vposy );
-        base_BottomMargin = mkf( (vBack.vposy + vBack.vsizey) - (vMiddle.vposy + vMiddle.vsizey) );
-        base_LeftMargin   = mkf( vMiddle.vposx - vBack.vposx );
-        base_RightMargin  = mkf( (vBack.vposx  + vBack.vsizex) - (vMiddle.vposx + vMiddle.vsizex) );   
+        base_TopMargin    = mkf( vRange.vposy - vBack.vposy );
+        base_BottomMargin = mkf( (vBack.vposy + vBack.vsizey) - (vRange.vposy + vRange.vsizey) );
+        base_LeftMargin   = mkf( vRange.vposx - vBack.vposx );
+        base_RightMargin  = mkf( (vBack.vposx  + vBack.vsizex) - (vRange.vposx + vRange.vsizex) );   
     };
 
     b.barW = roundf( mulf( base_barW , scalingFactor ) );
@@ -319,7 +319,7 @@ func void Bar_ResizePercentagedAdvanced(var int bar_hndl, var int scalingFactor 
     var int new_BottomMargin; new_BottomMargin = roundf( mulf( base_BottomMargin, scalingFactor ) );
     var int new_LeftMargin; new_LeftMargin     = roundf( mulf( base_LeftMargin, scalingFactor ) );
 
-    View_SetMargin( b.vMiddle, b.v0, ALIGN_CENTER, new_TopMargin, new_RightMargin, new_BottomMargin, new_LeftMargin ); 
+    View_SetMargin( b.vRange, b.v0, ALIGN_CENTER, new_TopMargin, new_RightMargin, new_BottomMargin, new_LeftMargin ); 
     View_SetMargin( b.v1     , b.v0, ALIGN_CENTER, new_TopMargin, new_RightMargin, new_BottomMargin, new_LeftMargin ); 
     View_SetMargin( b.vLabel , b.v0, ALIGN_CENTER, new_TopMargin, new_RightMargin, new_BottomMargin, new_LeftMargin ); 
 
@@ -372,11 +372,11 @@ func int Bar_Create(var int inst) {
     buhh -= bu.barTop;
     buwh -= bu.barLeft;
     b.barW = Print_ToVirtual(bu.width - bu.barLeft * 2 + aw, PS_X);
-    b.vMiddle = View_CreatePxl(bu.x - buwh, bu.y - buhh, bu.x + buwh + aw, bu.y + buhh + ah);
+    b.vRange = View_CreatePxl(bu.x - buwh, bu.y - buhh, bu.x + buwh + aw, bu.y + buhh + ah);
     b.v1 =      View_CreatePxl(bu.x - buwh, bu.y - buhh, bu.x + buwh + aw, bu.y + buhh + ah);
     b.vLabel =  View_CreatePxl(bu.x - buwh, bu.y - buhh, bu.x + buwh + aw, bu.y + buhh + ah);
     View_SetTexture(b.v0, bu.backTex);
-    View_SetTexture(b.vMiddle, bu.middleTex);
+    View_SetTexture(b.vRange, bu.middleTex);
     View_SetTexture(b.v1, bu.barTex);
     
     b.anchorPoint_mode = bu.anchorPoint_mode;
@@ -392,7 +392,7 @@ func int Bar_Create(var int inst) {
     v.fxOpen = 0;
     v.fxClose = 0;*/
     View_Open(b.v0);
-    View_Open(b.vMiddle);
+    View_Open(b.vRange);
     View_Open(b.v1);
     b.isFadedOut = 0;
     free(ptr, inst);
@@ -409,14 +409,14 @@ func int Bar_CreateCenterDynamic(var int constructor_instance) {
     //TODO change to virtual? dynamic Resultionbased scale in Prototype?
     bar.v0      = View_CreateCenterPxl(bar_constr.x, bar_constr.y, bar_constr.width, bar_constr.height);
     bar.barW    = bar_constr.width - bar_constr.barLeft *2;
-    bar.vMiddle = View_CreateCenterPxl(bar_constr.x, bar_constr.y, bar.barW, bar_constr.height- bar_constr.barTop *2);
+    bar.vRange = View_CreateCenterPxl(bar_constr.x, bar_constr.y, bar.barW, bar_constr.height- bar_constr.barTop *2);
     bar.v1      = View_CreateCenterPxl(bar_constr.x, bar_constr.y, bar.barW, bar_constr.height- bar_constr.barTop *2);
     bar.vLabel  = View_CreateCenterPxl(bar_constr.x, bar_constr.y, bar.barW, bar_constr.height- bar_constr.barTop *2);
-    //TODO remove? vMiddle is Range
+    //TODO remove? vRange is Range
     bar.barW = Print_ToVirtual(bar.barW, PS_X);
     //^^
     View_SetTexture(bar.v0, bar_constr.backTex);
-    View_SetTexture(bar.vMiddle, bar_constr.middleTex);
+    View_SetTexture(bar.vRange, bar_constr.middleTex);
     View_SetTexture(bar.v1, bar_constr.barTex);
 
     Bar_storePosSize(new_bar_hndl);
@@ -426,15 +426,15 @@ func int Bar_CreateCenterDynamic(var int constructor_instance) {
 
     var zCView v; v = View_Get(bar.v0);
     //v.alphafunc = zRND_ALPHA_FUNC_ADD;
-    v = View_Get(bar.vMiddle);
+    v = View_Get(bar.vRange);
     //v.alphafunc = zRND_ALPHA_FUNC_SUB;
     v = View_Get(bar.v1);
     //v.alphafunc = zRND_ALPHA_FUNC_ADD;
 
     View_Open(bar.v0);
-    View_Open(bar.vMiddle);
+    View_Open(bar.vRange);
     View_Open(bar.v1);
-    View_Open(bar.vLabel); //this order that vMiddle can hold text label, therefore alphafunc
+    View_Open(bar.vLabel); //this order that vRange can hold text label, therefore alphafunc
     bar.isFadedOut = 0;
     
     free(ptr, constructor_instance);
@@ -458,7 +458,7 @@ func void Bar_Hide(var int bar) {
 	if(!Hlp_IsValidHandle(bar)) { return; };
 	var _bar b; b = get(bar);
 	View_Close(b.v0);
-    View_Close(b.vMiddle);
+    View_Close(b.vRange);
 	View_Close(b.v1);
     View_Close(b.vLabel);
 };
@@ -470,7 +470,7 @@ func void Bar_Show(var int bar) {
 	if(!Hlp_IsValidHandle(bar)) { return; };
 	var _bar b; b = get(bar);
 	View_Open(b.v0);
-    View_Open(b.vMiddle);
+    View_Open(b.vRange);
 	View_Open(b.v1);
     View_Open(b.vLabel);
 };
@@ -483,7 +483,7 @@ func void Bar_MoveToAdvanced( var int bar_hndl, var int x, var int y, var int an
     if(!Hlp_IsValidHandle(bar_hndl)) { return; };
     var _bar b; b = get(bar_hndl);
     var zCView vBack; vBack = View_Get(b.v0);
-    var zCView vMiddle; vMiddle = View_Get(b.vMiddle);
+    var zCView vRange; vRange = View_Get(b.vRange);
     
     if( anchorPoint_mode == ANCHOR_USE_OBJECTS_ANCHOR ) {
         anchorPoint_mode = Bar_GetAnchor(bar_hndl);  
@@ -496,18 +496,18 @@ func void Bar_MoveToAdvanced( var int bar_hndl, var int x, var int y, var int an
     var int base_RightMargin;
 
     //TODO Protect against wrong values caused by mid "actual bar" animation movement?
-    base_TopMargin    = vMiddle.vposy - vBack.vposy;
-    base_RightMargin  = (vBack.vposx  + vBack.vsizex) - (vMiddle.vposx + vMiddle.vsizex);
-    base_BottomMargin = (vBack.vposy + vBack.vsizey) - (vMiddle.vposy + vMiddle.vsizey);
-    base_LeftMargin   = vMiddle.vposx - vBack.vposx;
+    base_TopMargin    = vRange.vposy - vBack.vposy;
+    base_RightMargin  = (vBack.vposx  + vBack.vsizex) - (vRange.vposx + vRange.vsizex);
+    base_BottomMargin = (vBack.vposy + vBack.vsizey) - (vRange.vposy + vRange.vsizey);
+    base_LeftMargin   = vRange.vposx - vBack.vposx;
 
     View_MoveToAdvanced( b.v0 , x, y, anchorPoint_mode, validScreenSpace );
 
-    View_SetMargin( b.vMiddle, b.v0, ALIGN_CENTER, base_TopMargin, base_RightMargin, base_BottomMargin, base_LeftMargin ); 
+    View_SetMargin( b.vRange, b.v0, ALIGN_CENTER, base_TopMargin, base_RightMargin, base_BottomMargin, base_LeftMargin ); 
     View_SetMargin( b.v1     , b.v0, ALIGN_CENTER, base_TopMargin, base_RightMargin, base_BottomMargin, base_LeftMargin ); 
     View_SetMargin( b.vLabel , b.v0, ALIGN_CENTER, base_TopMargin, base_RightMargin, base_BottomMargin, base_LeftMargin ); 
 
-    B4DI_Info2("Bar_MoveToAdvanced: vsizex= ", vMiddle.vsizex, " vsizey= ", vMiddle.vsizey);
+    B4DI_Info2("Bar_MoveToAdvanced: vsizex= ", vRange.vsizex, " vsizey= ", vRange.vsizey);
 };
 
 //========================================
@@ -533,7 +533,7 @@ func void Bar_MoveTo(var int bar, var int x, var int y) {
 	x -= v.vposx;
 	y -= v.vposy;
     View_Move( b.v0     , x, y );
-    View_Move( b.vMiddle, x, y );
+    View_Move( b.vRange, x, y );
     View_Move( b.v1     , x, y );
     View_Move( b.vLabel , x, y );
 };
@@ -557,7 +557,7 @@ func void Bar_MoveLeftUpperTo(var int bar_hndl, var int x, var int y) {
     //var _bar b; b = get(bar);
     //var zCView v; v = View_Get(b.v0);
     //View_MoveTo( b.v0     , x, y );
-    //View_MoveTo( b.vMiddle, x, y );
+    //View_MoveTo( b.vRange, x, y );
     //View_MoveTo( b.v1     , x, y );
     //View_MoveTo( b.vLabel , x, y );
     Bar_MoveToAdvanced( bar_hndl, x, y, ANCHOR_LEFT_TOP, NON_VALIDSCREENSPACE );
@@ -577,7 +577,7 @@ func void Bar_MoveLeftUpperToValidScreenSpace(var int bar_hndl, var int x, var i
 
     //View_MoveToValidScreenSpace(b.v0, x, y);
     ////to keep the margin valid if movement would surpass screen border
-    //View_MoveTo( b.vMiddle, vBack.vposx + barLeft, vBack.vposy + barTop );
+    //View_MoveTo( b.vRange, vBack.vposx + barLeft, vBack.vposy + barTop );
     //View_MoveTo( b.v1     , vBack.vposx + barLeft, vBack.vposy + barTop );
     //View_MoveTo( b.vLabel , vBack.vposx + barLeft, vBack.vposy + barTop );
     Bar_MoveToAdvanced( bar_hndl, x, y, ANCHOR_LEFT_TOP, VALIDSCREENSPACE );
@@ -590,7 +590,7 @@ func void Bar_SetAlpha(var int bar, var int alpha) {
 	if(!Hlp_IsValidHandle(bar)) { return; };
 	var _bar b; b = get(bar);
     View_SetAlpha(b.v0       , alpha);
-    View_SetAlpha(b.vMiddle  , alpha);
+    View_SetAlpha(b.vRange  , alpha);
     View_SetAlpha(b.v1       , alpha);
     View_SetAlphaAll(b.vLabel, alpha);
 };
@@ -609,7 +609,7 @@ func void Bar_SetMiddleTexture(var int bar, var string middleTex)
 {
     if(!Hlp_IsValidHandle(bar)) { return; };
     var _bar b; b = get(bar);
-    View_SetTexture(b.vMiddle, middleTex);
+    View_SetTexture(b.vRange, middleTex);
 };
 
 func void Bar_SetBarTexture(var int bar, var string barTex)
