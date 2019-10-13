@@ -140,6 +140,10 @@ const int CUR_MidClick   = 2;
 const int CUR_WheelUp    = 3;
 const int CUR_WheelDown  = 4;
 
+//========================================
+// Gothic ini float reader
+//========================================
+const string decimalPoint = "."; // Sollte man lieber nicht ändern
 
 /***********************************\
                MODIFY
