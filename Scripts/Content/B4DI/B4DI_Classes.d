@@ -6,12 +6,12 @@
 //========================================
 class _alignmentManager {
 
-    var int alignmentSlots[B4DI_ALIGNMENT_SLOT_ARRAY_SIZE];                //@zCArray<@zCList<_alignmentObject*hndl>>
+    var int alignmentSlots[B4DI_ALIGNMENT_SLOT_ARRAY_SIZE];                //zCArray(h)<@zCList<_alignmentObject*hndl>>[B4DI_ALIGNMENT_SLOT_ARRAY_SIZE]
     
-    var int margins_perSlot[B4DI_ALIGNMENT_SLOT_ARRAY_SIZE];               //@zCArray<@zCArray<int>[B4DI_ALIGNMENT_SLOT_MARGIN_ARRAY_SIZE]>
+    var int margins_perSlot[B4DI_ALIGNMENT_SLOT_ARRAY_SIZE];               //zCArray(h)<zCArray(h)<int>>[B4DI_ALIGNMENT_SLOT_ARRAY_SIZE][B4DI_ALIGNMENT_SLOT_MARGIN_ARRAY_SIZE]
     
     // TODO var int dynamic_sizelimits;                                            // Bool
-    var int sizelimits_ofObjects_perSlot[B4DI_ALIGNMENT_SLOT_ARRAY_SIZE];  //@zCArray<@zCArray<int>[2]> <-virtual
+    var int sizelimits_ofObjects_perSlot[B4DI_ALIGNMENT_SLOT_ARRAY_SIZE];  //zCArray(h)<zCArray(h)<int>>[B4DI_ALIGNMENT_SLOT_ARRAY_SIZE][2] <-virtual
 
 };
 

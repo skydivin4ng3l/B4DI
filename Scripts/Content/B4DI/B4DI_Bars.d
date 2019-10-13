@@ -119,7 +119,7 @@ func void B4DI_Bars_Inventory_update() {
 			//TODO check for preview animation end, repeat
 		};
 
-		//B4DI_Bars_SetLabelTop(MEM_eBar_HP_handle);
+		//B4DI_eBars_SetLabelTop(MEM_eBar_HP_handle);
 
 	} else {
 		//Inventory got closed or is just not open
@@ -200,7 +200,10 @@ func void B4DI_Bars_update(){
 //
 //#################################################################
 func void B4DI_Bars_applySettings() {
+	MEM_Info("B4DI_Bars_applySettings <----------- Started");
 	B4DI_InitBarScale(); // for resolution dependant scaling
+
+
 	//dynScalingFactor = B4DI_Bars_getDynamicScaleOptionValuef();
 	if( Hlp_IsValidHandle(MEM_eBar_HP_handle) ){
 		B4DI_eBar_dynamicMenuBasedScale(MEM_eBar_HP_handle);
@@ -222,11 +225,11 @@ func void B4DI_Bars_applySettings() {
 		B4DI_XpBar_calcXp();
 	};
 
-	//if( Hlp_IsValidHandle(MEM_mainAlignmentManager_handle) ){
-	//	B4DI_AlignmentManager_UpdateAllSlots( MEM_mainAlignmentManager_handle );
-	//};
+	if( Hlp_IsValidHandle(MEM_mainAlignmentManager_handle) ){
+		B4DI_AlignmentManager_UpdateAllSlots( MEM_mainAlignmentManager_handle );		
+	};
 
-	MEM_Info("B4DI_Bars_applySettings");
+	MEM_Info("B4DI_Bars_applySettings <----------- finished");
 };
 
 

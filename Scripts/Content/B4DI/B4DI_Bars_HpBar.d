@@ -24,7 +24,7 @@ func int B4DI_heroHp_changed(){
 func void B4DI_hpBar_InitAlways(){
 	//original bars
 	MEM_oBar_Hp = MEM_PtrToInst (MEM_GAME.hpBar); //original
-	//B4DI_originalBar_hide(MEM_GAME.hpBar);
+	B4DI_originalBar_hide(MEM_GAME.hpBar);
 	// new dBars dynamic
 	if( !Hlp_IsValidHandle(MEM_eBar_HP_handle) ){
 		MEM_Info("B4DI_hpBar_InitAlways: Creating an HP Bar Handle");
@@ -41,6 +41,8 @@ func void B4DI_hpBar_InitAlways(){
 	//TODO: implement customizable Positions Left Right Top bottom,...
 	//TODO: implement a Screen margin
 	//Bar_MoveLeftUpperToValidScreenSpace(MEM_eBar_HP.bar, MEM_oBar_Hp.zCView_vposx, MEM_oBar_Hp.zCView_vposy );
+	//B4DI_eBar_AlignmentManager_Updatehandler(MEM_eBar_HP_handle, MEM_oBar_Hp.zCView_vposx, MEM_oBar_Hp.zCView_vposy, B4DI_ALIGNMENT_USE_ANCHOR );
+	
 
 	MEM_Info("B4DI_hpBar_InitAlways");
 };

@@ -21,7 +21,7 @@ func void B4DI_manaBar_Refresh(var int animated_value_diff){
 func void B4DI_manaBar_InitAlways(){
 	//original bars
 	MEM_oBar_Mana = MEM_PtrToInst (MEM_GAME.manaBar); //original
-	//B4DI_originalBar_hide(MEM_GAME.manaBar);
+	B4DI_originalBar_hide(MEM_GAME.manaBar);
 	// new dBars dynamic
 	if(!Hlp_IsValidHandle(MEM_eBar_MANA_handle)){
 		MEM_Info("B4DI_manaBar_InitAlways: Creating an MAMA Bar Handle");

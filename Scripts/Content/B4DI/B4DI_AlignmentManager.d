@@ -1,5 +1,74 @@
 
 
+//========================================
+// size Limit of each Object per Slot Get
+//========================================
+func int B4DI_AlignmentManager_GetSizeLimit_forSlot( var int aM_hndl, var int alignmentSlot, var int Axis) {
+	if ( !Hlp_IsValidHandle( aM_hndl ) ) { MEM_Info("B4DI_AlignmentManager_GetSizeLimit_forSlot; Invalid Handle"); return 0; };
+	var _alignmentManager aM; aM = get( aM_hndl );
+	var int aSlot_array_hndl; 
+	var int sizeLimit;
+
+	aSlot_array_hndl = MEM_ReadStatArr( getPtr(aM.sizelimits_ofObjects_perSlot), alignmentSlot );
+	sizeLimit = MEM_ReadStatArr( getPtr(aSlot_array_hndl), Axis);
+
+
+	if (sizeLimit == B4DI_ALIGNMENT_SLOT_OBJECTSIZE_NO_LIMIT) {
+		return VIEW_NO_SIZE_LIMIT; //<---change this maybe per ini?
+	};
+
+	return sizeLimit;
+
+};
+
+
+//========================================
+// Margin Get
+//========================================
+func int B4DI_AlignmentManager_GetMargin_forSlot( var int aM_hndl, var int alignmentSlot, var int marginSide) {
+	if ( !Hlp_IsValidHandle( aM_hndl ) ) { MEM_Info("B4DI_AlignmentManager_GetMargin_forSlot; Invalid Handle"); return 0; };
+	var _alignmentManager aM; aM = get( aM_hndl );
+
+	var int marginArray_hndl;
+	marginArray_hndl = MEM_ReadStatArr(getPtr(aM.margins_perSlot), alignmentSlot);
+
+	var int marginValue;
+	marginValue = MEM_ReadStatArr(getPtr(marginArray_hndl), marginSide);
+
+	if (marginValue == B4DI_ALIGNMENT_MARGIN_USE_DEFAULT) {
+		return B4DI_ALIGNMENT_MARGIN_DEFAULT_VALUE; //<---change this maybe per ini?
+	};
+
+	return marginValue;
+
+};
+
+func int  B4DI_AlignmentManager_GetMargin_forSlotByAxis(var int aM_hndl, var int alignmentSlot, var int axis ) {
+	if ( !Hlp_IsValidHandle( aM_hndl ) ) { MEM_Info("B4DI_AlignmentManager_GetMargin_forSlotByAxis; Invalid Handle"); return 0; };
+	var int marginValue;
+
+	if( axis == PS_X ) {
+		if (alignmentSlot == B4DI_ALIGNMENT_LEFT_TOP || alignmentSlot == B4DI_ALIGNMENT_LEFT_BOTTOM || alignmentSlot == B4DI_ALIGNMENT_CENTER_LEFT ) {
+			marginValue = B4DI_AlignmentManager_GetMargin_forSlot( aM_hndl, alignmentSlot, B4DI_ALIGNMENT_SLOT_MARGIN_LEFT);
+		} else if (alignmentSlot == B4DI_ALIGNMENT_RIGHT_TOP || alignmentSlot == B4DI_ALIGNMENT_RIGHT_BOTTOM || alignmentSlot == B4DI_ALIGNMENT_CENTER_RIGHT ) {
+			marginValue = B4DI_AlignmentManager_GetMargin_forSlot( aM_hndl, alignmentSlot, B4DI_ALIGNMENT_SLOT_MARGIN_RIGHT);
+		} else if (alignmentSlot == B4DI_ALIGNMENT_CENTER) {
+			marginValue = 0;
+		};
+	} else if ( axis == PS_Y ) {
+		if (alignmentSlot == B4DI_ALIGNMENT_LEFT_TOP || alignmentSlot == B4DI_ALIGNMENT_RIGHT_TOP || alignmentSlot == B4DI_ALIGNMENT_CENTER_TOP ) {
+			marginValue = B4DI_AlignmentManager_GetMargin_forSlot( aM_hndl, alignmentSlot, B4DI_ALIGNMENT_SLOT_MARGIN_TOP);
+		} else if (alignmentSlot == B4DI_ALIGNMENT_LEFT_BOTTOM || alignmentSlot == B4DI_ALIGNMENT_RIGHT_BOTTOM || alignmentSlot == B4DI_ALIGNMENT_CENTER_BOTTOM ) {
+			marginValue = B4DI_AlignmentManager_GetMargin_forSlot( aM_hndl, alignmentSlot, B4DI_ALIGNMENT_SLOT_MARGIN_BOTTOM);
+		} else if (alignmentSlot == B4DI_ALIGNMENT_CENTER) {
+			marginValue = 0;
+		};
+	} else {
+		MEM_Warn("B4DI_AlignmentManager_GetMargin_forSlotByAxis failed invalid axis/ alignmentSlot");
+	};
+
+	return marginValue;
+};
 
 //========================================
 // [intern] get decicated slot sign
@@ -52,28 +121,24 @@ func int B4DI_AlignmentManager_GetStartPosition( var int aM_hndl, var int alignm
 	if ( !Hlp_IsValidHandle( aM_hndl ) ) { MEM_Warn("B4DI_AlignmentManager_GetStartPosition; Invalid Handle"); return 0; };
 	var _alignmentManager aM; aM = get( aM_hndl );
 
-	//TODO add Margin
-	var int marginArray_hndl;
-	marginArray_hndl = MEM_ReadStatArr(getPtr(aM.margins_perSlot), alignmentSlot);
-	var int margin_x; margin_x = MEM_ReadStatArr(getPtr(marginArray_hndl), PS_X);
-	var int margin_y; margin_y = MEM_ReadStatArr(getPtr(marginArray_hndl), PS_Y);
+	var int margin; margin = B4DI_AlignmentManager_GetMargin_forSlotByAxis(aM_hndl, alignmentSlot, axis);
 
 	var int startValue;
 	if( alignmentSlot == B4DI_ALIGNMENT_LEFT_TOP ) {
-		if(axis == PS_X) { startValue = 0 + margin_x; } else
-		if(axis == PS_Y) { startValue = 0 + margin_y; };
+		if(axis == PS_X) { startValue = 0 + margin; } else 
+		if(axis == PS_Y) { startValue = 0 + margin;	};
 
 	} else if ( alignmentSlot == B4DI_ALIGNMENT_LEFT_BOTTOM ) {
-		if(axis == PS_X) { startValue = 0 + margin_x; } else
-		if(axis == PS_Y) { startValue = PS_VMAX - margin_y; };
+		if(axis == PS_X) { startValue = 0 + margin; } else
+		if(axis == PS_Y) { startValue = PS_VMAX - margin; };
 
 	} else if ( alignmentSlot == B4DI_ALIGNMENT_RIGHT_TOP ) {
-		if(axis == PS_X) { startValue = PS_VMAX - margin_x; } else
-		if(axis == PS_Y) { startValue = 0 + margin_y; };
+		if(axis == PS_X) { startValue = PS_VMAX - margin; } else
+		if(axis == PS_Y) { startValue = 0 + margin; };
 
 	} else if ( alignmentSlot == B4DI_ALIGNMENT_RIGHT_BOTTOM ) {
-		if(axis == PS_X) { startValue = PS_VMAX - margin_x; } else
-		if(axis == PS_Y) { startValue = PS_VMAX - margin_y; };
+		if(axis == PS_X) { startValue = PS_VMAX - margin; } else
+		if(axis == PS_Y) { startValue = PS_VMAX - margin; };
 
 	} else if ( alignmentSlot == B4DI_ALIGNMENT_CENTER ) {
 		//TODO for center take list size into account?
@@ -82,20 +147,20 @@ func int B4DI_AlignmentManager_GetStartPosition( var int aM_hndl, var int alignm
 
 	} else if ( alignmentSlot == B4DI_ALIGNMENT_CENTER_TOP ) {
 		if(axis == PS_X) { startValue = PS_VMAX/2; } else
-		if(axis == PS_Y) { startValue = 0 + margin_y; };
+		if(axis == PS_Y) { startValue = 0 + margin; };
 
 	} else if ( alignmentSlot == B4DI_ALIGNMENT_CENTER_BOTTOM ) {
 		if(axis == PS_X) { startValue = PS_VMAX/2; } else
-		if(axis == PS_Y) { startValue = PS_VMAX - margin_y; };
+		if(axis == PS_Y) { startValue = PS_VMAX - margin; };
 
 	} else if ( alignmentSlot == B4DI_ALIGNMENT_CENTER_LEFT ) {
 		//TODO for center take list size into account?
-		if(axis == PS_X) { startValue = 0 + margin_x; } else
+		if(axis == PS_X) { startValue = 0 + margin; } else
 		if(axis == PS_Y) { startValue = PS_VMAX/2; };
 
 	} else if ( alignmentSlot == B4DI_ALIGNMENT_CENTER_RIGHT ) {
 		//TODO for center take list size into account?
-		if(axis == PS_X) { startValue = PS_VMAX - margin_x; } else
+		if(axis == PS_X) { startValue = PS_VMAX - margin; } else
 		if(axis == PS_Y) { startValue = PS_VMAX/2; };
 
 	}; 
@@ -109,6 +174,7 @@ func int B4DI_AlignmentManager_GetStartPosition( var int aM_hndl, var int alignm
 //TODO: take sizelimits into consideration
 //TODO: take Slot for position update into consideration
 func void B4DI_AlignmentManager_Update_CallPositionHandler( var int obj_hndl, var int vposx, var int vposy, var int anchorPoint_mode ) {
+	B4DI_Info3("B4DI_AlignmentManager_Update_CallPositionHandler called with x= ", vposx, " y= ", vposy, " anchorPoint_mode= ", anchorPoint_mode);
 	if ( !Hlp_IsValidHandle( obj_hndl ) ) { MEM_Warn("B4DI_AlignmentManager_Update_CallPositionHandler; Invalid Handle"); return; };
 	var _alignmentObject aObj; aObj = get(obj_hndl);
 
@@ -134,6 +200,8 @@ func int B4DI_AlignmentManager_Update_CallGetSizeHandler( var int obj_hndl, var 
 
 	var int result; result = MEM_PopIntResult();
 
+	B4DI_Info2("B4DI_AlignmentManager_Update_CallGetSizeHandler called for Axis= ", axis, " resulting in size= ", result);
+
 	return result;
 };
 
@@ -158,9 +226,7 @@ func void B4DI_AlignmentManager_UpdateSlotObjects( var int aM_hndl, var int alig
 	var int next_xPosition; next_xPosition = B4DI_AlignmentManager_GetStartPosition( aM_hndl, alignmentSlot, PS_X );
 	var int next_yPosition; next_yPosition = B4DI_AlignmentManager_GetStartPosition( aM_hndl, alignmentSlot, PS_Y );
 
-	var int marginArray_hndl; marginArray_hndl = MEM_ReadStatArr( getPtr(aM.margins_perSlot), alignmentSlot );
-	var int margin_betweenObjects; margin_betweenObjects = MEM_ReadStatArr( getPtr(marginArray_hndl), B4DI_ALIGNMENT_SLOT_MARGIN_Y_BETWEENOBJECTS );
-
+	var int margin_betweenObjects; margin_betweenObjects = B4DI_AlignmentManager_GetMargin_forSlot( aM_hndl, alignmentSlot, B4DI_ALIGNMENT_SLOT_MARGIN_Y_BETWEENOBJECTS );
 	var int x_sign; x_sign = B4DI_AlignmentManager_GetSlotSign(alignmentSlot, PS_X);
 	var int y_sign; y_sign = B4DI_AlignmentManager_GetSlotSign(alignmentSlot, PS_Y);
 
@@ -183,16 +249,50 @@ func void B4DI_AlignmentManager_UpdateSlotObjects( var int aM_hndl, var int alig
 };
 
 func void B4DI_AlignmentManager_UpdateAllSlots( var int aM_hndl ) {
+	MEM_Info("B4DI_AlignmentManager_UpdateAllSlots <--------------------------- started");
 	if ( !Hlp_IsValidHandle( aM_hndl ) ) { MEM_Warn("B4DI_AlignmentManager_UpdateAllSlots; Invalid Handle"); return; };
-	var _alignmentManager aM; aM = get( aM_hndl );
+	//var _alignmentManager aM; aM = get( aM_hndl );
 
 	var int alignmentSlot; alignmentSlot = B4DI_ALIGNMENT_LEFT_TOP;
 
 	while( alignmentSlot < B4DI_ALIGNMENT_SLOT_ARRAY_SIZE );
+		B4DI_Info1("B4DI_AlignmentManager_UpdateAllSlots processing Slot= ",alignmentSlot);
 		B4DI_AlignmentManager_UpdateSlotObjects( aM_hndl, alignmentSlot);
 		alignmentSlot += 1;
 	end;
+	MEM_Info("B4DI_AlignmentManager_UpdateAllSlots <--------------------------- Finished");
 };
+
+//========================================
+// Margin Set
+//========================================
+func void B4DI_AlignmentManager_SetMargin_forSlot( var int aM_hndl, var int alignmentSlot, var int marginSide, var int marginValue ) {
+	if ( !Hlp_IsValidHandle( aM_hndl ) ) { MEM_Info("B4DI_AlignmentManager_SetMargin_forSlot; Invalid Handle"); return; };
+	var _alignmentManager aM; aM = get( aM_hndl );
+	var int marginArray_hndl; 
+
+	marginArray_hndl = MEM_ReadStatArr( getPtr(aM.margins_perSlot), alignmentSlot );
+	MEM_WriteStatArr( getPtr(marginArray_hndl), marginSide, marginValue );
+
+	B4DI_AlignmentManager_UpdateSlotObjects( aM_hndl, alignmentSlot);
+
+};
+
+//========================================
+// size Limit of each Object per Slot Set
+//========================================
+func void B4DI_AlignmentManager_SetSizeLimit_forSlot( var int aM_hndl, var int alignmentSlot, var int Axis, var int sizeLimitValue, var func updateHandler ) {
+	if ( !Hlp_IsValidHandle( aM_hndl ) ) { MEM_Info("B4DI_AlignmentManager_SetSizeLimit_forSlot; Invalid Handle"); return; };
+	var _alignmentManager aM; aM = get( aM_hndl );
+	var int aSlot_array_hndl; 
+
+	aSlot_array_hndl = MEM_ReadStatArr( getPtr(aM.sizelimits_ofObjects_perSlot), alignmentSlot );
+	MEM_WriteStatArr( getPtr(aSlot_array_hndl), Axis, sizeLimitValue );
+
+	B4DI_AlignmentManager_UpdateSlotObjects( aM_hndl, alignmentSlot );
+
+};
+
 
 //========================================
 // AlignmentObject Create
@@ -213,6 +313,7 @@ func int B4DI_AlignmentObject_Create( var int obj_hndl, var func updateHandler, 
 // AlignmentManager Add Object to Slot
 //========================================
 func void B4DI_AlignmentManager_AddToSlot( var int aM_hndl, var int alignmentSlot, var int obj_hndl, var func updateHandler, var func getSizeHandler ) {
+	B4DI_Info1("B4DI_AlignmentManager_AddToSlot: Slot", alignmentSlot);
 	if ( !Hlp_IsValidHandle( aM_hndl ) || !Hlp_IsValidHandle( obj_hndl ) ) { MEM_Warn("B4DI_AlignmentManager_AddToSlot; Invalid Handle"); return; };
 	var _alignmentManager aM; aM = get( aM_hndl );
 	var int aO_hndl; aO_hndl = B4DI_AlignmentObject_Create(obj_hndl, updateHandler, getSizeHandler);
@@ -229,75 +330,9 @@ func void B4DI_AlignmentManager_AddToSlot( var int aM_hndl, var int alignmentSlo
 	MEM_WriteStatArr(getPtr(aM.alignmentSlots), alignmentSlot, slot_list_ptr );
 
 	B4DI_AlignmentManager_UpdateSlotObjects( aM_hndl, alignmentSlot );
+	B4DI_Info1("B4DI_AlignmentManager_AddToSlot: Finished Slot", alignmentSlot);
 };
 
-//========================================
-// size Limit of each Object per Slot Get/Set
-//========================================
-func int B4DI_AlignmentManager_GetSizeLimit_forSlot( var int aM_hndl, var int alignmentSlot, var int Axis) {
-	if ( !Hlp_IsValidHandle( aM_hndl ) ) { MEM_Info("B4DI_AlignmentManager_GetSizeLimit_forSlot; Invalid Handle"); return 0; };
-	var _alignmentManager aM; aM = get( aM_hndl );
-	var int aSlot_array_hndl; 
-	var int sizeLimit;
-
-	aSlot_array_hndl = MEM_ReadStatArr( getPtr(aM.sizelimits_ofObjects_perSlot), alignmentSlot );
-	sizeLimit = MEM_ReadStatArr( getPtr(aSlot_array_hndl), Axis);
-
-
-	if (sizeLimit == B4DI_ALIGNMENT_SLOT_OBJECTSIZE_NO_LIMIT) {
-		return VIEW_NO_SIZE_LIMIT; //<---change this maybe per ini?
-	};
-
-	return sizeLimit;
-
-};
-
-
-func void B4DI_AlignmentManager_SetSizeLimit_forSlot( var int aM_hndl, var int alignmentSlot, var int Axis, var int sizeLimitValue, var func updateHandler ) {
-	if ( !Hlp_IsValidHandle( aM_hndl ) ) { MEM_Info("B4DI_AlignmentManager_SetSizeLimit_forSlot; Invalid Handle"); return; };
-	var _alignmentManager aM; aM = get( aM_hndl );
-	var int aSlot_array_hndl; 
-
-	aSlot_array_hndl = MEM_ReadStatArr( getPtr(aM.sizelimits_ofObjects_perSlot), alignmentSlot );
-	MEM_WriteStatArr( getPtr(aSlot_array_hndl), Axis, sizeLimitValue );
-
-	B4DI_AlignmentManager_UpdateSlotObjects( aM_hndl, alignmentSlot );
-
-};
-
-//========================================
-// Margin Get/Set
-//========================================
-func int B4DI_AlignmentManager_GetMargin_forSlot( var int aM_hndl, var int alignmentSlot, var int marginSide) {
-	if ( !Hlp_IsValidHandle( aM_hndl ) ) { MEM_Info("B4DI_AlignmentManager_GetMargin_forSlot; Invalid Handle"); return 0; };
-	var _alignmentManager aM; aM = get( aM_hndl );
-	var int aSlot_array_hndl; 
-	var int marginValue;
-
-	aSlot_array_hndl = MEM_ReadStatArr( getPtr(aM.margins_perSlot), alignmentSlot );
-	marginValue = MEM_ReadStatArr( getPtr(aSlot_array_hndl), marginSide);
-
-
-	if (marginValue == B4DI_ALIGNMENT_MARGIN_USE_DEFAULT) {
-		return B4DI_ALIGNMENT_MARGIN_DEFAULT_VALUE; //<---change this maybe per ini?
-	};
-
-	return marginValue;
-
-};
-
-
-func void B4DI_AlignmentManager_SetMargin_forSlot( var int aM_hndl, var int alignmentSlot, var int marginSide, var int marginValue ) {
-	if ( !Hlp_IsValidHandle( aM_hndl ) ) { MEM_Info("B4DI_AlignmentManager_SetMargin_forSlot; Invalid Handle"); return; };
-	var _alignmentManager aM; aM = get( aM_hndl );
-	var int aSlot_array_hndl; 
-
-	aSlot_array_hndl = MEM_ReadStatArr( getPtr(aM.margins_perSlot), alignmentSlot );
-	MEM_WriteStatArr( getPtr(aSlot_array_hndl), marginSide, marginValue );
-
-	B4DI_AlignmentManager_UpdateSlotObjects( aM_hndl, alignmentSlot);
-
-};
 
 
 //========================================
