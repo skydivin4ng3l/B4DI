@@ -50,15 +50,15 @@ class _bar {
     var int valMax;
     var int val;
     var int barW;
-    var int v0;                         // zCView(h)
-    var int vMiddle;                    // zCView(h)
-    var int v1;                         // zCView(h)
-    var int vLabel;                     // zCView(h)
+    var int v0;               // zCView(h)
+    var int vMiddle;          // zCView(h)
+    var int v1;               // zCView(h)
+    var int vLabel;           // zCView(h)
     var int initVSizes[4];    // Array<int>
-    var int initVPos[12];       // Array<int>
-    var int isFadedOut;                 // Bool
-    var int anchorPoint_mode;               // Anchor for advanced resizing
-    //var int anim8FadeOut;               // A8Head(h)
+    var int initVPos[12];     // Array<int>
+    var int isFadedOut;       // Bool
+    var int anchorPoint_mode; // Anchor for advanced resizing
+                              //var int anim8FadeOut;               // A8Head(h)
 };
 
 instance _bar@(_bar);
@@ -76,9 +76,7 @@ func void _bar_Delete(var _bar b) {
     if(Hlp_IsValidHandle(b.vLabel)) {
         delete(b.vLabel);
     };
-    //if(Hlp_IsValidHandle(b.anim8FadeOut)) {
-    //    Anim8_Delete(b.anim8FadeOut);
-    //};
+    
 }; 
 
 //========================================
@@ -99,14 +97,14 @@ func void Bar_storePosSize(var int bar_hndl){
     b.initVSizes[IDS_VBACK_X]     = v.vsizex;
     b.initVSizes[IDS_VBACK_Y]     = v.vsizey;
     
-    v = View_Get(b.v1); //same as vMiddle and vLabel
+    v = View_Get(b.vMiddle); //same as v1/vBar(at full state) and vLabel
 
-    b.initVPos[IP_VBAR_LEFT]     = v.vposx;
-    //b.initVPos[IP_VBAR_RIGHT] = v.vposx + v.vsizex;
-    b.initVPos[IP_VBAR_TOP]      = v.vposy;
-    //b.initVPos[IP_VBAR_BOTTOM] = v.vposy + v.vsizey;
-    b.initVPos[IP_VBAR_CENTER_X] = v.vposx + v.vsizex>>1; // >>1 durch 2
-    b.initVPos[IP_VBAR_CENTER_Y] = v.vposy + v.vsizey>>1;
+    b.initVPos[IP_VRANGE_LEFT]     = v.vposx;
+    //b.initVPos[IP_VRANGE_RIGHT] = v.vposx + v.vsizex;
+    b.initVPos[IP_VRANGE_TOP]      = v.vposy;
+    //b.initVPos[IP_VRANGE_BOTTOM] = v.vposy + v.vsizey;
+    b.initVPos[IP_VRANGE_CENTER_X] = v.vposx + v.vsizex>>1; // >>1 durch 2
+    b.initVPos[IP_VRANGE_CENTER_Y] = v.vposy + v.vsizey>>1;
     b.initVSizes[IDS_VBAR_X]     = v.vsizex;
     b.initVSizes[IDS_VBAR_Y]     = v.vsizey;
 
@@ -138,9 +136,9 @@ func void Bar_SetMax(var int bar, var int max) {
     if(!Hlp_IsValidHandle(bar)) { return; };
     var _bar b; b = get(bar);
     // ignore max change - keep current max
-    if(max == BAR_REFRESH_NO_CHANGE) {
-        return;
-    };
+    //if(max == BAR_REFRESH_NO_CHANGE) {
+    //    return;
+    //};
     b.valMax = max;
     //MEM_Info(cs2("Bar_SetMax: ",i2s(max)));
 };
@@ -152,11 +150,11 @@ func void Bar_SetPromille(var int bar, var int pro) {
     if(!Hlp_IsValidHandle(bar)) { return; };
     var _bar b; b = get(bar);
     if(pro > 1000) { pro = 1000; };
-    if(pro == BAR_REFRESH_NO_CHANGE) {
-        pro = (b.val * 1000) / b.valMax;
-        View_Resize(b.v1, (pro * b.barW) / 1000, BAR_SIZE_LOCK_Y_AXIS);
-        return;
-    };
+    //if(pro == BAR_REFRESH_NO_CHANGE) {
+    //    pro = (b.val * 1000) / b.valMax;
+    //    View_Resize(b.v1, (pro * b.barW) / 1000, BAR_SIZE_LOCK_Y_AXIS);
+    //    return;
+    //};
     View_Resize(b.v1, (pro * b.barW) / 1000, BAR_SIZE_LOCK_Y_AXIS);
     b.val = (pro * b.valMax) / 1000; //to keep both valMax | val in the same space
 };
@@ -167,10 +165,10 @@ func void Bar_SetPromille(var int bar, var int pro) {
 func void Bar_SetPercent(var int bar, var int perc) {
     if(!Hlp_IsValidHandle(bar)) { return; };
     var _bar b; b = get(bar);
-    if(perc == BAR_REFRESH_NO_CHANGE) {
-        Bar_SetPromille(bar, BAR_REFRESH_NO_CHANGE);
-        return;        
-    };
+    //if(perc == BAR_REFRESH_NO_CHANGE) {
+    //    Bar_SetPromille(bar, BAR_REFRESH_NO_CHANGE);
+    //    return;        
+    //};
     Bar_SetPromille(bar, perc*10);
     b.val = (perc * 1000 * b.valMax) / 1000; 
 };
@@ -181,10 +179,10 @@ func void Bar_SetPercent(var int bar, var int perc) {
 func void Bar_SetValue(var int bar, var int val) {
     if(!Hlp_IsValidHandle(bar)) { return; };
     var _bar b; b = get(bar);
-    if(val == BAR_REFRESH_NO_CHANGE) {
-        Bar_SetPromille(bar, BAR_REFRESH_NO_CHANGE);
-        return;        
-    };
+    //if(val == BAR_REFRESH_NO_CHANGE) {
+    //    Bar_SetPromille(bar, BAR_REFRESH_NO_CHANGE);
+    //    return;        
+    //};
     if(val) {
         Bar_SetPromille(bar, (val * 1000) / b.valMax);
         b.val = val;
@@ -261,9 +259,9 @@ func int Bar_GetAnchor( var int bar_hndl ) {
 //    View_ResizeCenteredValidScreenSpace(b.v0, roundf( mulf( mkf(b.initVSizes[IDS_VBACK_X] ) , aboluteScalingFactor) ), roundf( mulf( mkf(b.initVSizes[IDS_VBACK_Y]) , aboluteScalingFactor ) ) );
 
 //    var int barTopBottomMargin;
-//    barTopBottomMargin = roundf( mulf( mkf(b.initVPos[IP_VBAR_TOP] - b.initVPos[IP_VBACK_TOP]  ) , aboluteScalingFactor) );
+//    barTopBottomMargin = roundf( mulf( mkf(b.initVPos[IP_VRANGE_TOP] - b.initVPos[IP_VBACK_TOP]  ) , aboluteScalingFactor) );
 //    var int barLeftRightMargin;
-//    barLeftRightMargin = roundf( mulf( mkf(b.initVPos[IP_VBAR_LEFT] - b.initVPos[IP_VBACK_LEFT]  ) , aboluteScalingFactor) );
+//    barLeftRightMargin = roundf( mulf( mkf(b.initVPos[IP_VRANGE_LEFT] - b.initVPos[IP_VBACK_LEFT]  ) , aboluteScalingFactor) );
 
 //    View_SetMargin(b.vMiddle, b.v0, ALIGN_CENTER, barTopBottomMargin, barLeftRightMargin, barTopBottomMargin, barLeftRightMargin ); 
 //    View_SetMargin(b.v1, b.v0, ALIGN_CENTER, barTopBottomMargin, barLeftRightMargin, barTopBottomMargin, barLeftRightMargin );
@@ -288,10 +286,10 @@ func void Bar_ResizePercentagedAdvanced(var int bar_hndl, var int scalingFactor 
     base_barW         = mkf( b.initVSizes[IDS_VBAR_X] );
     base_Back_vsizex  = mkf( b.initVSizes[IDS_VBACK_X] );
     base_Back_vsizey  = mkf( b.initVSizes[IDS_VBACK_Y] );
-    base_TopMargin    = mkf( b.initVPos[IP_VBAR_TOP] - b.initVPos[IP_VBACK_TOP] );
-    base_BottomMargin = mkf((b.initVPos[IP_VBACK_TOP] + b.initVSizes[IDS_VBACK_Y]) - (b.initVPos[IP_VBAR_TOP] + b.initVSizes[IDS_VBAR_Y]) );
-    base_LeftMargin   = mkf( b.initVPos[IP_VBAR_LEFT] - b.initVPos[IP_VBACK_LEFT] );
-    base_RightMargin  = mkf((b.initVPos[IP_VBACK_LEFT] + b.initVSizes[IDS_VBACK_X]) - (b.initVPos[IP_VBAR_LEFT] + b.initVSizes[IDS_VBAR_X]) );
+    base_TopMargin    = mkf( b.initVPos[IP_VRANGE_TOP] - b.initVPos[IP_VBACK_TOP] );
+    base_BottomMargin = mkf((b.initVPos[IP_VBACK_TOP] + b.initVSizes[IDS_VBACK_Y]) - (b.initVPos[IP_VRANGE_TOP] + b.initVSizes[IDS_VBAR_Y]) );
+    base_LeftMargin   = mkf( b.initVPos[IP_VRANGE_LEFT] - b.initVPos[IP_VBACK_LEFT] );
+    base_RightMargin  = mkf((b.initVPos[IP_VBACK_LEFT] + b.initVSizes[IDS_VBACK_X]) - (b.initVPos[IP_VRANGE_LEFT] + b.initVSizes[IDS_VBAR_X]) );
     //------------------------------------------
 
     var zCView vBack; vBack = View_Get(b.v0);
@@ -303,10 +301,10 @@ func void Bar_ResizePercentagedAdvanced(var int bar_hndl, var int scalingFactor 
         base_barW         = mkf( b.barW );
         base_Back_vsizex  = mkf( vBack.vsizex );
         base_Back_vsizey  = mkf( vBack.vsizey );
-        base_TopMargin    = mkf( vBar.vposy - vBack.vposy );
-        base_BottomMargin = mkf( (vBar.vposy + vBar.vsizey) - (vBack.vposy + vBack.vsizey) );
-        base_LeftMargin   = mkf( vBar.vposx - vBack.vposx );
-        base_RightMargin  = mkf( (vBar.vposx + vBar.vsizex) - (vBack.vposx  + vBack.vsizex) );   
+        base_TopMargin    = mkf( vMiddle.vposy - vBack.vposy );
+        base_BottomMargin = mkf( (vBack.vposy + vBack.vsizey) - (vMiddle.vposy + vMiddle.vsizey) );
+        base_LeftMargin   = mkf( vMiddle.vposx - vBack.vposx );
+        base_RightMargin  = mkf( (vBack.vposx  + vBack.vsizex) - (vMiddle.vposx + vMiddle.vsizex) );   
     };
 
     b.barW = roundf( mulf( base_barW , scalingFactor ) );
@@ -481,35 +479,39 @@ func void Bar_Show(var int bar) {
 // Bar MoveToAdvanced anchorPoint_mode / validScreenSpace based 
 //========================================
 func void Bar_MoveToAdvanced( var int bar_hndl, var int x, var int y, var int anchorPoint_mode, var int validScreenSpace ) {
+    B4DI_Info3("Bar_MoveToAdvanced: x= ", x, " y= ", y, " anchorPoint_mode= ", anchorPoint_mode);
     if(!Hlp_IsValidHandle(bar_hndl)) { return; };
     var _bar b; b = get(bar_hndl);
     var zCView vBack; vBack = View_Get(b.v0);
-    var zCView vBar; vBar = View_Get(b.v1);
+    var zCView vMiddle; vMiddle = View_Get(b.vMiddle);
     
     if( anchorPoint_mode == ANCHOR_USE_OBJECTS_ANCHOR ) {
         anchorPoint_mode = Bar_GetAnchor(bar_hndl);  
     };
 
-    View_MoveToAdvanced( b.v0 , x, y, anchorPoint_mode, validScreenSpace );
 
     var int base_TopMargin; 
     var int base_BottomMargin; 
     var int base_LeftMargin; 
     var int base_RightMargin;
 
-    base_TopMargin    = mkf( vBar.vposy - vBack.vposy );
-    base_RightMargin  = mkf( (vBar.vposx + vBar.vsizex) - (vBack.vposx  + vBack.vsizex) );
-    base_BottomMargin = mkf( (vBar.vposy + vBar.vsizey) - (vBack.vposy + vBack.vsizey) );
-    base_LeftMargin   = mkf( vBar.vposx - vBack.vposx );
+    //TODO Protect against wrong values caused by mid "actual bar" animation movement?
+    base_TopMargin    = vMiddle.vposy - vBack.vposy;
+    base_RightMargin  = (vBack.vposx  + vBack.vsizex) - (vMiddle.vposx + vMiddle.vsizex);
+    base_BottomMargin = (vBack.vposy + vBack.vsizey) - (vMiddle.vposy + vMiddle.vsizey);
+    base_LeftMargin   = vMiddle.vposx - vBack.vposx;
+
+    View_MoveToAdvanced( b.v0 , x, y, anchorPoint_mode, validScreenSpace );
 
     View_SetMargin( b.vMiddle, b.v0, ALIGN_CENTER, base_TopMargin, base_RightMargin, base_BottomMargin, base_LeftMargin ); 
     View_SetMargin( b.v1     , b.v0, ALIGN_CENTER, base_TopMargin, base_RightMargin, base_BottomMargin, base_LeftMargin ); 
     View_SetMargin( b.vLabel , b.v0, ALIGN_CENTER, base_TopMargin, base_RightMargin, base_BottomMargin, base_LeftMargin ); 
 
+    B4DI_Info2("Bar_MoveToAdvanced: vsizex= ", vMiddle.vsizex, " vsizey= ", vMiddle.vsizey);
 };
 
 //========================================
-// Bar AnchorPoint bewegen 
+// Bar AnchorPoint bewegen, moves the wohle bar in such a way that the anchorpoint will be on the coordinates afterwards
 //========================================
 func void Bar_Anchor_MoveTo( var int bar_hndl, var int x, var int y ) {
     Bar_MoveToAdvanced( bar_hndl, x, y, ANCHOR_USE_OBJECTS_ANCHOR, NON_VALIDSCREENSPACE);

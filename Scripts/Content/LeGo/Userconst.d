@@ -103,16 +103,16 @@ const int IDS_VBAR_Y = 3;
 //Access for initialVPosition Array
 const int IP_VBACK_CENTER_X	= 0;
 const int IP_VBACK_CENTER_Y	= 1;
-const int IP_VBAR_CENTER_X	= 2;
-const int IP_VBAR_CENTER_Y	= 3;
+const int IP_VRANGE_CENTER_X	= 2;
+const int IP_VRANGE_CENTER_Y	= 3;
 const int IP_VBACK_LEFT		= 4;
 //const int IP_VBACK_RIGHT	= 5;
 const int IP_VBACK_TOP		= 6;
 //const int IP_VBACK_BOTTOM	= 7;
-const int IP_VBAR_LEFT		= 8;
-//const int IP_VBAR_RIGHT		= 9;
-const int IP_VBAR_TOP		= 10;
-//const int IP_VBAR_BOTTOM	= 11;
+const int IP_VRANGE_LEFT		= 8;
+//const int IP_VRANGE_RIGHT		= 9;
+const int IP_VRANGE_TOP		= 10;
+//const int IP_VRANGE_BOTTOM	= 11;
 
 //// interpretations of ini Setting
 //const int B4DI_BarScale_off		= 100; // will not be used?
