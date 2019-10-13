@@ -45,12 +45,20 @@ const int B4DI_FOCUSBAR_SHOW_ATT_HOSTILE 	= 1;
 
 const int B4DI_FOCUSBAR_SHOW_LABLE			= 1;
 
+
+
 //========================================
 // eBar CONST DONOT CHANGE
 //========================================
 
 const int B4DI_eBAR_INTITIAL_REFRESH 	= 0;
 const int B4DI_eBAR_NO_REPLACEMENT 		= 0;
+
+const int B4DI_eBar_ALPHA_SLIDER_RANGE = 255;
+const int B4DI_MENU_SLIDER_ALPHA_STEPS = 8; //copy of Menu_Defines.d
+
+const int B4DI_eBar_FADEIN_MAX = 255;
+const int B4DI_eBar_FADEOUT_MIN = 0;
 
 //========================================
 // Margin (benutzt in AlignmentManager)

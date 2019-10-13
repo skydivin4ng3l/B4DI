@@ -203,8 +203,11 @@ func void B4DI_Bars_applySettings() {
 	MEM_Info("B4DI_Bars_applySettings <----------- Started");
 	B4DI_InitBarScale(); // for resolution dependant scaling
 
-
+	//Load Ini based menue altered Values
 	//dynScalingFactor = B4DI_Bars_getDynamicScaleOptionValuef();
+	B4DI_Bars_getFadeOutMinOptionValuef();
+	B4DI_Bars_getFadeInMaxOptionValuef();
+
 	if( Hlp_IsValidHandle(MEM_eBar_HP_handle) ){
 		B4DI_eBar_dynamicMenuBasedScale(MEM_eBar_HP_handle);
 		B4DI_HpBar_Refresh(B4DI_eBAR_INTITIAL_REFRESH);

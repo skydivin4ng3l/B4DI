@@ -138,7 +138,7 @@ func void B4DI_BarPostview_Show( var int barPostview_hndl) {
         //TODO: Check Value and adjust for value increase bar and label have to be top
         bp.isFadedOutPostview = 0;
         View_Open(bp.vPostView);
-        View_SetAlpha(bp.vPostView, 127);
+        View_SetAlpha(bp.vPostView, B4DI_barFadeInMax/2);
         View_Top(bp.vPostView);
         View_Top(bar.vLabel);
         //MEM_Info("B4DI_BarPostview_Show finished");

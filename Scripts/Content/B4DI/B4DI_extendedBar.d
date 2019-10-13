@@ -115,8 +115,12 @@ func void B4DI_eBar_Bar_StorePosSize( var int eBar_hndl ) {
 func int B4DI_eBar_Bar_GetSize( var int eBar_hndl, var int axis ) {
     if(!Hlp_IsValidHandle(eBar_hndl)) { MEM_Warn("B4DI_eBar_Bar_GetSize failed: invalid eBar_hndl"); return 0; };
     var _extendedBar eBar; eBar = get( eBar_hndl );
-    
-    return Bar_GetSize(eBar.bar, axis);
+
+    dynScalingFactor = B4DI_Bars_getDynamicScaleOptionValuef();
+
+    var int scaled_size; scaled_size = roundf( mulf( mkf( Bar_GetSize(eBar.bar, axis) ), dynScalingFactor ) );
+
+    return scaled_size;
 };
 
 
@@ -164,7 +168,8 @@ func int B4DI_eBar_CreateCustomXY(var int Bar_constructor_instance, var int left
 
     Bar_Show(eBar.bar);
     //created invisible
-    B4DI_eBar_SetAlpha(new_eBar_hndl, 0);
+    //B4DI_eBar_SetAlpha(new_eBar_hndl, B4DI_barFadeOutMin); //<--- think about this Focusbar makes trouble
+    B4DI_eBar_SetAlpha(new_eBar_hndl, 0); //<--- think about this Focusbar makes trouble
     eBar.isFadedOut = 1;
 
     eBar.npcRef = 0;
@@ -203,7 +208,7 @@ func int B4DI_eBar_Create(var int Bar_constructor_instance ) {
 func void B4DI_eBar_fadeOut(var int eBar_hndl, var int deleteBar) {
     var _extendedBar eBar_inst; eBar_inst = get(eBar_hndl);
     //var _bar bar_inst; bar_inst = get(eBar_inst.bar);
-    eBar_inst.anim8FadeOut = Anim8_NewExt(255, B4DI_eBar_SetAlpha, eBar_hndl, false);
+    eBar_inst.anim8FadeOut = Anim8_NewExt(B4DI_barFadeInMax, B4DI_eBar_SetAlpha, eBar_hndl, false);
     Anim8_RemoveIfEmpty(eBar_inst.anim8FadeOut, true);
     if (deleteBar) {
         Anim8_RemoveDataIfEmpty(eBar_inst.anim8FadeOut, true);
@@ -211,8 +216,8 @@ func void B4DI_eBar_fadeOut(var int eBar_hndl, var int deleteBar) {
         Anim8_RemoveDataIfEmpty(eBar_inst.anim8FadeOut, false);
     };
     
-    Anim8(eBar_inst.anim8FadeOut, 255,  5000, A8_Wait);
-    Anim8q(eBar_inst.anim8FadeOut,   0, 2000, A8_SlowEnd);
+    Anim8(eBar_inst.anim8FadeOut, B4DI_barFadeInMax,  5000, A8_Wait);
+    Anim8q(eBar_inst.anim8FadeOut,   B4DI_barFadeOutMin, 2000, A8_SlowEnd);
 };
 
 func void B4DI_eBar_pulse_size(var int eBar_hndl, var func pulseFunc) {
@@ -308,7 +313,7 @@ func void B4DI_eBar_RefreshLabel(var int eBar_hndl) {
     //View_AddText(bar.vRange, xPos, yPos , label , B4DI_LABEL_FONT);
     Bar_SetLabelText(eBar.bar, label, B4DI_LABEL_FONT );
     if(eBar.isFadedOut) {
-        B4DI_eBar_SetAlpha(eBar_hndl, 0);
+        B4DI_eBar_SetAlpha(eBar_hndl, B4DI_barFadeOutMin); //TODO <----think about this, this causes Focus Bar to get drawn although now focus
     };
 
     B4DI_Info1("B4DI_eBar_RefreshLabel call while isFadedOut: ", eBar.isFadedOut);
@@ -324,6 +329,7 @@ func void B4DI_eBar_hideCustom( var int eBar_hndl, var int animated){
     if( !eBar_inst.isFadedOut ) {
         eBar_inst.isFadedOut = 1;
         if(!animated) {
+            //B4DI_eBar_SetAlpha(eBar_hndl, B4DI_barFadeOutMin); //TODO: Think about this Focus Bar has to completly fade away!
             B4DI_eBar_SetAlpha(eBar_hndl, 0);
         } else {
             B4DI_eBar_fadeOut(eBar_hndl, false);
@@ -357,7 +363,7 @@ func void B4DI_eBar_show( var int eBar_hndl){
             Anim8_Delete(eBar_inst.anim8FadeOut);
         };
         eBar_inst.isFadedOut = 0;
-        B4DI_eBar_SetAlpha(eBar_hndl, 255);
+        B4DI_eBar_SetAlpha(eBar_hndl, B4DI_barFadeInMax);
 
         //Bar_Show(eBar_inst.bar);
         MEM_Info("B4DI_eBar_show successful");

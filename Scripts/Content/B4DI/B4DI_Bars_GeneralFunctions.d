@@ -58,6 +58,119 @@ func int B4DI_Bars_getDynamicScaleOptionValuef(){
     return percScalingFactor;
 };
 
+//for now only integer exponents
+func int powf(var int basef, var int exponent ) {
+	if( lef(basef,FLOATNULL) && gef(basef,FLOATNULL)  && exponent == 0) {
+		MEM_Warn("pow: basef can not be ZERO when exponent is also ZERO");
+		return FLOATNULL;
+	};
+	if(exponent == 0) {return FLOATEINS;};
+	var int result; result = basef;
+	var int power; power = 1;
+	while(power < abs(exponent));
+		result = mulf(result,basef);
+		power += 1;
+	end;
+	if(exponent < 0) {
+		result = divf( FLOATEINS, result );
+	};
+
+	return result;
+
+};
+
+func int pow(var int base, var int exponent) {
+	return roundf(powf(mkf(base), exponent));
+};
+
+func int STR_ToIntf( var string intFString ) {
+	//B4DI_Info1("STR_ToIntf: SplitCount: ", STR_SplitCount(intFString, decimalPoint) );
+	var int resultf;
+	var int preDecimalf;
+	if( STR_Len(intFString) > 1 && STR_IndexOf(intFString, decimalPoint) >= 1 ) {
+		//var string preDecimalS; preDecimalS = STR_Split(intFString, decimalPoint, 0);
+		//B4DI_debugSpy("STR_ToIntf: WITH preDecimalS ", preDecimalS );
+
+		preDecimalf = mkf( STR_ToInt( STR_Split( intFString, decimalPoint, 0 ) ) );
+		//B4DI_debugSpy("STR_ToIntf: WITH preDecimalf ", toStringf(preDecimalf) );
+
+
+		var string decimalS; decimalS = STR_Split(intFString, decimalPoint, 1);
+		//B4DI_debugSpy("STR_ToIntf: WITH decimalS ", decimalS );
+
+		var int decimalLenght; decimalLenght = STR_Len(decimalS);
+		//B4DI_Info1("STR_ToIntf: decimalLenght= ", decimalLenght);
+
+		var int decimalf; decimalf = fracf( STR_ToInt(decimalS), pow( 10, decimalLenght ) );
+		//B4DI_debugSpy("STR_ToIntf: WITH decimalf ", toStringf(decimalf) );
+
+		resultf = addf(preDecimalf, decimalf);		
+		//B4DI_debugSpy("STR_ToIntf: WITH decimalPoint ", toStringf(resultf) );
+	} else {
+		preDecimalf = mkf( STR_ToInt( STR_Split( intFString, decimalPoint, 0 ) ) );
+		resultf = preDecimalf;
+		//B4DI_debugSpy("STR_ToIntf: no decimalPoint ", toStringf(resultf) );
+	};
+
+	return resultf;
+
+};
+
+//func float STR_ToFloat( var string floatString ) {
+//	var float result; result = castFromIntf(STR_ToIntf(floatString));
+
+//	return result;
+
+//};
+
+func int MEM_GetGothOptSliderf(var string sectionname, var string optionname, var int actualValueRange ) {
+	//B4DI_debugSpy("MEM_GetGothOptSliderf: optionString", MEM_GetGothOpt(sectionname, optionname) );
+	var int optionValuef; optionValuef = STR_ToIntf( MEM_GetGothOpt(sectionname, optionname) );
+	//B4DI_debugSpy("MEM_GetGothOptSliderf: optionValuef", toStringf(optionValuef) );
+	var int resultf; resultf = mulf( mkf(actualValueRange), optionValuef);
+	//B4DI_debugSpy("MEM_GetGothOptSliderf: resultf", toStringf(resultf) );
+	
+	return resultf;
+};
+
+func int MEM_GetGothOptSlider(var string sectionname, var string optionname, var int actualValueRange ) {
+		return roundf( MEM_GetGothOptSliderf( sectionname, optionname, actualValueRange, sliderSteps ) );
+};
+
+//========================================
+// [Intern] Get FadeOut Min Value of Menu value (gothic.ini) asFloat
+//
+//========================================
+func int B4DI_Bars_getFadeOutMinOptionValuef(){
+	var int fadeOutMinOption; fadeOutMinOption = MEM_GetGothOptSlider( "B4DI", "B4DI_barFadeOutMin", B4DI_eBar_ALPHA_SLIDER_RANGE, B4DI_MENU_SLIDER_ALPHA_STEPS );
+
+    B4DI_Info1( "Bar fadeOutMinOption = ", fadeOutMinOption );
+    B4DI_barFadeOutMin = fadeOutMinOption;
+
+    return fadeOutMinOption;
+};
+
+//========================================
+// [Intern] Get FadeIn Max Value of Menu value (gothic.ini) asFloat
+//
+//========================================
+func int B4DI_Bars_getFadeInMaxOptionValuef(){
+    var int fadeInMaxOption; fadeInMaxOption = MEM_GetGothOptSlider( "B4DI", "B4DI_barFadeInMax", B4DI_eBar_ALPHA_SLIDER_RANGE, B4DI_MENU_SLIDER_ALPHA_STEPS );
+
+    B4DI_Info1( "Bar fadeInMaxOption = ", fadeInMaxOption );
+
+    if( B4DI_barFadeOutMin > fadeInMaxOption ) {
+    	fadeInMaxOption = B4DI_barFadeOutMin;
+    	B4DI_barFadeInMax = fadeInMaxOption;
+    	fadeInMaxOption = divf( fracf( B4DI_eBar_ALPHA_SLIDER_RANGE, fadeInMaxOption ), B4DI_MENU_SLIDER_ALPHA_STEPS );
+    	MEM_SetGothOpt("B4DI", "B4DI_barFadeInMax", toStringf(fadeInMaxOption) );
+    };
+
+    B4DI_barFadeInMax = fadeInMaxOption;
+
+    return fadeInMaxOption;
+};
+
 //========================================
 // [Intern] Fill the instance oHero(oCNpc);
 //

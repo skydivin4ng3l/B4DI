@@ -117,7 +117,7 @@ func void B4DI_BarPreview_Show( var int barPreview_hndl) {
     //TODO: Start animanitions
     bp.isFadedOutPreview = 0;
     View_Open(bp.vPreView);
-    View_SetAlpha(bp.vPreView, 127);
+    View_SetAlpha(bp.vPreView, B4DI_barFadeInMax/2);
     View_Top(bp.vPreView);
 };
 
@@ -131,7 +131,7 @@ func void B4DI_BarPreview_ShowOverShoot( var int barPreview_hndl) {
     //TODO: Start animanitions
     bp.isFadedOutOvershoot = 0;
     View_Open(bp.vOverShoot);
-    View_SetAlpha(bp.vOverShoot, 80);
+    View_SetAlpha(bp.vOverShoot, B4DI_barFadeInMax/3);
     View_Top(bp.vOverShoot);  
 };
 

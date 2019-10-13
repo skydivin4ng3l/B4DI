@@ -8,6 +8,16 @@ func void B4DI_InitBarFeatures(){
         // Add INI-entry, if not set
         MEM_SetGothOpt("B4DI", "B4DI_barScale", "1");
     };
+
+    if (!MEM_GothOptExists("B4DI", "B4DI_barFadeOutMin")) {
+        // Add INI-entry, if not set
+        MEM_SetGothOpt("B4DI", "B4DI_barFadeOutMin", "0.0");
+    };
+
+    if (!MEM_GothOptExists("B4DI", "B4DI_barFadeInMax")) {
+        // Add INI-entry, if not set
+        MEM_SetGothOpt("B4DI", "B4DI_barFadeInMax", "1.0");
+    };
 };
 
 func int B4DI_InitOnce() {

@@ -164,7 +164,8 @@ instance B4DI_ManaBar(GothicBar){
     y = Print_Screen[PS_Y] -100;
     barTop = 2;     // 2 is almost too small
     barTex = "Bar_Mana.tga";
-    anchorPoint_mode = ANCHOR_RIGHT_BOTTOM;
+    //anchorPoint_mode = ANCHOR_RIGHT_BOTTOM;
+    anchorPoint_mode = ANCHOR_LEFT_BOTTOM;
 };
 
 instance B4DI_FocusBar(GothicBar){
