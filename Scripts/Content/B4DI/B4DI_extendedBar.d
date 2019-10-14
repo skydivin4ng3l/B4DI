@@ -69,13 +69,21 @@ func void B4DI_eBar_dynamicMenuBasedScale(var int eBar_hndl){
 func void B4DI_eBar_SetAlpha(var int eBar_hndl, var int alpha) {
     if(!Hlp_IsValidHandle(eBar_hndl)) { MEM_Warn("B4DI_eBar_SetAlpha failed"); return; };
     var _extendedBar eBar; eBar = get(eBar_hndl);
-    var _bar bar; bar = get(eBar.bar);
+    //var _bar bar; bar = get(eBar.bar);
 
-    View_SetAlpha(bar.v0, alpha);
-    View_SetAlpha(bar.vRange, alpha);
-    View_SetAlpha(bar.v1, alpha);
-    View_SetAlphaAll(bar.vLabel, alpha);
-    
+    //View_SetAlpha(bar.v0, alpha);
+    //View_SetAlpha(bar.vRange, alpha);
+    //View_SetAlpha(bar.v1, alpha);
+    //View_SetAlphaAll(bar.vLabel, alpha);
+    Bar_SetAlpha(eBar.bar, alpha);
+};
+
+func int B4DI_eBar_GetAlpha( var int eBar_hndl ) {
+    if(!Hlp_IsValidHandle(eBar_hndl)) { MEM_Warn("B4DI_eBar_SetAlpha failed"); return 0; };
+    var _extendedBar eBar; eBar = get(eBar_hndl);
+
+    //vBack as representation for overall Alpha
+    return Bar_GetAlpha(eBar.bar);
 };
 
 //========================================
@@ -87,6 +95,13 @@ func void B4DI_eBar_SetNpcRef(var int eBar_hndl, var int C_NPC_ptr) {
     var C_NPC new_npc_inst; new_npc_inst = MEM_PtrToInst(C_NPC_ptr);
     if ( !Hlp_IsValidNpc( new_npc_inst ) ) { MEM_Warn("B4DI_eBar_SetNpcRef failed: invalid C_NPC_ptr"); return; };
     eBar.npcRef = C_NPC_ptr;
+};
+
+func void B4DI_eBar_ClearNpcRef( var int eBar_hndl ) {
+    if(!Hlp_IsValidHandle(eBar_hndl)) { MEM_Warn("B4DI_eBar_SetNpcRef failed: invalid eBar_hndl"); return; };
+    var _extendedBar eBar; eBar = get(eBar_hndl);
+
+    eBar.npcRef = 0;
 };
 
 func int B4DI_eBar_GetNpcRef(var int eBar_hndl) {
@@ -170,6 +185,7 @@ func int B4DI_eBar_CreateCustomXY(var int Bar_constructor_instance, var int left
     //created invisible
     //B4DI_eBar_SetAlpha(new_eBar_hndl, B4DI_barFadeOutMin); //<--- think about this Focusbar makes trouble
     B4DI_eBar_SetAlpha(new_eBar_hndl, 0); //<--- think about this Focusbar makes trouble
+
     eBar.isFadedOut = 1;
 
     eBar.npcRef = 0;
@@ -248,6 +264,21 @@ func void B4DI_eBar_pulse_size(var int eBar_hndl, var func pulseFunc) {
 //========================================
 // eBar Label
 //========================================
+func void B4DI_eBar_showLabel( var int eBar_hndl ) {
+    if(!Hlp_IsValidHandle(ebar_hndl)) { MEM_Warn("B4DI_eBar_showLabel failed"); return; };
+    var _extendedBar eBar; eBar = get(eBar_hndl);
+
+    Bar_showLabel(eBar.bar);
+
+};
+
+func void B4DI_eBar_hideLabel( var int eBar_hndl ) {
+    if(!Hlp_IsValidHandle(ebar_hndl)) { MEM_Warn("B4DI_eBar_hideLabel failed"); return; };
+    var _extendedBar eBar; eBar = get(eBar_hndl);
+
+    Bar_hideLabel(eBar.bar);
+};
+
 func string B4DI_eBar_generateLabelTextSimple(var int ebar_hndl) {
     if(!Hlp_IsValidHandle(ebar_hndl)) { MEM_Warn("B4DI_eBar_generateLabelTextSimple failed"); return ""; };
 
@@ -299,21 +330,16 @@ func void B4DI_eBar_RefreshLabel(var int eBar_hndl) {
     var _extendedBar eBar; eBar = get(eBar_hndl);
     
     var _bar bar; bar = get(eBar.bar);
-    //var zCView vLabel; vLabel = View_Get(bar.vRange);
     var string label; label = B4DI_eBar_generateLabelTextSimple(eBar_hndl);
 
-    //var int lLenght; lLenght = Print_ToVirtual( Print_GetStringWidth(label, B4DI_LABEL_FONT), PS_X );
-    //var int fHeight; fHeight = Print_ToVirtual( Print_GetFontHeight(B4DI_LABEL_FONT), PS_Y );
 
-    //var int xPos; xPos = (PS_VMAX / 2) - ( Print_ToVirtual(lLenght, vLabel.vsizex) / 2 ); // >>1 == / 2
-    //var int yPos; yPos = (PS_VMAX / 2) - ( Print_ToVirtual(fHeight, vLabel.vsizey) / 2 ); // >>1 == / 2
-    ////B4DI_Info2("Label xPos: ", xPos, " yPos: ", yPos );
-
-    //View_DeleteText(bar.vRange);
-    //View_AddText(bar.vRange, xPos, yPos , label , B4DI_LABEL_FONT);
+    //add text in closed mode
     Bar_SetLabelText(eBar.bar, label, B4DI_LABEL_FONT );
     if(eBar.isFadedOut) {
-        B4DI_eBar_SetAlpha(eBar_hndl, B4DI_barFadeOutMin); //TODO <----think about this, this causes Focus Bar to get drawn although now focus
+        //B4DI_eBar_hideLabel(eBar_hndl);
+        B4DI_eBar_SetAlpha(eBar_hndl, B4DI_barFadeOutMin); //TODO <----think about this, this causes Focus Bar to get drawn although no focus, 
+        //B4DI_eBar_GetAlpha(eBar_hndl) could be an option but if animation is currently onGoing problematic
+
     };
 
     B4DI_Info1("B4DI_eBar_RefreshLabel call while isFadedOut: ", eBar.isFadedOut);
@@ -326,21 +352,27 @@ func void B4DI_eBar_hideCustom( var int eBar_hndl, var int animated){
     if(!Hlp_IsValidHandle(ebar_hndl)) { MEM_Info("B4DI_eBar_hide failed"); return; };
     var _extendedBar eBar_inst; eBar_inst = get(ebar_hndl);
 
-    if( !eBar_inst.isFadedOut ) {
+    if(!animated) {
         eBar_inst.isFadedOut = 1;
-        if(!animated) {
-            //B4DI_eBar_SetAlpha(eBar_hndl, B4DI_barFadeOutMin); //TODO: Think about this Focus Bar has to completly fade away!
-            B4DI_eBar_SetAlpha(eBar_hndl, 0);
-        } else {
-            B4DI_eBar_fadeOut(eBar_hndl, false);
-        };
-        MEM_Info("B4DI_eBar_hide successful");
+        //B4DI_eBar_SetAlpha(eBar_hndl, B4DI_barFadeOutMin); //TODO: Think about this Focus Bar has to completly fade away!
+        B4DI_eBar_SetAlpha(eBar_hndl, 0);
+        MEM_Info("B4DI_eBar_hideCustom NOT Animated successful");
     } else {
-        //MEM_Info("B4DI_eBar_hide already hidden");
+        if( !eBar_inst.isFadedOut ) { //TODO <------think about this
+            eBar_inst.isFadedOut = 1;
+            B4DI_eBar_fadeOut(eBar_hndl, false);
+            MEM_Info("B4DI_eBar_hideCustom Animated successful");
+        } else {
+            MEM_Info("B4DI_eBar_hideCustom already hidden");
+        };
+
     };
+    MEM_Info("B4DI_eBar_hideCustom successful");
 };
 
 func void B4DI_eBar_hideInstant( var int eBar_hndl){
+    if(!Hlp_IsValidHandle(ebar_hndl)) { MEM_Info("B4DI_eBar_hideInstant failed"); return; };
+
     B4DI_eBar_hideCustom(eBar_hndl, false);
     var _extendedBar eBar; eBar = get(eBar_hndl);
     if ( Hlp_IsValidHandle(eBar.barPostview) ) {
@@ -371,13 +403,11 @@ func void B4DI_eBar_show( var int eBar_hndl){
         //MEM_Info("B4DI_eBar_show already visible");
     };
 
-    ////TODO make optional 
-    //B4DI_eBar_RefreshLabel(eBar_hndl);
+    ////TODO make optional
+    //if(B4DI_barShowLabel){
+    //    B4DI_eBar_showLabel(eBar_hndl);
+    //};
 
-    //var _bar bar; bar = get(eBar_inst.bar);
-    //View_DeleteText(bar.vRange); //experimental use of middle
-
-    //View_AddText(bar.vRange, 0, 0, B4DI_eBar_generateLabelTextSimple(eBar_hndl), TEXT_FONT_Inventory);
 
 };
 
@@ -399,6 +429,7 @@ func void B4DI_eBar_ShowPreview(var int eBar_hndl, var int value) {
 
     B4DI_BarPreview_CalcPosScale(eBar.barPreview, value);
     B4DI_eBar_RefreshLabel(eBar_hndl);
+    B4DI_eBar_showLabel(eBar_hndl);
 
     areItemPreviewsHidden = false;
     MEM_Info("B4DI_eBar_ShowPreview successful");
@@ -477,7 +508,6 @@ func void B4DI_eBar_SetValuesAttributeBased(var int eBar_hndl, var int index_val
 };
 
 func void B4DI_eBar_SetValues(var int ebar_hndl, var int index_value, var int index_valueMax) {
-    //B4DI_eBar_SetValuesNPC(ebar_hndl, index_value, index_valueMax, 0);
     if(!Hlp_IsValidHandle(eBar_hndl)) { MEM_Warn("B4DI_eBar_SetValues failed"); return; };
     var _extendedBar eBar; eBar = get(eBar_hndl);
 
@@ -606,14 +636,6 @@ func void B4DI_eBar_MoveTo( var int eBar_hndl, var int x, var int y, var int anc
     };
     Bar_MoveToAdvanced(eBar.bar, x, y, anchorPoint_mode, VALIDSCREENSPACE);
 
-};
-
-func void B4DI_eBars_SetLabelTop(var int eBar_hndl) {
-    var _extendedBar eBar; eBar = get(eBar_hndl);
-    var _bar bar; bar = get(eBar.bar);
-    var zCView vLabel; vLabel = View_Get(bar.vLabel);
-
-    View_Top(bar.vLabel);
 };
 
 func void B4DI_eBar_AlignmentManager_Updatehandler( var int eBar_hndl, var int x, var int y, var int anchorPoint_mode ) {

@@ -9,6 +9,11 @@ func void B4DI_InitBarFeatures(){
         MEM_SetGothOpt("B4DI", "B4DI_barScale", "1");
     };
 
+    if (!MEM_GothOptExists("B4DI", "B4DI_barShowLabel")) {
+        // Add INI-entry, if not set
+        MEM_SetGothOpt("B4DI", "B4DI_barShowLabel", "0");
+    };
+
     if (!MEM_GothOptExists("B4DI", "B4DI_barFadeOutMin")) {
         // Add INI-entry, if not set
         MEM_SetGothOpt("B4DI", "B4DI_barFadeOutMin", "0.0");

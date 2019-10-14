@@ -525,9 +525,16 @@ func void Bar_SetAlpha(var int bar, var int alpha) {
 	if(!Hlp_IsValidHandle(bar)) { return; };
 	var _bar b; b = get(bar);
     View_SetAlpha(b.v0       , alpha);
-    View_SetAlpha(b.vRange  , alpha);
+    View_SetAlpha(b.vRange   , alpha);
     View_SetAlpha(b.v1       , alpha);
     View_SetAlphaAll(b.vLabel, alpha);
+};
+
+func int Bar_GetAlpha( var int bar ) {
+    if(!Hlp_IsValidHandle(bar)) { return 0; };
+    var _bar b; b = get(bar);
+    //vBack as representation for overall alpha
+    return View_GetAlpha(b.v0 );
 };
 
 //========================================
@@ -555,12 +562,29 @@ func void Bar_SetBarTexture(var int bar, var string barTex)
 };
 
 //========================================
+// Bar Show Hide Label Text
+//========================================
+func void Bar_showLabel( var int bar_hndl ) {
+    if(!Hlp_IsValidHandle(bar_hndl)) { return; };
+    var _bar bar; bar = get(bar_hndl);
+
+    View_Open(bar.vLabel);
+};
+
+func void Bar_hideLabel( var int bar_hndl ) {
+    if(!Hlp_IsValidHandle(bar_hndl)) { return; };
+    var _bar bar; bar = get(bar_hndl);
+
+    View_Close(bar.vLabel);
+};
+
+//========================================
 // Bar Set Label Text (centered)
 //========================================
 func void Bar_SetLabelText(var int bar_hndl, var string labelText, var string font) {
     if(!Hlp_IsValidHandle(bar_hndl)) { return; };
-    var _bar bar; bar = get(bar_hndl);
     var zCView vLabel; vLabel = View_Get(bar.vLabel);
+    var _bar bar; bar = get(bar_hndl);
 
     var int lLenght; lLenght = Print_ToVirtual( Print_GetStringWidth(labelText, font), PS_X );
     var int fHeight; fHeight = Print_ToVirtual( Print_GetFontHeight(font), PS_Y );

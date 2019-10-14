@@ -133,14 +133,13 @@ func void B4DI_BarPostview_Show( var int barPostview_hndl) {
     };
     var _barPostview bp; bp = get(barPostview_hndl);
     var _extendedBar eBar_parent; eBar_parent = get(bp.eBar_parent);
-    var _bar bar; bar = get(eBar_parent.bar);
     //if( !eBar_parent.isFadedOut ) { //TODO isFadedOut may be to early set and prevent display of Postview
-        //TODO: Check Value and adjust for value increase bar and label have to be top
+        //TODO: Check Value and adjust for value increase bar 
         bp.isFadedOutPostview = 0;
         View_Open(bp.vPostView);
-        View_SetAlpha(bp.vPostView, B4DI_barFadeInMax/2);
+        View_SetAlpha(bp.vPostView, B4DI_barFadeInMax*2/3);
         View_Top(bp.vPostView);
-        View_Top(bar.vLabel);
+        B4DI_eBars_SetLabelTop(bp.eBar_parent);
         //MEM_Info("B4DI_BarPostview_Show finished");
     //};
 };

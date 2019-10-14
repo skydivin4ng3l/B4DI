@@ -245,6 +245,19 @@ func int View_GetAlphaFunc( var int hndl ) {
     return ViewPtr_GetAlphaFunc( getPtr(hndl) );
 };
 
+//========================================
+// Mark:
+// View get alpha
+//========================================
+func int ViewPtr_GetAlpha(var int ptr) {
+    var zCView v; v = _^(ptr);
+
+    return v.alpha;
+};
+
+func int View_GetAlpha(var int hndl) {
+   return ViewPtr_GetAlpha(getPtr(hndl));
+};
 
 //========================================
 // View einf�rben

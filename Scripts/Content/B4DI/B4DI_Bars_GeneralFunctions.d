@@ -58,6 +58,12 @@ func int B4DI_Bars_getDynamicScaleOptionValuef(){
     return percScalingFactor;
 };
 
+func int B4DI_Bars_getbarShowLabelOptionValue(){
+	B4DI_barShowLabel = STR_ToInt(MEM_GetGothOpt("B4DI", "B4DI_barShowLabel"));
+	B4DI_Info1("B4DI_Bars_getbarShowLabelOptionValue: ", B4DI_barShowLabel );
+	return B4DI_barShowLabel;
+};
+
 //for now only integer exponents
 func int powf(var int basef, var int exponent ) {
 	if( lef(basef,FLOATNULL) && gef(basef,FLOATNULL)  && exponent == 0) {
@@ -134,41 +140,71 @@ func int MEM_GetGothOptSliderf(var string sectionname, var string optionname, va
 };
 
 func int MEM_GetGothOptSlider(var string sectionname, var string optionname, var int actualValueRange ) {
-		return roundf( MEM_GetGothOptSliderf( sectionname, optionname, actualValueRange, sliderSteps ) );
+		return roundf( MEM_GetGothOptSliderf( sectionname, optionname, actualValueRange ) );
+};
+
+func int B4DI_GetGothOptSlider( var string sectionname, var string optionname, var int actualValueRange, var int actualValueRangeMin, var int actualValueDefault ) {
+    var int OptionValue; OptionValue = MEM_GetGothOptSlider( sectionname, optionname, actualValueRange );
+
+    B4DI_Info1( cs3("B4DI_GetGothOptSlider: ", optionname, "= ") , OptionValue );
+
+    if( !(actualValueRangeMin <= OptionValue && OptionValue <= actualValueRange) ) {
+    	
+    	OptionValue = actualValueDefault;
+    	MEM_SetGothOpt( sectionname, optionname, toStringf( fracf( actualValueRange, actualValueDefault ) ) );
+    };
+
+    return OptionValue;
 };
 
 //========================================
-// [Intern] Get FadeOut Min Value of Menu value (gothic.ini) asFloat
+// [Intern] Get FadeOut Min Value of Menu value (gothic.ini) 
 //
 //========================================
-func int B4DI_Bars_getFadeOutMinOptionValuef(){
-	var int fadeOutMinOption; fadeOutMinOption = MEM_GetGothOptSlider( "B4DI", "B4DI_barFadeOutMin", B4DI_eBar_ALPHA_SLIDER_RANGE, B4DI_MENU_SLIDER_ALPHA_STEPS );
+func int B4DI_Bars_getFadeOutMinOptionValue(){
+	var int fadeOutMinOption; fadeOutMinOption = B4DI_GetGothOptSlider( "B4DI", "B4DI_barFadeOutMin", B4DI_eBar_ALPHA_SLIDER_RANGE, B4DI_eBar_ALPHA_SLIDER_RANGE_MIN, B4DI_eBar_FADEOUT_MIN);
 
-    B4DI_Info1( "Bar fadeOutMinOption = ", fadeOutMinOption );
+    //B4DI_Info1( "Bar fadeOutMinOption = ", fadeOutMinOption );
     B4DI_barFadeOutMin = fadeOutMinOption;
 
     return fadeOutMinOption;
 };
 
 //========================================
-// [Intern] Get FadeIn Max Value of Menu value (gothic.ini) asFloat
+// [Intern] Get FadeIn Max Value of Menu value (gothic.ini)
 //
 //========================================
 func int B4DI_Bars_getFadeInMaxOptionValuef(){
-    var int fadeInMaxOption; fadeInMaxOption = MEM_GetGothOptSlider( "B4DI", "B4DI_barFadeInMax", B4DI_eBar_ALPHA_SLIDER_RANGE, B4DI_MENU_SLIDER_ALPHA_STEPS );
+    //var int fadeInMaxOption; fadeInMaxOption = MEM_GetGothOptSlider( "B4DI", "B4DI_barFadeInMax", B4DI_eBar_ALPHA_SLIDER_RANGE );
+    var int fadeInMaxOption; fadeInMaxOption = B4DI_GetGothOptSlider( "B4DI", "B4DI_barFadeInMax", B4DI_eBar_ALPHA_SLIDER_RANGE, B4DI_eBar_ALPHA_SLIDER_RANGE_MIN, B4DI_eBar_FADEIN_MAX);
 
     B4DI_Info1( "Bar fadeInMaxOption = ", fadeInMaxOption );
 
-    if( B4DI_barFadeOutMin > fadeInMaxOption ) {
-    	fadeInMaxOption = B4DI_barFadeOutMin;
-    	B4DI_barFadeInMax = fadeInMaxOption;
-    	fadeInMaxOption = divf( fracf( B4DI_eBar_ALPHA_SLIDER_RANGE, fadeInMaxOption ), B4DI_MENU_SLIDER_ALPHA_STEPS );
-    	MEM_SetGothOpt("B4DI", "B4DI_barFadeInMax", toStringf(fadeInMaxOption) );
-    };
+    //if( B4DI_eBar_ALPHA_SLIDER_RANGE_MIN <= fadeInMaxOption && fadeInMaxOption <= B4DI_eBar_ALPHA_SLIDER_RANGE ) {
+    	if ( fadeInMaxOption < B4DI_barFadeOutMin ) {
+    		fadeInMaxOption = B4DI_barFadeOutMin;
+    		MEM_SetGothOpt("B4DI", "B4DI_barFadeInMax", MEM_GetGothOpt("B4DI", "B4DI_barFadeOutMin") );
+    	};
+    //} else {
+    //	fadeInMaxOption = B4DI_eBar_ALPHA_SLIDER_RANGE;
+    //	MEM_SetGothOpt("B4DI", "B4DI_barFadeInMax", toStringf(B4DI_eBar_FADEIN_MAX_INI_DEFAULT) );
+    //};
 
     B4DI_barFadeInMax = fadeInMaxOption;
 
     return fadeInMaxOption;
+};
+
+//========================================
+// [hacky] Set LabelTop used in multiple dependening files
+//
+//========================================
+func void B4DI_eBars_SetLabelTop(var int eBar_hndl) {
+    var _extendedBar eBar; eBar = get(eBar_hndl);
+    var _bar bar; bar = get(eBar.bar);
+    var zCView vLabel; vLabel = View_Get(bar.vLabel);
+
+    View_Top(bar.vLabel);
 };
 
 //========================================

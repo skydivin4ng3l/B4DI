@@ -299,7 +299,7 @@ func void B4DI_AlignmentManager_SetSizeLimit_forSlot( var int aM_hndl, var int a
 //========================================
 // AlignmentObject Create
 //========================================
-func int B4DI_AlignmentObject_Create( var int obj_hndl, var func updateHandler, var func getSizeHandler ) {
+func int B4DI_AlignmentObject_Create( var int obj_hndl, var func updateHandler, var func getSizeHandler, var int alignmentSlot ) {
 	if ( !Hlp_IsValidHandle( obj_hndl ) ) { MEM_Warn("B4DI_AlignmentObject_Create; Invalid Handle"); return 0; };
 	var int new_aO_hndl; new_aO_hndl = new( _alignmentObject@ );
 	var _alignmentObject new_aO; new_aO = get(new_aO_hndl);
@@ -307,6 +307,7 @@ func int B4DI_AlignmentObject_Create( var int obj_hndl, var func updateHandler, 
 	new_aO.objectHandle = obj_hndl;
 	new_aO.updateHandler = MEM_GetFuncID(updateHandler);
 	new_aO.getSizeHandler = MEM_GetFuncID(getSizeHandler);
+	new_aO.alignmentSlot = alignmentSlot;
 
 	return new_aO_hndl;
 };
@@ -318,7 +319,7 @@ func void B4DI_AlignmentManager_AddToSlot( var int aM_hndl, var int alignmentSlo
 	//B4DI_Info1("B4DI_AlignmentManager_AddToSlot: Slot", alignmentSlot);
 	if ( !Hlp_IsValidHandle( aM_hndl ) || !Hlp_IsValidHandle( obj_hndl ) ) { MEM_Warn("B4DI_AlignmentManager_AddToSlot; Invalid Handle"); return; };
 	var _alignmentManager aM; aM = get( aM_hndl );
-	var int aO_hndl; aO_hndl = B4DI_AlignmentObject_Create(obj_hndl, updateHandler, getSizeHandler);
+	var int aO_hndl; aO_hndl = B4DI_AlignmentObject_Create(obj_hndl, updateHandler, getSizeHandler, alignmentSlot);
 	
 	var int slot_list_ptr; 
 	slot_list_ptr = MEM_ReadStatArr(getPtr(aM.alignmentSlots), alignmentSlot);
@@ -334,7 +335,25 @@ func void B4DI_AlignmentManager_AddToSlot( var int aM_hndl, var int alignmentSlo
 	B4DI_AlignmentManager_UpdateSlotObjects( aM_hndl, alignmentSlot );
 	//B4DI_Info1("B4DI_AlignmentManager_AddToSlot: Finished Slot", alignmentSlot);
 };
+//TODO: Implement some dictionary to get from any obj_hndl to aO_hndl, foreachHndl could be an easy solution
+func void B4DI_AlignmentManager_MoveToSlot( var int aM_hndl, var int aO_hndl, var int targetAlignmentSlot ) {
+	if ( !Hlp_IsValidHandle( aM_hndl ) || !Hlp_IsValidHandle( aO_hndl ) ) { MEM_Warn("B4DI_AlignmentManager_MoveToSlot; Invalid Handle"); return; };
+	var _alignmentManager aM; aM = get( aM_hndl );
+	var _alignmentObject aO; aO = get( aO_hndl );
+	
+	var int origin_slot_list_ptr;
+	origin_slot_list_ptr = MEM_ReadStatArr(getPtr(aM.alignmentSlots), aO.alignmentSlot);
+	var int traget_slot_list_ptr;
+	traget_slot_list_ptr = MEM_ReadStatArr(getPtr(aM.alignmentSlots), targetAlignmentSlot);
 
+	var int origin_listPos;
+	origin_listPos = List_Contains(origin_slot_list_ptr, aO_hndl);
+	if(origin_listPos) {
+		List_Delete(origin_slot_list_ptr, origin_listPos);
+	};
+	List_Add(traget_slot_list_ptr, aO_hndl);
+
+};
 
 
 //========================================

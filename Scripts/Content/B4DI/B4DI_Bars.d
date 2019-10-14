@@ -205,32 +205,52 @@ func void B4DI_Bars_applySettings() {
 
 	//Load Ini based menue altered Values
 	//dynScalingFactor = B4DI_Bars_getDynamicScaleOptionValuef();
-	B4DI_Bars_getFadeOutMinOptionValuef();
+	B4DI_Bars_getFadeOutMinOptionValue();
 	B4DI_Bars_getFadeInMaxOptionValuef();
+	B4DI_Bars_getbarShowLabelOptionValue();
+
+	if( Hlp_IsValidHandle(MEM_mainAlignmentManager_handle) ){
+		B4DI_AlignmentManager_UpdateAllSlots( MEM_mainAlignmentManager_handle );		
+	};
 
 	if( Hlp_IsValidHandle(MEM_eBar_HP_handle) ){
 		B4DI_eBar_dynamicMenuBasedScale(MEM_eBar_HP_handle);
 		B4DI_HpBar_Refresh(B4DI_eBAR_INTITIAL_REFRESH);
+		if(B4DI_barShowLabel){
+    	    B4DI_eBar_showLabel(MEM_eBar_HP_handle);
+	    } else {
+	    	B4DI_eBar_hideLabel(MEM_eBar_HP_handle);
+	    };
 	};
 
 	if( Hlp_IsValidHandle(MEM_eBar_MANA_handle) ){
 		B4DI_eBar_dynamicMenuBasedScale(MEM_eBar_MANA_handle);
 		B4DI_manaBar_Refresh(B4DI_eBAR_INTITIAL_REFRESH);
+		if(B4DI_barShowLabel){
+    	    B4DI_eBar_showLabel(MEM_eBar_MANA_handle);
+	    } else {
+	    	B4DI_eBar_hideLabel(MEM_eBar_MANA_handle);
+	    };
 	};
 
 	if( Hlp_IsValidHandle(MEM_eBar_FOCUS_handle) ){
 		B4DI_eBar_dynamicMenuBasedScale(MEM_eBar_FOCUS_handle);
 		B4DI_focusBar_Refresh(B4DI_eBAR_INTITIAL_REFRESH);
+		if(B4DI_barShowLabel){
+    	    B4DI_eBar_showLabel(MEM_eBar_FOCUS_handle);
+	    } else {
+	    	B4DI_eBar_hideLabel(MEM_eBar_FOCUS_handle);
+	    };
 	};
 
 	if( Hlp_IsValidHandle(MEM_eBar_XP_handle) ){
 		B4DI_eBar_dynamicMenuBasedScale(MEM_eBar_XP_handle);
 		B4DI_XpBar_calcXp();
+		if(!B4DI_barFadeOutMin) {
+			B4DI_xpBar_show();
+		};
 	};
 
-	if( Hlp_IsValidHandle(MEM_mainAlignmentManager_handle) ){
-		B4DI_AlignmentManager_UpdateAllSlots( MEM_mainAlignmentManager_handle );		
-	};
 
 	MEM_Info("B4DI_Bars_applySettings <----------- finished");
 };

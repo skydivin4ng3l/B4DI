@@ -15,6 +15,8 @@ var int B4DI_vMargin_right;
 var int B4DI_barFadeOutMin;
 var int B4DI_barFadeInMax;
 
+var int B4DI_barShowLabel;
+
 //========================================
 // [intern] Global Vars
 //========================================

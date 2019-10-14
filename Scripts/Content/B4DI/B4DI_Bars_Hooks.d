@@ -86,6 +86,11 @@ func void B4DI_inventory_opend(){
 		//B4DI_Bars_update();
 		B4DI_eBar_show(MEM_eBar_HP_handle);
 		B4DI_eBar_show(MEM_eBar_MANA_handle);
+		if(!B4DI_barShowLabel){
+			B4DI_eBar_showLabel(MEM_eBar_HP_handle);
+			B4DI_eBar_showLabel(MEM_eBar_MANA_handle);
+		};
+
 		//FF_ApplyOnceExtGT(B4DI_Bars_update,50,-1);
 		FF_ApplyOnceExtGT(B4DI_Bars_Inventory_update, 50,-1);
 		MEM_Info("B4DI_inventory_opend");
@@ -101,6 +106,11 @@ func void B4DI_inventory_closeHelper() {
 	//B4DI_Bars_update(); // call again to make sure status get updated, not necessary i think caus of the FF?
 	B4DI_eBar_hideFaded(MEM_eBar_HP_handle);
 	B4DI_eBar_hideFaded(MEM_eBar_MANA_handle);
+	if(!B4DI_barShowLabel){
+		B4DI_eBar_hideLabel(MEM_eBar_HP_handle);
+		B4DI_eBar_hideLabel(MEM_eBar_MANA_handle);
+	};
+	
 	//B4DI_Bars_hideItemPreview(); //maybe redundant?!
 
 	MEM_Info("B4DI_inventory_closed");

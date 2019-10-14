@@ -3,15 +3,6 @@
 //  Focus Bar
 //
 //#################################################################
-func void B4DI_focusBar_Refresh(var int animated_value_diff){
-	B4DI_eBar_RefreshAnimated(MEM_eBar_FOCUS_handle, ATR_HITPOINTS, ATR_HITPOINTS_MAX, animated_value_diff);
-};
-
-func void B4DI_focusBar_BindNPC(var int C_NPC_ptr){
-	B4DI_eBar_SetNpcRef(MEM_eBar_FOCUS_handle, C_NPC_ptr);
-};
-
-
 func void B4DI_focusBar_show() {
 	B4DI_eBar_show(MEM_eBar_FOCUS_handle);
 	//B4DI_hook_UpdatePlayerStatus_return();
@@ -21,7 +12,20 @@ func void B4DI_focusBar_show() {
 func void B4DI_focusBar_hide() {
 	last_ID_ofFocus = 0;
 	B4DI_eBar_hideInstant(MEM_eBar_FOCUS_handle);
+	B4DI_eBar_ClearNpcRef(MEM_eBar_FOCUS_handle);
 	FocusBar_update_CallbackActive = false;
+};
+
+func void B4DI_focusBar_Refresh(var int animated_value_diff){
+	B4DI_eBar_RefreshAnimated( MEM_eBar_FOCUS_handle, ATR_HITPOINTS, ATR_HITPOINTS_MAX, animated_value_diff );
+	B4DI_Info1("B4DI_focusBar_Refresh: MEM_eBar_FOCUS.npcRef= ", MEM_eBar_FOCUS.npcRef);
+	if(!MEM_eBar_FOCUS.npcRef){
+		B4DI_focusBar_hide();
+	};
+};
+
+func void B4DI_focusBar_BindNPC(var int C_NPC_ptr){
+	B4DI_eBar_SetNpcRef(MEM_eBar_FOCUS_handle, C_NPC_ptr);
 };
 
 func int B4DI_focusBar_handleAttitude(var int attitude) {

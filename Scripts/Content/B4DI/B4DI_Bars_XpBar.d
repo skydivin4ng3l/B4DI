@@ -24,6 +24,7 @@ func void B4DI_XpBar_calcXp(){
 	//Bar_SetValue(XpBar, hero.exp - exp_lastLvlUp);
 	B4DI_eBar_SetValuesBasic(MEM_eBar_XP_handle, exp_gotSinceLastLevelUp, exp_neededForNextLevelUp);
 	B4DI_eBar_RefreshLabel(MEM_eBar_XP_handle);
+	B4DI_eBar_showLabel(MEM_eBar_XP_handle);
 };
 
 func void B4DI_xpBar_show(){
