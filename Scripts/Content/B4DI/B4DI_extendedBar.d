@@ -149,7 +149,7 @@ func void B4DI_eBar_AddToAlignmentSlot( var int eBar_hndl, var int alignmentSlot
     if (alignmentSlot == B4DI_ALIGNMENT_USE_ANCHOR) {
         alignmentSlot = Bar_GetAnchor(eBar.bar);
     };
-    B4DI_AlignmentManager_AddToSlot(MEM_mainAlignmentManager_handle, alignmentSlot, eBar_hndl, B4DI_eBar_AlignmentManager_Updatehandler, B4DI_eBar_Bar_GetSize );
+    B4DI_AlignmentManager_AddToSlotInitial(MEM_mainAlignmentManager_handle, eBar_hndl, alignmentSlot, B4DI_eBar_AlignmentManager_Updatehandler, B4DI_eBar_Bar_GetSize );
     
     //B4DI_eBar_Bar_StorePosSize(eBar_hndl);
     //this will break dynScaling of initValues and maybe not necessay until sizelimits are introduced correctly

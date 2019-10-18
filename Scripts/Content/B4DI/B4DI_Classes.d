@@ -4,15 +4,17 @@
 //========================================
 // [intern] Klasse für PermMem
 //========================================
+//aligmentSlots are a bit redundant to obj_hashtables if aOs carray theri respetive slot information, <- think about it
 class _alignmentManager {
 
     var int alignmentSlots[B4DI_ALIGNMENT_SLOT_ARRAY_SIZE];                //zCArray(h)<@zCList<_alignmentObject*hndl>>[B4DI_ALIGNMENT_SLOT_ARRAY_SIZE]
-    
+                                                                           //necessary for order within the slot
     var int margins_perSlot[B4DI_ALIGNMENT_SLOT_ARRAY_SIZE];               //zCArray(h)<zCArray(h)<int>>[B4DI_ALIGNMENT_SLOT_ARRAY_SIZE][B4DI_ALIGNMENT_SLOT_MARGIN_ARRAY_SIZE]
     
     // TODO var int dynamic_sizelimits;                                            // Bool
     var int sizelimits_ofObjects_perSlot[B4DI_ALIGNMENT_SLOT_ARRAY_SIZE];  //zCArray(h)<zCArray(h)<int>>[B4DI_ALIGNMENT_SLOT_ARRAY_SIZE][2] <-virtual
 
+    var int obj_hashtable;                                                 //_Hashtable(h) //zCArray<zCArray<_HT_Obj>*>
 };
 
 instance _alignmentManager@(_alignmentManager);
@@ -26,7 +28,7 @@ class _alignmentObject {
     
     var int updateHandler;               //function ID which will be called to update the position (and size) of the obj_hndl
     var int getSizeHandler;              //function ID which will be called to get the size of the obj_hndl
-    
+
     var int alignmentSlot;               //index of aM.alignmentSlots array with the listptr the object is currenlty Listed in
 };
 
