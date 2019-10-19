@@ -20,6 +20,21 @@
 
 //};
 //========================================
+// B4DI_ArrayCreateExactSize
+// 			MEM_ArrayCreate with Exact size and handle
+//========================================
+const int sizeOf_Int = 4;
+func int B4DI_ArrayCreateExactSize( var int countToAlloc, var int bytesOfType ) {
+	var int array_hndl;	array_hndl =  new(zCArray@);
+    var zCArray array_inst; array_inst = get(array_hndl);
+    array_inst.numInArray = countToAlloc;
+    array_inst.numAlloc = countToAlloc;
+    array_inst.array = MEM_Alloc(bytesOfType * countToAlloc);
+
+    return array_hndl;
+};
+
+//========================================
 // [intern] Helper Scales depenting on Resolution
 //========================================
 var int B4DI_BarScale[6];

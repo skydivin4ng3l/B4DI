@@ -492,30 +492,33 @@ func int B4DI_AlignmentManager_Create() {
     var int slot_index; var int margin_index; 
     var int current_slot_margin_array; var int current_slot_sizeLimit_array;
 
-    aM.alignmentSlots = new(zCArray@);
-    aM.margins_perSlot = new(zCArray@);
-    aM.sizelimits_ofObjects_perSlot = new(zCArray@);
+    //aM.alignmentSlots = new(zCArray@);
+    aM.alignmentSlots = B4DI_ArrayCreateExactSize( B4DI_ALIGNMENT_SLOT_ARRAY_SIZE ,sizeOf_Int );
+    //aM.margins_perSlot = new(zCArray@);
+    aM.margins_perSlot = B4DI_ArrayCreateExactSize( B4DI_ALIGNMENT_SLOT_ARRAY_SIZE ,sizeOf_Int );
+    //aM.sizelimits_ofObjects_perSlot = new(zCArray@);
+    aM.sizelimits_ofObjects_perSlot = B4DI_ArrayCreateExactSize( B4DI_ALIGNMENT_SLOT_ARRAY_SIZE ,sizeOf_Int );
 
     MEM_Info("Before obj_hashtable");
     aM.obj_hashtable = HT_Create();
     B4DI_Info1("After obj_hashtable:", aM.obj_hashtable );
 
     repeat( slot_index, B4DI_ALIGNMENT_SLOT_ARRAY_SIZE );
-    	MEM_ArrayInsert( getPtr(aM.alignmentSlots), /*slot_index,*/ 0 );
+    	MEM_ArrayWrite( getPtr(aM.alignmentSlots), slot_index, 0 ); //no list yet
 
-    	current_slot_margin_array =  new(zCArray@);
-    	MEM_ArrayInsert(getPtr(aM.margins_perSlot), /*slot_index,*/ current_slot_margin_array);
+    	//current_slot_margin_array =  new(zCArray@);
+    	current_slot_margin_array =  B4DI_ArrayCreateExactSize( B4DI_ALIGNMENT_SLOT_MARGIN_ARRAY_SIZE, sizeOf_Int );
+    	MEM_ArrayWrite(getPtr(aM.margins_perSlot), slot_index, current_slot_margin_array);
 
     	repeat( margin_index, B4DI_ALIGNMENT_SLOT_MARGIN_ARRAY_SIZE );
-			MEM_ArrayInsert( getPtr(current_slot_margin_array), /*margin_index,*/ B4DI_ALIGNMENT_MARGIN_USE_DEFAULT);
+			MEM_ArrayWrite( getPtr(current_slot_margin_array), margin_index, B4DI_ALIGNMENT_MARGIN_USE_DEFAULT);
 		end;
 
-    	current_slot_sizeLimit_array =  new(zCArray@);
-
-    	MEM_ArrayInsert(getPtr(current_slot_sizeLimit_array), /*PS_X,*/ B4DI_ALIGNMENT_SLOT_OBJECTSIZE_NO_LIMIT);
-    	MEM_ArrayInsert(getPtr(current_slot_sizeLimit_array), /*PS_Y,*/ B4DI_ALIGNMENT_SLOT_OBJECTSIZE_NO_LIMIT);
-    	MEM_ArrayInsert(getPtr(aM.sizelimits_ofObjects_perSlot), /*slot_index,*/ current_slot_sizeLimit_array);
-
+    	current_slot_sizeLimit_array = B4DI_ArrayCreateExactSize( B4DI_NUM_OF_AXIS, sizeOf_Int);
+    	
+    	MEM_ArrayWrite(getPtr(current_slot_sizeLimit_array), PS_X, B4DI_ALIGNMENT_SLOT_OBJECTSIZE_NO_LIMIT);
+    	MEM_ArrayWrite(getPtr(current_slot_sizeLimit_array), PS_Y, B4DI_ALIGNMENT_SLOT_OBJECTSIZE_NO_LIMIT);
+    	MEM_ArrayWrite(getPtr(aM.sizelimits_ofObjects_perSlot), slot_index, current_slot_sizeLimit_array);
     end;
 
 
