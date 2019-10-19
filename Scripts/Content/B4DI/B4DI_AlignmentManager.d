@@ -324,7 +324,7 @@ func int B4DI_AlignmentObject_Create( var int aM_hndl, var int obj_hndl, var fun
 	var _alignmentObject new_aO; new_aO = get(new_aO_hndl);
 
 	//link from obj_hndl to aO_hndl
-	if ( !HT_Get(aM.obj_hashtable, obj_hndl) ) {
+	if ( !HT_Has(aM.obj_hashtable, obj_hndl) ) {
 		HT_Insert(aM.obj_hashtable, new_aO_hndl, obj_hndl);
 	};
 	//link from aO_hndl to obj_hndl
@@ -337,15 +337,24 @@ func int B4DI_AlignmentObject_Create( var int aM_hndl, var int obj_hndl, var fun
 	return new_aO_hndl;
 };
 
-func int B4DI_AlignmentObject_Get( var int aM_hndl, var int obj_hndl) {
-	if ( !Hlp_IsValidHandle( aM_hndl ) || !Hlp_IsValidHandle( obj_hndl ) ) { MEM_Warn("B4DI_AlignmentObject_Get; Invalid Handle"); return 0; };
+//========================================
+// AlignmentObject ExistsForObj
+//
+// 		returning the aO_hndl corresponding to the obj_hndl if it exists already
+//========================================
+func int B4DI_AlignmentObject_GetHandleOfObj( var int aM_hndl, var int obj_hndl) {
+	if ( !Hlp_IsValidHandle( aM_hndl ) || !Hlp_IsValidHandle( obj_hndl ) ) { MEM_Warn("B4DI_AlignmentObject_GetHandleOfObj; Invalid Handle"); return 0; };
 	var _alignmentManager aM; aM = get( aM_hndl );
-	// returning the aO_hndl corresponding to the obj_hndl
-	return HT_Get(aM.obj_hashtable, obj_hndl);
+	var int aO_hndl; aO_hndl = 0;
+	if( HT_Has(aM.obj_hashtable, obj_hndl) ) {
+			aO_hndl = HT_Get(aM.obj_hashtable, obj_hndl);
+	};
+	return aO_hndl;
 };
 
+
 //========================================
-// [intern] AlignmentManager Add Object to Slot
+// [intern] AlignmentManager Add alignmentObject to Slot
 //========================================
 func void _B4DI_AlignmentManager_AddToSlot( var int aM_hndl, var int aO_hndl, var int index_targetAlignmentSlot ) {
 	//B4DI_Info1("B4DI_AlignmentManager_AddToSlotInitial: Slot", index_targetAlignmentSlot);
@@ -372,29 +381,19 @@ func void _B4DI_AlignmentManager_AddToSlot( var int aM_hndl, var int aO_hndl, va
 // AlignmentManager Add Object to Slot/initialize
 //========================================
 func void B4DI_AlignmentManager_AddToSlotInitial( var int aM_hndl, var int obj_hndl, var int index_targetAlignmentSlot, var func updateHandler, var func getSizeHandler ) {
-	//B4DI_Info1("B4DI_AlignmentManager_AddToSlotInitial: Slot", index_targetAlignmentSlot);
+	B4DI_Info1("B4DI_AlignmentManager_AddToSlotInitial: Slot", index_targetAlignmentSlot);
 	if ( !Hlp_IsValidHandle( aM_hndl ) || !Hlp_IsValidHandle( obj_hndl ) ) { MEM_Warn("B4DI_AlignmentManager_AddToSlotInitial; Invalid Handle"); return; };
 	var _alignmentManager aM; aM = get( aM_hndl );
 
-	var int aO_hndl; aO_hndl = B4DI_AlignmentObject_Get(aM_hndl, obj_hndl);
-	if ( !aO_hndl ) {
+	var int aO_hndl; aO_hndl = B4DI_AlignmentObject_GetHandleOfObj(aM_hndl, obj_hndl);
+	if ( !Hlp_IsValidHandle(aO_hndl) ) {
 		aO_hndl = B4DI_AlignmentObject_Create( aM_hndl, obj_hndl, updateHandler, getSizeHandler, index_targetAlignmentSlot );
 	};
 	
-	//var int slot_list_ptr; 
-	//slot_list_ptr = MEM_ReadStatArr(getPtr(aM.alignmentSlots), index_targetAlignmentSlot);
-	//if (!slot_list_ptr) {
-	//	slot_list_ptr = List_Create(aO_hndl);
-
-	//} else {
-	//	List_Add(slot_list_ptr, aO_hndl);
-	//};
-
-	//MEM_WriteStatArr(getPtr(aM.alignmentSlots), index_targetAlignmentSlot, slot_list_ptr );
 	_B4DI_AlignmentManager_AddToSlot(aM_hndl, aO_hndl, index_targetAlignmentSlot);
 
 	B4DI_AlignmentManager_UpdateSlotObjects( aM_hndl, index_targetAlignmentSlot );
-	//B4DI_Info1("B4DI_AlignmentManager_AddToSlotInitial: Finished Slot", index_targetAlignmentSlot);
+	B4DI_Info1("B4DI_AlignmentManager_AddToSlotInitial: Finished Slot", index_targetAlignmentSlot);
 };
 
 //========================================
@@ -430,7 +429,7 @@ func void _B4DI_AlignmentManager_RemoveFromSlot( var int aM_hndl, var int aO_hnd
 //========================================
 func void B4DI_AlignmentManager_RemoveFromSlot( var int aM_hndl, var int obj_hndl/*, var int index_alignmentSlot*/ ) {
 	if ( !Hlp_IsValidHandle( aM_hndl ) || !Hlp_IsValidHandle( obj_hndl ) ) { MEM_Warn("B4DI_AlignmentManager_RemoveFromSlot; Invalid Handle"); return; };
-	var _alignmentObject aO; aO = get( B4DI_AlignmentObject_Get(aM_hndl, obj_hndl) );
+	var _alignmentObject aO; aO = get( B4DI_AlignmentObject_GetHandleOfObj(aM_hndl, obj_hndl) );
 	var int index_originAlignmentSlot; index_originAlignmentSlot = aO.alignmentSlot;
 
 	_B4DI_AlignmentManager_RemoveFromSlot( aM_hndl, obj_hndl );
@@ -444,7 +443,7 @@ func void B4DI_AlignmentManager_MoveToSlot( var int aM_hndl, var int obj_hndl, v
 	if ( !Hlp_IsValidHandle( aM_hndl ) || !Hlp_IsValidHandle( obj_hndl ) ) { MEM_Warn("B4DI_AlignmentManager_MoveToSlot; Invalid Handle"); return; };
 	var _alignmentManager aM; aM = get( aM_hndl );
 
-	var int aO_hndl; aO_hndl = B4DI_AlignmentObject_Get(aM.obj_hashtable, obj_hndl);
+	var int aO_hndl; aO_hndl = B4DI_AlignmentObject_GetHandleOfObj(aM_hndl, obj_hndl);
 	var _alignmentObject aO; aO = get( aO_hndl );
 	var int index_originAlignmentSlot; index_originAlignmentSlot = aO.alignmentSlot;
 
@@ -497,7 +496,9 @@ func int B4DI_AlignmentManager_Create() {
     aM.margins_perSlot = new(zCArray@);
     aM.sizelimits_ofObjects_perSlot = new(zCArray@);
 
+    MEM_Info("Before obj_hashtable");
     aM.obj_hashtable = HT_Create();
+    B4DI_Info1("After obj_hashtable:", aM.obj_hashtable );
 
     repeat( slot_index, B4DI_ALIGNMENT_SLOT_ARRAY_SIZE );
     	MEM_WriteStatArr( getPtr(aM.alignmentSlots), slot_index, 0 );
