@@ -9,8 +9,8 @@ func int B4DI_AlignmentManager_GetSizeLimit_forSlot( var int aM_hndl, var int in
 	var int aSlot_array_hndl; 
 	var int sizeLimit;
 
-	aSlot_array_hndl = MEM_ReadStatArr( getPtr(aM.sizelimits_ofObjects_perSlot), index_alignmentSlot );
-	sizeLimit = MEM_ReadStatArr( getPtr(aSlot_array_hndl), Axis);
+	aSlot_array_hndl = MEM_ArrayRead( getPtr(aM.sizelimits_ofObjects_perSlot), index_alignmentSlot );
+	sizeLimit = MEM_ArrayRead( getPtr(aSlot_array_hndl), Axis);
 
 
 	if (sizeLimit == B4DI_ALIGNMENT_SLOT_OBJECTSIZE_NO_LIMIT) {
@@ -30,10 +30,10 @@ func int B4DI_AlignmentManager_GetMargin_forSlot( var int aM_hndl, var int index
 	var _alignmentManager aM; aM = get( aM_hndl );
 
 	var int marginArray_hndl;
-	marginArray_hndl = MEM_ReadStatArr(getPtr(aM.margins_perSlot), index_alignmentSlot);
+	marginArray_hndl = MEM_ArrayRead(getPtr(aM.margins_perSlot), index_alignmentSlot);
 
 	var int marginValue;
-	marginValue = MEM_ReadStatArr(getPtr(marginArray_hndl), marginSide);
+	marginValue = MEM_ArrayRead(getPtr(marginArray_hndl), marginSide);
 
 	if (marginValue == B4DI_ALIGNMENT_MARGIN_USE_DEFAULT) {
 		return B4DI_ALIGNMENT_MARGIN_DEFAULT_VALUE; //<---change this maybe per ini?
@@ -216,7 +216,7 @@ func int B4DI_AlignmentManager_GetObjectCountOfSlot( var int aM_hndl, var int in
 	var int slot_list_ptr;
 	var int list_size;
 
-	slot_list_ptr = MEM_ReadStatArr( getPtr(aM.alignmentSlots), index_alignmentSlot );
+	slot_list_ptr = MEM_ArrayRead( getPtr(aM.alignmentSlots), index_alignmentSlot );
 
 	if( !slot_list_ptr ) { MEM_Info("B4DI_AlignmentManager_UpdateSlotObjects: No Objects"); return 0; };
 	list_size = List_Length(slot_list_ptr);
@@ -237,7 +237,7 @@ func void B4DI_AlignmentManager_UpdateSlotObjects( var int aM_hndl, var int inde
 	var int slot_list_ptr;
 	var int list_size;
 
-	slot_list_ptr = MEM_ReadStatArr( getPtr(aM.alignmentSlots), index_alignmentSlot );
+	slot_list_ptr = MEM_ArrayRead( getPtr(aM.alignmentSlots), index_alignmentSlot );
 
 	if( !slot_list_ptr ) { MEM_Info("B4DI_AlignmentManager_UpdateSlotObjects: No Objects"); return; };
 	list_size = List_Length(slot_list_ptr);
@@ -291,8 +291,8 @@ func void B4DI_AlignmentManager_SetMargin_forSlot( var int aM_hndl, var int inde
 	var _alignmentManager aM; aM = get( aM_hndl );
 	var int marginArray_hndl; 
 
-	marginArray_hndl = MEM_ReadStatArr( getPtr(aM.margins_perSlot), index_alignmentSlot );
-	MEM_WriteStatArr( getPtr(marginArray_hndl), marginSide, marginValue );
+	marginArray_hndl = MEM_ArrayRead( getPtr(aM.margins_perSlot), index_alignmentSlot );
+	MEM_ArrayWrite( getPtr(marginArray_hndl), marginSide, marginValue );
 
 	B4DI_AlignmentManager_UpdateSlotObjects( aM_hndl, index_alignmentSlot);
 
@@ -306,8 +306,8 @@ func void B4DI_AlignmentManager_SetSizeLimit_forSlot( var int aM_hndl, var int i
 	var _alignmentManager aM; aM = get( aM_hndl );
 	var int aSlot_array_hndl; 
 
-	aSlot_array_hndl = MEM_ReadStatArr( getPtr(aM.sizelimits_ofObjects_perSlot), index_alignmentSlot );
-	MEM_WriteStatArr( getPtr(aSlot_array_hndl), Axis, sizeLimitValue );
+	aSlot_array_hndl = MEM_ArrayRead( getPtr(aM.sizelimits_ofObjects_perSlot), index_alignmentSlot );
+	MEM_ArrayWrite( getPtr(aSlot_array_hndl), Axis, sizeLimitValue );
 
 	B4DI_AlignmentManager_UpdateSlotObjects( aM_hndl, index_alignmentSlot );
 
@@ -363,7 +363,7 @@ func void _B4DI_AlignmentManager_AddToSlot( var int aM_hndl, var int aO_hndl, va
 	var _alignmentObject aO; aO = get( aO_hndl );
 	
 	var int slot_list_ptr; 
-	slot_list_ptr = MEM_ReadStatArr(getPtr(aM.alignmentSlots), index_targetAlignmentSlot);
+	slot_list_ptr = MEM_ArrayRead(getPtr(aM.alignmentSlots), index_targetAlignmentSlot);
 	if (!slot_list_ptr) {
 		slot_list_ptr = List_Create(aO_hndl);
 
@@ -371,7 +371,7 @@ func void _B4DI_AlignmentManager_AddToSlot( var int aM_hndl, var int aO_hndl, va
 		List_AddFront(slot_list_ptr, aO_hndl);
 	};
 
-	MEM_WriteStatArr(getPtr(aM.alignmentSlots), index_targetAlignmentSlot, slot_list_ptr );
+	MEM_ArrayWrite(getPtr(aM.alignmentSlots), index_targetAlignmentSlot, slot_list_ptr );
 
 	aO.alignmentSlot = index_targetAlignmentSlot;
 	
@@ -406,7 +406,7 @@ func void _B4DI_AlignmentManager_RemoveFromSlot( var int aM_hndl, var int aO_hnd
 
 	var int index_originAlignmentSlot; index_originAlignmentSlot = aO.alignmentSlot;
 	var int origin_slot_list_ptr;
-	origin_slot_list_ptr = MEM_ReadStatArr(getPtr(aM.alignmentSlots), index_originAlignmentSlot);
+	origin_slot_list_ptr = MEM_ArrayRead(getPtr(aM.alignmentSlots), index_originAlignmentSlot);
 	var int origin_listPos;
 	origin_listPos = List_Contains(origin_slot_list_ptr, aO_hndl);
 	if(origin_listPos) {
@@ -414,7 +414,7 @@ func void _B4DI_AlignmentManager_RemoveFromSlot( var int aM_hndl, var int aO_hnd
 		//List is empty and data = 0; 
 		if( List_HasLength( origin_slot_list_ptr, 1 ) && !List_Get( origin_slot_list_ptr, 1 ) ) {
 			List_Destroy(origin_slot_list_ptr);
-			MEM_WriteStatArr( getPtr(aM.alignmentSlots), index_originAlignmentSlot, 0 );
+			MEM_ArrayWrite( getPtr(aM.alignmentSlots), index_originAlignmentSlot, 0 );
 		};
 	} else {
 		MEM_Warn("B4DI_AlignmentManager_RemoveFromSlot; Invalid Slot");
@@ -501,20 +501,20 @@ func int B4DI_AlignmentManager_Create() {
     B4DI_Info1("After obj_hashtable:", aM.obj_hashtable );
 
     repeat( slot_index, B4DI_ALIGNMENT_SLOT_ARRAY_SIZE );
-    	MEM_WriteStatArr( getPtr(aM.alignmentSlots), slot_index, 0 );
+    	MEM_ArrayInsert( getPtr(aM.alignmentSlots), /*slot_index,*/ 0 );
 
     	current_slot_margin_array =  new(zCArray@);
-    	MEM_WriteStatArr(getPtr(aM.margins_perSlot), slot_index, current_slot_margin_array);
+    	MEM_ArrayInsert(getPtr(aM.margins_perSlot), /*slot_index,*/ current_slot_margin_array);
 
     	repeat( margin_index, B4DI_ALIGNMENT_SLOT_MARGIN_ARRAY_SIZE );
-			MEM_WriteStatArr( getPtr(current_slot_margin_array), margin_index, B4DI_ALIGNMENT_MARGIN_USE_DEFAULT);
+			MEM_ArrayInsert( getPtr(current_slot_margin_array), /*margin_index,*/ B4DI_ALIGNMENT_MARGIN_USE_DEFAULT);
 		end;
 
     	current_slot_sizeLimit_array =  new(zCArray@);
 
-    	MEM_WriteStatArr(getPtr(current_slot_sizeLimit_array), PS_X, B4DI_ALIGNMENT_SLOT_OBJECTSIZE_NO_LIMIT);
-    	MEM_WriteStatArr(getPtr(current_slot_sizeLimit_array), PS_Y, B4DI_ALIGNMENT_SLOT_OBJECTSIZE_NO_LIMIT);
-    	MEM_WriteStatArr(getPtr(aM.sizelimits_ofObjects_perSlot), slot_index, current_slot_sizeLimit_array);
+    	MEM_ArrayInsert(getPtr(current_slot_sizeLimit_array), /*PS_X,*/ B4DI_ALIGNMENT_SLOT_OBJECTSIZE_NO_LIMIT);
+    	MEM_ArrayInsert(getPtr(current_slot_sizeLimit_array), /*PS_Y,*/ B4DI_ALIGNMENT_SLOT_OBJECTSIZE_NO_LIMIT);
+    	MEM_ArrayInsert(getPtr(aM.sizelimits_ofObjects_perSlot), /*slot_index,*/ current_slot_sizeLimit_array);
 
     end;
 
