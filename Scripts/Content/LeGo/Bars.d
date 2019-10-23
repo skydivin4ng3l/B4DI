@@ -588,10 +588,11 @@ func void Bar_SetLabelText(var int bar_hndl, var string labelText, var string fo
 
     var int lLenght; lLenght = Print_ToVirtual( Print_GetStringWidth(labelText, font), PS_X );
     var int fHeight; fHeight = Print_ToVirtual( Print_GetFontHeight(font), PS_Y );
-
-    var int xPos; xPos = (PS_VMAX / 2) - ( Print_ToVirtual(lLenght, vLabel.vsizex) / 2 ); 
-    var int yPos; yPos = (PS_VMAX / 2) - ( Print_ToVirtual(fHeight, vLabel.vsizey) / 2 ); 
-    //B4DI_Info2("Label xPos: ", xPos, " yPos: ", yPos );
+    // calculation seem to happen too early after resize?
+    var int xPos; xPos = roundf ( subf( fracf(PS_VMAX , 2) , fracf( Print_ToVirtual(lLenght, vLabel.vsizex) , 2 ) ) ); 
+    var int yPos; yPos = roundf ( subf( fracf(PS_VMAX , 2) , fracf( Print_ToVirtual(fHeight, vLabel.vsizey) , 2 ) ) ); 
+    //var int yPos; yPos = (PS_VMAX / 2) - ( Print_ToVirtual(fHeight, vLabel.vsizey) / 2 ); 
+    B4DI_Info2("Label xPos: ", xPos, " yPos: ", yPos );
 
     View_DeleteText(bar.vLabel);
     View_AddText(bar.vLabel, xPos, yPos , labelText , font);
