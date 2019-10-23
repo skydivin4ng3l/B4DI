@@ -72,7 +72,7 @@ func void B4DI_Bars_showItemPreview() {
 
 
 //=====Inv_GetSelectedItem=====
-
+//TODO check for other entries that might be selected items in loot/chests
 func int Inv_GetSelectedItem(){
 	var int itm_index; itm_index = oHero.inventory2_oCItemContainer_selectedItem + 2; 		//anscheinend sind die ersten beiden items in der List nie belegt.
 	var zCListSort list; list = _^(oHero.inventory2_oCItemContainer_contents);
@@ -101,22 +101,26 @@ func void B4DI_Bars_Inventory_update() {
 		if( heroManaChanged /*&& !MEM_eBar_MANA.isFadedOut*/ ){
 			B4DI_manaBar_Refresh(heroManaChanged);
 		};
-		selectedInvItem = _^(Inv_GetSelectedItem());
-		//show only preview for new items // description instead of name cause potions are not destinguishable by name, which is "potion" for all
-		if( (STR_Compare(lastSelectedItemName, selectedInvItem.description ) != STR_EQUAL) || (heroHpChanged /*!= false*/ ) || (heroManaChanged/* != false*/ ) ) { 
-			lastSelectedItemName = selectedInvItem.description;
-			//TODO Filter for bar influencing items What about different types: timed, procentual, absolute
-			//TODO pack into preView_Update Function?
-			MEM_Info(selectedInvItem.description);
-			if(selectedInvItem.mainflag == ITEM_KAT_POTIONS || selectedInvItem.mainflag == ITEM_KAT_FOOD){
-				B4DI_Bars_showItemPreview();
-			} else {
-				if (!areItemPreviewsHidden) {
-					B4DI_Bars_hideItemPreview();
+		//TODO PROTECT Against invalid Read -> empty inventory think about it further
+		var int temp_item_ptr; temp_item_ptr = Inv_GetSelectedItem();	
+		if (temp_item_ptr) {
+			selectedInvItem = _^(temp_item_ptr);
+			//show only preview for new items // description instead of name cause potions are not destinguishable by name, which is "potion" for all
+			if( (STR_Compare(lastSelectedItemName, selectedInvItem.description ) != STR_EQUAL) || (heroHpChanged /*!= false*/ ) || (heroManaChanged/* != false*/ ) ) { 
+				lastSelectedItemName = selectedInvItem.description;
+				//TODO Filter for bar influencing items What about different types: timed, procentual, absolute
+				//TODO pack into preView_Update Function?
+				MEM_Info(selectedInvItem.description);
+				if(selectedInvItem.mainflag == ITEM_KAT_POTIONS || selectedInvItem.mainflag == ITEM_KAT_FOOD){
+					B4DI_Bars_showItemPreview();
+				} else {
+					if (!areItemPreviewsHidden) {
+						B4DI_Bars_hideItemPreview();
+					};
 				};
+			} else {
+				//TODO check for preview animation end, repeat
 			};
-		} else {
-			//TODO check for preview animation end, repeat
 		};
 
 		//B4DI_eBars_SetLabelTop(MEM_eBar_HP_handle);
@@ -199,6 +203,7 @@ func void B4DI_Bars_update(){
 //  Apply changed Settings to all Bars
 //
 //#################################################################
+//TODO make sure it is not called before bars are fully initialized npcRef is correct
 func void B4DI_Bars_applySettings() {
 	MEM_Info("B4DI_Bars_applySettings <----------- Started");
 	B4DI_InitBarScale(); // for resolution dependant scaling
@@ -208,6 +213,7 @@ func void B4DI_Bars_applySettings() {
 	B4DI_Bars_getFadeOutMinOptionValue();
 	B4DI_Bars_getFadeInMaxOptionValuef();
 	B4DI_Bars_getbarShowLabelOptionValue();
+	B4DI_getEnableEditUIModeOptionValue();
 
 	if( Hlp_IsValidHandle(MEM_mainAlignmentManager_handle) ){
 		B4DI_AlignmentManager_UpdateAllSlots( MEM_mainAlignmentManager_handle );		
@@ -251,6 +257,11 @@ func void B4DI_Bars_applySettings() {
 		};
 	};
 
+	if(B4DI_enableEditUIMode) {
+		B4DI_EditUI_enable();
+	} else {
+		B4DI_EditUI_disable();
+	};
 
 	MEM_Info("B4DI_Bars_applySettings <----------- finished");
 };

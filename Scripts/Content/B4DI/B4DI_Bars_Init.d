@@ -17,7 +17,7 @@ func void B4DI_Bars_InitOnce() {
 	
 
 	//MEM_Game.pause_screen as a TODO condition
-	HookEngine(cGameManager__ApplySomeSettings_rtn, 6, "B4DI_Bars_applySettings");  // B4DI_Bars_applySettings()
+	HookEngine(cGameManager__ApplySomeSettings_rtn, 6, "B4DI_cGameManager__ApplySomeSettings_rtn");  // B4DI_cGameManager__ApplySomeSettings_rtn()
 	HookEngine(oCNpc__OpenScreen_Status, 7 , "B4DI_OpenScreen_Status"); 					// B4DI_xpBar_show()
 
 	HookEngine(oCNpc__OpenInventory, 6 , "B4DI_inventory_opend");					// B4DI_inventory_opend()
@@ -73,7 +73,7 @@ func void B4DI_Bars_InitOnce() {
 	HookEngineF(oCNpc__ActivateDialogCam, 6, B4DI_oCNpc__ActivateDialogCam);
 	HookEngineF(oCNpc__DeactivateDialogCam, 6, B4DI_oCNpc__DeactivateDialogCam);
 
-	MEM_Info("B4DI Bars ininitialised");
+	
 };
 
 func void B4DI_Bars_InitAlways() {
@@ -85,4 +85,6 @@ func void B4DI_Bars_InitAlways() {
 	B4DI_manaBar_InitAlways();
 	B4DI_focusBar_InitAlways();
 	B4DI_xpBar_InitAlways();
+	
+	B4DI_BARS_INITIALIZED_ALWAYS = 1;
 };

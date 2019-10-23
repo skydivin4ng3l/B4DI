@@ -1,28 +1,21 @@
+func void B4DI_InitAlways(){
+    B4DI_AlignmentManager_InitAlways();
+    B4DI_Bars_InitAlways();
+
+    B4DI_Bars_applySettings();
+};
+
 func void B4DI_InitBarFeatures(){
 
 	B4DI_Bars_InitOnce();
+    //FF_ApplyExt(B4DI_Bars_InitOnce, 1, 1);
 	// Read INI Settings
-    MEM_Info("Initializing entries in Gothic.ini.");
+    B4DI_OptionGetters_InitOnce();
 
-    if (!MEM_GothOptExists("B4DI", "B4DI_barScale")) {
-        // Add INI-entry, if not set
-        MEM_SetGothOpt("B4DI", "B4DI_barScale", "1");
-    };
-
-    if (!MEM_GothOptExists("B4DI", "B4DI_barShowLabel")) {
-        // Add INI-entry, if not set
-        MEM_SetGothOpt("B4DI", "B4DI_barShowLabel", "0");
-    };
-
-    if (!MEM_GothOptExists("B4DI", "B4DI_barFadeOutMin")) {
-        // Add INI-entry, if not set
-        MEM_SetGothOpt("B4DI", "B4DI_barFadeOutMin", "0.0");
-    };
-
-    if (!MEM_GothOptExists("B4DI", "B4DI_barFadeInMax")) {
-        // Add INI-entry, if not set
-        MEM_SetGothOpt("B4DI", "B4DI_barFadeInMax", "1.0");
-    };
+    //B4DI_InitAlways();
+    
+    //B4DI_BARS_FEATURES_INITIALISED = 1;
+    MEM_Info("B4DI Bars ininitialised");
 };
 
 func int B4DI_InitOnce() {
@@ -38,6 +31,8 @@ func int B4DI_InitOnce() {
     // FEATURE: Dynamic Bars
     if (B4DI_Flags & B4DI_BARS) {
         B4DI_InitBarFeatures();
+        //TODO think about this, cause only init always seem to have an issue with game start.
+        //FF_ApplyExt(B4DI_InitBarFeatures,1,1);
     };
 
     
@@ -46,10 +41,6 @@ func int B4DI_InitOnce() {
     return TRUE;
 };
 
-func void B4DI_InitAlways(){
-    B4DI_AlignmentManager_InitAlways();
-    B4DI_Bars_InitAlways();
-};
 
 func void B4DI_Init(var int flags) {
     // Ikarus and LeGo need to be initialized first
@@ -76,8 +67,12 @@ func void B4DI_Init(var int flags) {
         B4DI_INITIALIZED = 1;
     };
 
-    // Perform for every new session and on every load and level change
-    B4DI_InitAlways();
+    // performs only after once initialized actually happended 
+    //if( B4DI_BARS_FEATURES_INITIALISED ) {
+        // Perform for every new session and on every load and level change
+        //B4DI_InitAlways();
+    //};
+    FF_ApplyExt(B4DI_InitAlways, 1, 1); //TODO totally unsafe think about this
 
     MEM_Info(ConcatStrings(B4DI_VERSION, " was initialized successfully."));
 };

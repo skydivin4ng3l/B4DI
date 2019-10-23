@@ -66,16 +66,14 @@ func void B4DI_focusedNpcHP_setLastHP(){
 	lastNpcHP = npc_inFocus.attribute[ATR_HITPOINTS];
 };
 
-// Will be called Twice 
+// Will be called Twice if (FocusBar_update_CallbackActive) 
 func void B4DI_focusBar_update(){
 	//MEM_Info("B4DI_focusBar_update called");
 	//B4DI_Info1("B4DI_focusBar_update showPlayerStatus:", MEM_GAME.showPlayerStatus);
 	if( Hlp_Is_oCNpc(oHero.focus_vob) && MEM_GAME.showPlayerStatus ) {
-		//MEM_Info("B4DI_focusBar_update Its an NPC!");
+		MEM_Info("B4DI_focusBar_update Its an NPC!");
 		var C_Npc npc_inFocus; npc_inFocus = MEM_PtrToInst(oHero.focus_vob);
 		var int current_ID_ofFocus; current_ID_ofFocus = Npc_GetID(npc_inFocus);
-		// Refresh only when HP Changed or different NPC in Focus
-		//TODO check if it is the same npc as before and check for HP difference for animation
 		if( !Npc_isDead( npc_inFocus ) ) {
 
 			if (current_ID_ofFocus != last_ID_ofFocus ) {
@@ -87,20 +85,17 @@ func void B4DI_focusBar_update(){
 			} else if ( current_ID_ofFocus == last_ID_ofFocus ) {
 				var int hp_diff; hp_diff = B4DI_focusedNpcHp_changed();
 				if ( hp_diff ) {
-					//Mark for animation
+					//with animation
 					B4DI_focusBar_Refresh(hp_diff);
 				};
 			};
-			//B4DI_Info1("npc_HP: ", npc_inFocus.attribute[ATR_HITPOINTS]);
 
 			
 			var int att; att = Npc_GetPermAttitude(hero, npc_inFocus);
 			if ( B4DI_focusBar_handleAttitude(att) && !npc_inFocus.noFocus ) {
 				//TODO Customizeable if focus is present at all / only in Combat?
 				B4DI_focusBar_show();
-				//TODO Animated If marked for?? maybe better in refresh function?
 			} else {
-				//B4DI_eBar_hideInstant(MEM_eBar_FOCUS_handle);
 				B4DI_focusBar_hide();
 
 			};
@@ -109,7 +104,6 @@ func void B4DI_focusBar_update(){
 			//MEM_Info("I am an NPC but DEAD ");
 			//TODO Check for avilable loot?
 			B4DI_focusBar_hide();
-			//B4DI_eBar_hideInstant(MEM_eBar_FOCUS_handle);
 		};
 	} else if(Hlp_Is_oCItem(oHero.focus_vob) && MEM_GAME.showPlayerStatus ) {
 		var c_item itm; itm = MEM_PtrToInst(oHero.focus_vob);
@@ -133,12 +127,15 @@ func void B4DI_focusBar_InitAlways(){
 	//original bars
 	MEM_oBar_Focus = MEM_PtrToInst (MEM_GAME.focusBar); //original
 	B4DI_originalBar_hide(MEM_GAME.focusBar);
-	// new dBars dynamic
+	// new eBar
 	if(!Hlp_IsValidHandle(MEM_eBar_FOCUS_handle)){
 		MEM_Info("B4DI_focusBar_InitAlways: Creating an FOCUS Bar Handle");
 		MEM_eBar_FOCUS_handle = B4DI_eBar_CreateAsReplacement(B4DI_FocusBar, MEM_GAME.focusBar );
 	};
 	MEM_eBar_FOCUS = get(MEM_eBar_FOCUS_handle);
+	//Reset npcRef
+	//MEM_eBar_FOCUS.npcRef = 0;
+	B4DI_eBar_ClearNpcRef(MEM_eBar_FOCUS_handle);
 	//B4DI_focusBar_Refresh();
 
 

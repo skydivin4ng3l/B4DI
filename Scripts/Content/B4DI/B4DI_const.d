@@ -1,6 +1,6 @@
 /* Initialization */
 
-const string B4DI_VERSION            = "Beyond 4rt Dynamic Interface v0.0.1";
+const string B4DI_VERSION            = "Beyond 4rt Dynamic Interface v0.0.5";
 const int    B4DI_LEGO_FLAGS         = LeGo_HookEngine       // For initializing all hooks
                                     | LeGo_FrameFunctions   // For projectile gravity
                                     | LeGo_ConsoleCommands  // For console commands and debugging
@@ -8,6 +8,9 @@ const int    B4DI_LEGO_FLAGS         = LeGo_HookEngine       // For initializing
                                     | LeGo_Bars
                                     | LeGo_Gamestate
                                     | LeGo_Buffs
+                                    | LeGo_Cursor
+                                    /*| LeGo_Render*/
+                                    | LeGo_Buttons
                                     | LeGo_PrintS;          // To be safe (in case it is used in critical hit event)
 
 var   int    B4DI_Flags;                                     // Flags for initialization of B4DI
@@ -15,7 +18,9 @@ const int    B4DI_BARS             = 1<<0;                 	// xpBars.d
 
 const int    B4DI_ALL                = (1<<2) - 1;           // Initialize all features
 
-const int    B4DI_INITIALIZED        = 0;                    // Indicator whether B4DI was initialized
+const int    B4DI_INITIALIZED				= 0;                    // Indicator whether B4DI was initialized
+const int 	 B4DI_BARS_FEATURES_INITIALISED		= 0;
+const int 	 B4DI_BARS_INITIALIZED_ALWAYS	= 0;
 
 //========================================
 // _barPreview Options

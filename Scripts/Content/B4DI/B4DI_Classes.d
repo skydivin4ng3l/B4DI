@@ -48,7 +48,7 @@ class _extendedBar {
     var int isFadedOut;             // Bool
     var int anim8FadeOut;           // A8Head(h)
     var int anim8PulseSize;         // A8Head(h)
-    var int npcRef;                 // C_NPC_PTR
+    var int npcRef;                 // Npc_GetID(C_NPC_PTR);
 };
 
 instance _extendedBar@(_extendedBar);
@@ -70,6 +70,30 @@ func void _extendedBar_Delete(var _extendedBar eBar) {
         Anim8_Delete(eBar.anim8PulseSize);
     };
 };
+
+// maybe not necessary ptr will be recreated
+/*func void _extentedBar_Archiver( var _extendedBar this ) {
+    PM_SaveInt("bar", this.bar);
+    PM_SaveInt("barPreview", this.barPreview);
+    PM_SaveInt("barPostview", this.barPostview);
+    PM_SaveInt("isFadedOut", this.isFadedOut);
+    PM_SaveInt("anim8FadeOut", this.anim8FadeOut);
+    PM_SaveInt("anim8PulseSize", this.anim8PulseSize);
+
+    PM_SaveInt("npcRef", this.npcRef); //Do not save Pointer
+};
+
+func void _extendedBar_Unarchiver( var _extendedBar this ) {
+    if(PM_Exists("bar")) {this.bar = PM_Load("bar"); };  
+    if(PM_Exists("barPreview")) {this.barPreview = PM_Load("barPreview"); };  
+    if(PM_Exists("barPostview")) {this.barPostview = PM_Load("barPostview"); };  
+    if(PM_Exists("isFadedOut")) {this.isFadedOut = PM_Load("isFadedOut"); };  
+    if(PM_Exists("anim8FadeOut")) {this.anim8FadeOut = PM_Load("anim8FadeOut"); };  
+    if(PM_Exists("anim8PulseSize")) {this.anim8PulseSize = PM_Load("anim8PulseSize"); };  
+    
+    if(PM_Exists("npcRef")) {this.npcRef = PM_Load("npcRef"); };  
+};
+*/
 
 /***********************************\
                 BARPREVIEW

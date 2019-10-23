@@ -26,8 +26,8 @@ func void B4DI_manaBar_InitAlways(){
 	if(!Hlp_IsValidHandle(MEM_eBar_MANA_handle)){
 		MEM_Info("B4DI_manaBar_InitAlways: Creating an MAMA Bar Handle");
 		MEM_eBar_MANA_handle = B4DI_eBar_CreateAsReplacement(B4DI_ManaBar, MEM_GAME.manaBar);
-		B4DI_eBar_SetNpcRef(MEM_eBar_MANA_handle, MEM_InstToPtr(hero));
 	};
+	B4DI_eBar_SetNpcRef(MEM_eBar_MANA_handle, MEM_InstToPtr(hero));
 	MEM_eBar_MANA = get(MEM_eBar_MANA_handle);
 	B4DI_manaBar_Refresh(B4DI_eBAR_INTITIAL_REFRESH);
 

@@ -94,7 +94,7 @@ func void B4DI_eBar_SetNpcRef(var int eBar_hndl, var int C_NPC_ptr) {
     var _extendedBar eBar; eBar = get(eBar_hndl);
     var C_NPC new_npc_inst; new_npc_inst = MEM_PtrToInst(C_NPC_ptr);
     if ( !Hlp_IsValidNpc( new_npc_inst ) ) { MEM_Warn("B4DI_eBar_SetNpcRef failed: invalid C_NPC_ptr"); return; };
-    eBar.npcRef = C_NPC_ptr;
+    eBar.npcRef = Npc_GetID(new_npc_inst);
 };
 
 func void B4DI_eBar_ClearNpcRef( var int eBar_hndl ) {
@@ -108,7 +108,7 @@ func int B4DI_eBar_GetNpcRef(var int eBar_hndl) {
     if(!Hlp_IsValidHandle(eBar_hndl)) { MEM_Warn("B4DI_eBar_GetNpcRef failed: invalid eBar_hndl"); return 0; };
     var _extendedBar eBar; eBar = get(eBar_hndl);
     if ( eBar.npcRef ) {
-        return eBar.npcRef;
+        return Npc_FindByID(eBar.npcRef);
     } else {
         return false;
     };
@@ -492,7 +492,7 @@ func void B4DI_eBar_SetValuesBasic(var int eBar_hndl, var int value, var int val
 func void B4DI_eBar_SetValuesAttributeBased(var int eBar_hndl, var int index_value, var int index_valueMax) {
     if( !Hlp_IsValidHandle(eBar_hndl) ) { MEM_Warn("B4DI_eBar_SetValuesAttributeBased failed"); return; };
     var _extendedBar eBar; eBar = get(eBar_hndl);
-    var C_NPC npcRef_inst; npcRef_inst = MEM_PtrToInst(eBar.npcRef);
+    var C_NPC npcRef_inst; npcRef_inst = MEM_PtrToInst(B4DI_eBar_GetNpcRef(eBar_hndl));
     
     if( !Hlp_IsValidNpc( npcRef_inst ) ) { 
         MEM_Info("B4DI_eBar_SetValuesAttributeBased failed not correct NPC");
@@ -510,12 +510,15 @@ func void B4DI_eBar_SetValuesAttributeBased(var int eBar_hndl, var int index_val
 func void B4DI_eBar_SetValues(var int ebar_hndl, var int index_value, var int index_valueMax) {
     if(!Hlp_IsValidHandle(eBar_hndl)) { MEM_Warn("B4DI_eBar_SetValues failed"); return; };
     var _extendedBar eBar; eBar = get(eBar_hndl);
-
-    if ( !eBar.npcRef ) {
+    var int npcRef_ptr; npcRef_ptr = B4DI_eBar_GetNpcRef(eBar_hndl);
+    if ( !npcRef_ptr ) {
+        MEM_Info("B4DI_eBar_SetValues npcRef is 0");
         B4DI_eBar_SetValuesBasic(eBar_hndl, index_value, index_valueMax);
     } else {
-        var C_NPC npcRef_inst; npcRef_inst = MEM_PtrToInst(eBar.npcRef);
+        MEM_Info("B4DI_eBar_SetValues npcRef is NOT 0");
+        var C_NPC npcRef_inst; npcRef_inst = MEM_PtrToInst(npcRef_ptr);
         if ( !Hlp_IsValidNpc( npcRef_inst ) ) {
+            MEM_Info("B4DI_eBar_SetValues failed wrong npcRef");
             MEM_Warn("B4DI_eBar_SetValues failed wrong npcRef");
             return;
         };

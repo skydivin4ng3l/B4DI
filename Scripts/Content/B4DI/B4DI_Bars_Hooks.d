@@ -286,3 +286,14 @@ func void B4DI_oCNpc__DeactivateDialogCam(){
 	MEM_Info("B4DI_oCNpc__DeactivateDialogCam");
 };
 
+//========================================
+// Apply Settings Return
+//========================================
+func void B4DI_cGameManager__ApplySomeSettings_rtn(){
+	B4DI_Info1("B4DI_cGameManager__ApplySomeSettings_rtn: B4DI_BARS_INITIALIZED_ALWAYS= ", B4DI_BARS_INITIALIZED_ALWAYS );
+	if(B4DI_BARS_INITIALIZED_ALWAYS) { //<--- useless for after hot load
+		FF_ApplyOnceExt(B4DI_Bars_applySettings, 1, 1); 
+		//B4DI_Bars_applySettings();
+	};
+};
+

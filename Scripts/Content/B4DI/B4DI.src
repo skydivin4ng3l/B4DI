@@ -4,10 +4,12 @@ B4DI_Globals.d
 
 
 B4DI_Bars_GeneralFunctions.d
+B4DI_OptionGetters.d
 B4DI_AlignmentManager.d
 B4DI_BarPreview.d
 B4DI_BarPostview.d
 B4DI_extendedBar.d
+B4DI_EditUI.d
 
 B4DI_Bars_FocusBar.d
 B4DI_Bars_XpBar.d

@@ -30,8 +30,8 @@ func void B4DI_hpBar_InitAlways(){
 		MEM_Info("B4DI_hpBar_InitAlways: Creating an HP Bar Handle");
 
 		MEM_eBar_HP_handle = B4DI_eBar_CreateAsReplacement(B4DI_HpBar, MEM_GAME.hpBar);
-		B4DI_eBar_SetNpcRef(MEM_eBar_HP_handle, MEM_InstToPtr(hero));
 	};
+	B4DI_eBar_SetNpcRef(MEM_eBar_HP_handle, MEM_InstToPtr(hero));
 	MEM_eBar_Hp = get(MEM_eBar_HP_handle);
 	B4DI_HpBar_Refresh(B4DI_eBAR_INTITIAL_REFRESH);
 
