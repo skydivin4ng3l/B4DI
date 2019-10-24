@@ -28,9 +28,9 @@ func void B4DI_OptionGetters_InitOnce() {
     };
 
     //TODO Think about always disable on startup
-    if (!MEM_GothOptExists("B4DI", "B4DI_enableEditUIMode")) {
+    //if (!MEM_GothOptExists("B4DI", "B4DI_enableEditUIMode")) {
         MEM_SetGothOpt("B4DI", "B4DI_enableEditUIMode", "0");
-    };
+    //};
 };
 
 //========================================

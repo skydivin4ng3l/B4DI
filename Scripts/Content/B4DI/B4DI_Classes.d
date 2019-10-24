@@ -24,10 +24,11 @@ instance _alignmentManager@(_alignmentManager);
 //========================================
 class _alignmentObject {
 
-    var int objectHandle;                //obj*hndl
+    var int objectHandle;                //obj(h)
     
     var int updateHandler;               //function ID which will be called to update the position (and size) of the obj_hndl
     var int getSizeHandler;              //function ID which will be called to get the size of the obj_hndl
+    var int getPosHandler;              //function ID which will be called to get the Position of the obj_hndl
 
     var int alignmentSlot;               //index of aM.alignmentSlots array with the listptr the object is currenlty Listed in
 };

@@ -19,8 +19,11 @@ INSTANCE MENU_GAME_OPT_B4DI(C_MENU_DEF)
 
 	items[7]		= "MENUITEM_B4DI_BAR_FADEOUT_MIN";
 	items[8]		= "MENUITEM_B4DI_BAR_FADEOUT_MIN_SLIDER";
+
+	items[9]		= "MENUITEM_B4DI_EDITUI";
+	items[10]		= "MENUITEM_B4DI_EDITUI_CHOICE";
 				
-	items[9]		= "MENUITEM_OPT_B4DI_BACK";
+	items[11]		= "MENUITEM_OPT_B4DI_BACK";
 	
 	flags = flags | MENU_SHOW_INFO;
 };
@@ -180,6 +183,45 @@ instance MENUITEM_B4DI_BAR_FADEOUT_MIN_SLIDER(C_MENU_ITEM_DEF)
 
 	flags		= flags & ~IT_SELECTABLE;	
 };
+
+//
+// Bar Label
+//
+
+INSTANCE MENUITEM_B4DI_EDITUI(C_MENU_ITEM_DEF)
+{
+	backpic		=	MENU_ITEM_BACK_PIC;
+	text[0]		=	"EditUI Mode";
+	text[1]		= 	"Toggles interactive UI Editing."; // Kommentar
+	// Position und Dimension	
+	posx		=	1000;	posy		=	MENU_START_Y + MENU_DY*4;
+	dimx		=	4000;	dimy		=	600;
+	// Aktionen
+	onSelAction[0]	= SEL_ACTION_UNDEF;
+	// Weitere Eigenschaften
+	flags			= flags | IT_EFFECTS_NEXT;
+};
+
+instance MENUITEM_B4DI_EDITUI_CHOICE(C_MENU_ITEM_DEF)
+{
+	backPic		=	MENU_CHOICE_BACK_PIC;
+	type		=	MENU_ITEM_CHOICEBOX;		
+	text[0]		= 	"off|on";
+	fontName	=   MENU_FONT_SMALL;
+	// Position und Dimension	
+	posx		= 5000;		posy		=	MENU_START_Y + MENU_DY*4 + MENU_CHOICE_YPLUS;
+	dimx = MENU_CHOICE_DX;	dimy 		= 	MENU_CHOICE_DY;
+	// Aktionen
+	onChgSetOption						= "B4DI_enableEditUIMode";
+	onChgSetOptionSection 				= "B4DI";
+	// Weitere Eigenschaften
+	flags		= flags & ~IT_SELECTABLE;	
+	flags		= flags  | IT_TXT_CENTER;
+};
+
+//========================================
+// BACK
+//========================================
 
 INSTANCE MENUITEM_OPT_B4DI_BACK(C_MENU_ITEM_DEF)
 {

@@ -106,6 +106,15 @@ const int B4DI_ALIGNMENT_CENTER_RIGHT		= 8;
 
 const int B4DI_ALIGNMENT_SLOT_ARRAY_SIZE	= 9;
 
+const int B4DI_AlignmentMananger_SlotsOrder[B4DI_ALIGNMENT_SLOT_ARRAY_SIZE] = { B4DI_ALIGNMENT_LEFT_TOP,
+																				B4DI_ALIGNMENT_CENTER_TOP,
+																				B4DI_ALIGNMENT_RIGHT_TOP,
+																				B4DI_ALIGNMENT_CENTER_LEFT,
+																				B4DI_ALIGNMENT_CENTER,
+																				B4DI_ALIGNMENT_CENTER_RIGHT,
+																				B4DI_ALIGNMENT_LEFT_BOTTOM,
+																				B4DI_ALIGNMENT_CENTER_BOTTOM,
+																				B4DI_ALIGNMENT_RIGHT_BOTTOM };
 
 //========================================
 // Animation Modes

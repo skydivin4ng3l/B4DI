@@ -117,7 +117,7 @@ func void Bar_storePosSize(var int bar_hndl){
 //========================================
 // [AlignmentManager Helper]Get initial vsize per axis
 //========================================
-// Do Not use "View_GetSize( var int hndl, var int axis )", cause Animation may has influence, use this instead.
+// Do Not use "View_GetSizePerAxis( var int hndl, var int axis )", cause Animation may has influence, use this instead.
 func int Bar_GetSize(var int bar_hndl, var int axis) {
     if(!Hlp_IsValidHandle(bar_hndl)) { return 0; };
     var _bar bar; bar = get(bar_hndl);
@@ -127,6 +127,18 @@ func int Bar_GetSize(var int bar_hndl, var int axis) {
     } else if(axis == PS_Y) {
         return bar.initVSizes[IDS_VBACK_Y];
     };
+};
+
+//========================================
+// [AlignmentObject Helper]Get current vpos per axis
+//========================================
+// Do Not use "View_GetSizePerAxis( var int hndl, var int axis )", cause Animation may has influence, use this instead.
+func int Bar_GetPositionPerAxis(var int bar_hndl, var int axis) {
+    if(!Hlp_IsValidHandle(bar_hndl)) { return 0; };
+    var _bar bar; bar = get(bar_hndl);
+
+    return View_GetPositionPerAxis(bar.v0, axis);
+    
 };
 
 //========================================

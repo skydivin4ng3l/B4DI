@@ -474,18 +474,35 @@ func void View_MoveToAdvancedPxl(var int hndl, var int x, var int y, var int anc
 //========================================
 // View GetSize per Axis
 //========================================
-func int ViewPtr_GetSize( var int ptr, var int axis ) {
+func int ViewPtr_GetSizePerAxis( var int ptr, var int axis ) {
     var zCView v; v = _^(ptr);
     if(axis == PS_X) { return v.vsizex; };
     if(axis == PS_Y) { return v.vsizey; };
 
-    MEM_Warn("ViewPtr_GetSize failed");
+    MEM_Warn("ViewPtr_GetSizePerAxis failed");
 
     return 0;
 };
 
-func int View_GetSize( var int hndl, var int axis ) {
-    ViewPtr_GetSize( getPtr(hndl), axis );
+func int View_GetSizePerAxis( var int hndl, var int axis ) {
+    ViewPtr_GetSizePerAxis( getPtr(hndl), axis );
+};
+
+//========================================
+// View GetPosition per Axis
+//========================================
+func int ViewPtr_GetPositionPerAxis( var int ptr, var int axis ) {
+    var zCView v; v = _^(ptr);
+    if(axis == PS_X) { return v.vposx; };
+    if(axis == PS_Y) { return v.vposy; };
+
+    MEM_Warn("ViewPtr_GetPositionPerAxis failed");
+
+    return 0;
+};
+
+func int View_GetPositionPerAxis( var int hndl, var int axis ) {
+    ViewPtr_GetPositionPerAxis( getPtr(hndl), axis );
 };
 
 //========================================

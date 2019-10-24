@@ -138,6 +138,16 @@ func int B4DI_eBar_Bar_GetSize( var int eBar_hndl, var int axis ) {
     return scaled_size;
 };
 
+//========================================
+//  eBar Get LeftUpper vPos per Axis
+//========================================
+func int B4DI_eBar_Bar_GetPos( var int eBar_hndl, var int axis ) {
+    if(!Hlp_IsValidHandle(eBar_hndl)) { MEM_Warn("B4DI_eBar_Bar_GetPos failed: invalid eBar_hndl"); return 0; };
+    var _extendedBar eBar; eBar = get( eBar_hndl );
+
+    return Bar_GetPositionPerAxis(eBar.bar, axis);
+
+};
 
 //========================================
 // eBar add to alignment lists
@@ -149,7 +159,7 @@ func void B4DI_eBar_AddToAlignmentSlot( var int eBar_hndl, var int alignmentSlot
     if (alignmentSlot == B4DI_ALIGNMENT_USE_ANCHOR) {
         alignmentSlot = Bar_GetAnchor(eBar.bar);
     };
-    B4DI_AlignmentManager_AddToSlotInitial(MEM_mainAlignmentManager_handle, eBar_hndl, alignmentSlot, B4DI_eBar_AlignmentManager_Updatehandler, B4DI_eBar_Bar_GetSize );
+    B4DI_AlignmentManager_AddToSlotInitial(MEM_mainAlignmentManager_handle, eBar_hndl, alignmentSlot, B4DI_eBar_AlignmentManager_Updatehandler, B4DI_eBar_Bar_GetSize, B4DI_eBar_Bar_GetPos );
     
     //B4DI_eBar_Bar_StorePosSize(eBar_hndl);
     //this will break dynScaling of initValues and maybe not necessay until sizelimits are introduced correctly
