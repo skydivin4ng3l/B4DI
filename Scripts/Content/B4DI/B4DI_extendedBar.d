@@ -272,6 +272,72 @@ func void B4DI_eBar_pulse_size(var int eBar_hndl, var func pulseFunc) {
 };
 
 //========================================
+// eBar Hide / Show
+//========================================
+func void B4DI_eBar_hideCustom( var int eBar_hndl, var int animated){
+    if(!Hlp_IsValidHandle(ebar_hndl)) { MEM_Info("B4DI_eBar_hide failed"); return; };
+    var _extendedBar eBar_inst; eBar_inst = get(ebar_hndl);
+
+    if(!animated) {
+        eBar_inst.isFadedOut = 1;
+        //B4DI_eBar_SetAlpha(eBar_hndl, B4DI_barFadeOutMin); //TODO: Think about this Focus Bar has to completly fade away!
+        B4DI_eBar_SetAlpha(eBar_hndl, 0);
+        //MEM_Info("B4DI_eBar_hideCustom NOT Animated successful");
+    } else {
+        if( !eBar_inst.isFadedOut ) { //TODO <------think about this
+            eBar_inst.isFadedOut = 1;
+            B4DI_eBar_fadeOut(eBar_hndl, false);
+            MEM_Info("B4DI_eBar_hideCustom Animated successful");
+        } else {
+            MEM_Info("B4DI_eBar_hideCustom already hidden");
+        };
+
+    };
+    //MEM_Info("B4DI_eBar_hideCustom successful");
+};
+
+func void B4DI_eBar_hideInstant( var int eBar_hndl){
+    if(!Hlp_IsValidHandle(ebar_hndl)) { MEM_Info("B4DI_eBar_hideInstant failed"); return; };
+
+    B4DI_eBar_hideCustom(eBar_hndl, false);
+    var _extendedBar eBar; eBar = get(eBar_hndl);
+    if ( Hlp_IsValidHandle(eBar.barPostview) ) {
+        B4DI_BarPostview_delete(eBar.barPostview);
+    };
+};
+
+func void B4DI_eBar_hideFaded( var int eBar_hndl){
+    B4DI_eBar_hideCustom(eBar_hndl, true);
+};
+
+func void B4DI_eBar_show( var int eBar_hndl){
+    if(!Hlp_IsValidHandle(eBar_hndl)) {
+        MEM_Warn("B4DI_eBar_show failed");
+        return;
+    };
+    var _extendedBar eBar_inst; eBar_inst = get(eBar_hndl);
+    if (eBar_inst.isFadedOut) {
+        if(Hlp_IsValidHandle(eBar_inst.anim8FadeOut) ){
+            Anim8_Delete(eBar_inst.anim8FadeOut);
+        };
+        eBar_inst.isFadedOut = 0;
+        B4DI_eBar_SetAlpha(eBar_hndl, B4DI_barFadeInMax);
+
+        //Bar_Show(eBar_inst.bar);
+        MEM_Info("B4DI_eBar_show successful");
+    } else {
+        //MEM_Info("B4DI_eBar_show already visible");
+    };
+
+    ////TODO make optional
+    //if(B4DI_barShowLabel){
+    //    B4DI_eBar_showLabel(eBar_hndl);
+    //};
+
+
+};
+
+//========================================
 // eBar Label
 //========================================
 func void B4DI_eBar_showLabel( var int eBar_hndl ) {
@@ -346,79 +412,16 @@ func void B4DI_eBar_RefreshLabel(var int eBar_hndl) {
     //add text in closed mode
     Bar_SetLabelText(eBar.bar, label, B4DI_LABEL_FONT );
     if(eBar.isFadedOut) {
-        //B4DI_eBar_hideLabel(eBar_hndl);
-        B4DI_eBar_SetAlpha(eBar_hndl, B4DI_barFadeOutMin); //TODO <----think about this, this causes Focus Bar to get drawn although no focus, 
-        //B4DI_eBar_GetAlpha(eBar_hndl) could be an option but if animation is currently onGoing problematic
+        //Special case for MEM_eBar_FOCUS_handle cause it should not be drawn at all if fadedout
+        if(eBar_hndl != MEM_eBar_FOCUS_handle) {
+            B4DI_eBar_SetAlpha(eBar_hndl, B4DI_barFadeOutMin); 
+        } else {
+            B4DI_eBar_hideInstant(MEM_eBar_FOCUS_handle); 
+        };
 
     };
 
     B4DI_Info1("B4DI_eBar_RefreshLabel call while isFadedOut: ", eBar.isFadedOut);
-};
-
-//========================================
-// eBar Hide / Show
-//========================================
-func void B4DI_eBar_hideCustom( var int eBar_hndl, var int animated){
-    if(!Hlp_IsValidHandle(ebar_hndl)) { MEM_Info("B4DI_eBar_hide failed"); return; };
-    var _extendedBar eBar_inst; eBar_inst = get(ebar_hndl);
-
-    if(!animated) {
-        eBar_inst.isFadedOut = 1;
-        //B4DI_eBar_SetAlpha(eBar_hndl, B4DI_barFadeOutMin); //TODO: Think about this Focus Bar has to completly fade away!
-        B4DI_eBar_SetAlpha(eBar_hndl, 0);
-        MEM_Info("B4DI_eBar_hideCustom NOT Animated successful");
-    } else {
-        if( !eBar_inst.isFadedOut ) { //TODO <------think about this
-            eBar_inst.isFadedOut = 1;
-            B4DI_eBar_fadeOut(eBar_hndl, false);
-            MEM_Info("B4DI_eBar_hideCustom Animated successful");
-        } else {
-            MEM_Info("B4DI_eBar_hideCustom already hidden");
-        };
-
-    };
-    MEM_Info("B4DI_eBar_hideCustom successful");
-};
-
-func void B4DI_eBar_hideInstant( var int eBar_hndl){
-    if(!Hlp_IsValidHandle(ebar_hndl)) { MEM_Info("B4DI_eBar_hideInstant failed"); return; };
-
-    B4DI_eBar_hideCustom(eBar_hndl, false);
-    var _extendedBar eBar; eBar = get(eBar_hndl);
-    if ( Hlp_IsValidHandle(eBar.barPostview) ) {
-        B4DI_BarPostview_delete(eBar.barPostview);
-    };
-};
-
-func void B4DI_eBar_hideFaded( var int eBar_hndl){
-    B4DI_eBar_hideCustom(eBar_hndl, true);
-};
-
-func void B4DI_eBar_show( var int eBar_hndl){
-    if(!Hlp_IsValidHandle(eBar_hndl)) {
-        MEM_Warn("B4DI_eBar_show failed");
-        return;
-    };
-    var _extendedBar eBar_inst; eBar_inst = get(eBar_hndl);
-    if (eBar_inst.isFadedOut) {
-        if(Hlp_IsValidHandle(eBar_inst.anim8FadeOut) ){
-            Anim8_Delete(eBar_inst.anim8FadeOut);
-        };
-        eBar_inst.isFadedOut = 0;
-        B4DI_eBar_SetAlpha(eBar_hndl, B4DI_barFadeInMax);
-
-        //Bar_Show(eBar_inst.bar);
-        MEM_Info("B4DI_eBar_show successful");
-    } else {
-        //MEM_Info("B4DI_eBar_show already visible");
-    };
-
-    ////TODO make optional
-    //if(B4DI_barShowLabel){
-    //    B4DI_eBar_showLabel(eBar_hndl);
-    //};
-
-
 };
 
 //========================================

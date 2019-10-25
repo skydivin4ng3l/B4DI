@@ -66,11 +66,16 @@ func void B4DI_oCGame__UpdatePlayerStatus_FocusBar(){
 	//MEM_Info("B4DI_oCGame__UpdatePlayerStatus_FocusBar finished");
 };
 
-//Gets Hooked after focusbar appearance and unhooked after hide
+//========================================
+// Bar Callback after Playerstatus got updated
+//========================================
 func void B4DI_oCGame__UpdatePlayerStatus_return(){
 	//MEM_Info("B4DI_oCGame__UpdatePlayerStatus_return called");
 	if (FocusBar_update_CallbackActive) {
 		B4DI_focusBar_update();
+	};
+	if (B4DI_HpBar_update_CallbackActive) {
+		B4DI_Bars_update();
 	};
 	//MEM_Info("B4DI_oCGame__UpdatePlayerStatus_return finished");
 };
@@ -250,7 +255,7 @@ func void B4DI_oCNpc__OnDamage_Hit_return(){
 	//TODO else part for Focusbar update?
 	if (heroGotHit) {
 		//B4DI_update_fight_mode();
-		B4DI_Bars_update();
+		B4DI_Bars_update(); //might have to call this twice to fade out again after hit register
 		//MEM_Info("B4DI_oCNpc__OnDamage_Hit_return called after hero got hit");
 		heroGotHit = false;
 	};

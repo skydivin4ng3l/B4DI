@@ -4,6 +4,18 @@
 //
 //#################################################################
 //TODO Rework
+func void B4DI_HpBar_show() {
+	B4DI_eBar_show(MEM_eBar_HP_handle);
+
+	B4DI_HpBar_update_CallbackActive = true;
+};
+
+func void B4DI_hPBar_hide() {
+	B4DI_eBar_hideFaded(MEM_eBar_HP_handle);
+	
+	B4DI_HpBar_update_CallbackActive = false;
+};
+
 func void B4DI_HpBar_Refresh(var int animated_value_diff) {
 	B4DI_eBar_RefreshAnimated(MEM_eBar_HP_handle, ATR_HITPOINTS, ATR_HITPOINTS_MAX, animated_value_diff);
 	//B4DI_eBar_Refresh(MEM_eBar_HP_handle, ATR_HITPOINTS, ATR_HITPOINTS_MAX);
@@ -42,7 +54,7 @@ func void B4DI_hpBar_InitAlways(){
 	//TODO: implement a Screen margin
 	//Bar_MoveLeftUpperToValidScreenSpace(MEM_eBar_HP.bar, MEM_oBar_Hp.zCView_vposx, MEM_oBar_Hp.zCView_vposy );
 	//B4DI_eBar_AlignmentManager_Updatehandler(MEM_eBar_HP_handle, MEM_oBar_Hp.zCView_vposx, MEM_oBar_Hp.zCView_vposy, B4DI_ALIGNMENT_USE_ANCHOR );
-	
+	B4DI_HpBar_update_CallbackActive = false;
 
 	MEM_Info("B4DI_hpBar_InitAlways");
 };

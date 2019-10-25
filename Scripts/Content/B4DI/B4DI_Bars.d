@@ -153,48 +153,22 @@ func void B4DI_Bars_update(){
 		B4DI_manaBar_Refresh(heroManaChanged);
 	};
 	//TODO option on when to show/hide manaBar
-	if ( (!Npc_IsInFightMode( hero, FMODE_NONE ) || heroHpChanged || heroManaChanged || isInventoryOpen ) && MEM_eBar_Hp.isFadedOut ) {
-		B4DI_eBar_show(MEM_eBar_HP_handle);
-		/*if(heroHpChanged ){
-			B4DI_HpBar_Refresh(heroHpChanged);
-		};*/
-		if( (Npc_IsInFightMode( hero, FMODE_MAGIC ) || isInventoryOpen ) && MEM_eBar_MANA.isFadedOut ) {
-			B4DI_eBar_show(MEM_eBar_MANA_handle);
-			/*if( heroManaChanged ){
-				B4DI_manaBar_Refresh(heroManaChanged);
-			};*/
-			B4DI_Info1("SpellMana:", oHero.spellMana);
-		};
-	} else if(Npc_IsInFightMode( hero, FMODE_NONE ) && !heroHpChanged && !heroManaChanged && !isInventoryOpen && !MEM_eBar_Hp.isFadedOut) {
-		B4DI_eBar_hideFaded(MEM_eBar_MANA_handle);
-		B4DI_eBar_hideFaded(MEM_eBar_HP_handle);
+	//HP
+	if ( (!Npc_IsInFightMode( hero, FMODE_NONE ) || heroHpChanged || isInventoryOpen ) && MEM_eBar_Hp.isFadedOut ) {
+		B4DI_HpBar_show();
+		
+	} else if(Npc_IsInFightMode( hero, FMODE_NONE ) && !heroHpChanged && !isInventoryOpen && !MEM_eBar_Hp.isFadedOut) {
+		B4DI_HpBar_hide();
 	};
-	/*if(isInventoryOpen){
-		selectedInvItem = _^(Inv_GetSelectedItem());
-		//show only preview for new items // description instead of name cause potions are not destinguishable by name, which is "potion" for all
-		if( (STR_Compare(lastSelectedItemName, selectedInvItem.description ) != STR_EQUAL) || (heroHpChanged != false ) || (heroManaChanged != false ) ) { 
-			lastSelectedItemName = selectedInvItem.description;
-			//TODO Filter for bar influencing items What about different types: timed, procentual, absolute
-			//TODO pack into preView_Update Function?
-			if(selectedInvItem.mainflag == ITEM_KAT_POTIONS || selectedInvItem.mainflag == ITEM_KAT_FOOD){
-				MEM_Info(selectedInvItem.description);
-				B4DI_Bars_showItemPreview();
-			} else {
-				if (!areItemPreviewsHidden) {
-					B4DI_Bars_hideItemPreview();
-				};
-			};
-		} else {
-			//TODO check for preview animation end, repeat
-		};
-	} else {
-		//Inventory got closed or is just not open
-		if (!areItemPreviewsHidden) {
-			B4DI_Bars_hideItemPreview(); //close previews after inventory closed
-		};
-	};*/
-	//MEM_Info("B4DI_Bars_update");
-	//B4DI_debugSpy("B4DI_ITEM_is: ", item.nameID);
+	//Mana
+	if( (Npc_IsInFightMode( hero, FMODE_MAGIC ) || heroManaChanged || isInventoryOpen ) && MEM_eBar_MANA.isFadedOut ) {
+		B4DI_eBar_show(MEM_eBar_MANA_handle);
+		B4DI_Info1("SpellMana:", oHero.spellMana);
+
+	} else if(Npc_IsInFightMode( hero, FMODE_NONE ) && !heroManaChanged && !isInventoryOpen && !MEM_eBar_MANA.isFadedOut) {
+		B4DI_eBar_hideFaded(MEM_eBar_MANA_handle);
+	};
+
 
 };
 

@@ -35,6 +35,7 @@ var int isInventoryOpen;
 var int areItemPreviewsHidden;
 //var int anyFightModeActive;
 var int FocusBar_update_CallbackActive;
+var int B4DI_HpBar_update_CallbackActive;
 
 var int last_ID_ofFocus;
 var int lastAttitudeOfCurrentFocus;
