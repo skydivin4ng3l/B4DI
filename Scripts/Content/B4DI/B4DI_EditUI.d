@@ -96,6 +96,9 @@ func void B4DI_EditUI_generateButtonForAllAlignmentSlots() {
 
 
 func void B4DI_EditUI_enable(){
+    B4DI_EditUI_enabled = true;
+    B4DI_enableEditUIMode = false;
+    MEM_SetGothOpt("B4DI", "B4DI_enableEditUIMode", "0");
 	Cursor_Show();
     Cursor_NoEngine = true;
 	Event_AddOnce(Cursor_Event, B4DI_EditUI_CursorListener);
@@ -104,6 +107,7 @@ func void B4DI_EditUI_enable(){
 
 
 func void B4DI_EditUI_disable(){
+    B4DI_EditUI_enabled = false;
     Cursor_NoEngine = false;
     Button_DeleteMouseover();
 	Cursor_Hide();
@@ -111,8 +115,6 @@ func void B4DI_EditUI_disable(){
 		Event_Remove(Cursor_Event, B4DI_EditUI_CursorListener);
 	};
     B4DI_EditUI_Buttons_deleteAll();
-    B4DI_enableEditUIMode = false;
-    MEM_SetGothOpt("B4DI", "B4DI_enableEditUIMode", "0");
 
 };
 

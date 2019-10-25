@@ -215,9 +215,6 @@ func void B4DI_Bars_applySettings() {
 	B4DI_Bars_getbarShowLabelOptionValue();
 	B4DI_getEnableEditUIModeOptionValue();
 
-	if( Hlp_IsValidHandle(MEM_mainAlignmentManager_handle) ){
-		B4DI_AlignmentManager_UpdateAllSlots( MEM_mainAlignmentManager_handle );		
-	};
 
 	if( Hlp_IsValidHandle(MEM_eBar_HP_handle) ){
 		B4DI_eBar_dynamicMenuBasedScale(MEM_eBar_HP_handle);
@@ -257,9 +254,14 @@ func void B4DI_Bars_applySettings() {
 		};
 	};
 
-	if(B4DI_enableEditUIMode) {
+	//TODO Fix FocusBar visiblily caused by AlignmentManger Update
+	if( Hlp_IsValidHandle(MEM_mainAlignmentManager_handle) ){
+		B4DI_AlignmentManager_UpdateAllSlots( MEM_mainAlignmentManager_handle );		
+	};
+
+	if(B4DI_enableEditUIMode && !B4DI_EditUI_enabled) {
 		B4DI_EditUI_enable();
-	} else {
+	} else if (B4DI_EditUI_enabled) {
 		B4DI_EditUI_disable();
 	};
 

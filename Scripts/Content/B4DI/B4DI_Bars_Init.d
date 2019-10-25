@@ -79,6 +79,7 @@ func void B4DI_Bars_InitOnce() {
 func void B4DI_Bars_InitAlways() {
 	isInventoryOpen = false;
 	areItemPreviewsHidden = true;
+	B4DI_EditUI_enabled = false;
 	B4DI_heroInstance_InitAlways();
 
 	B4DI_hpBar_InitAlways();

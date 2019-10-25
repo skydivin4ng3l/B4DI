@@ -18,6 +18,7 @@ var int B4DI_barFadeInMax;
 var int B4DI_barShowLabel;
 
 var int B4DI_enableEditUIMode;
+var int B4DI_EditUI_enabled;
 
 //========================================
 // [intern] Global Vars
