@@ -80,8 +80,8 @@ func void B4DI_EditUI_generateButtonForAlignmentSlot( var int vposx, var int vpo
 };
 
 func void B4DI_EditUI_generateButtonForAllAlignmentSlots() {
-    var int slot_chooser_start_x; slot_chooser_start_x = Print_ToVirtual( Cursor_X, PS_X ) + 50;
-    var int slot_chooser_start_y; slot_chooser_start_y = Print_ToVirtual( Cursor_Y, PS_Y ) + 50;
+    var int slot_chooser_start_x; slot_chooser_start_x = Print_ToVirtual( Cursor_X, PS_X );
+    var int slot_chooser_start_y; slot_chooser_start_y = Print_ToVirtual( Cursor_Y, PS_Y );
     B4DI_Info1("B4DI_EditUI_generateButtonForAllAlignmentSlots: slot_chooser_start_x= ", slot_chooser_start_x);
     B4DI_Info1("B4DI_EditUI_generateButtonForAllAlignmentSlots: slot_chooser_start_y= ", slot_chooser_start_y);
     if( slot_chooser_start_x + 1000 > PS_VMAX ) { slot_chooser_start_x -= 1000; };
