@@ -3830,6 +3830,11 @@ func int Hlp_Is_oCMobContainer(var int ptr) {
     return (MEM_ReadInt (ptr) == oCMobContainer_vtbl);
 };
 
+func int Hlp_Is_oCItemContainer(var int ptr) {
+    if (!ptr) { return 0; };
+    return (MEM_ReadInt (ptr) == oCItemContainer_vtbl);
+};
+
 func int Hlp_Is_oCMobDoor(var int ptr) {
     if (!ptr) { return 0; };
     return (MEM_ReadInt (ptr) == oCMobDoor_vtbl);

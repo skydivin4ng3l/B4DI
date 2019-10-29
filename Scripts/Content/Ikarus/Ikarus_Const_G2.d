@@ -101,7 +101,8 @@ const int oCMobInter_vtbl       = 8639884;
 const int oCMobLockable_vtbl    = 8637628;
 const int oCMobContainer_vtbl   = 8637284;
 const int oCMobDoor_vtbl        = 8638548;
-const int oCItem_vtbl           = 8636420;
+const int oCItem_vtbl           = 8636420; //0x83c804
+const int oCItemContainer_vtbl  = 8635564; //0083C4AC
 const int oCNpc_vtbl            = 8640292;
 const int zCVobLight_vtbl		= 8624756;
 
