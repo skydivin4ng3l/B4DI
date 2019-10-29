@@ -244,6 +244,19 @@ instance selectedInvItem(oCItem);
 var string lastSelectedItemName;
 
 /***********************************\
+      Selected Chest Container
+\***********************************/
+
+instance container_inFocus(oCMobContainer);
+
+/***********************************\
+      Open Item Container 
+\***********************************/
+
+instance opened_ItemContainer(oCItemContainer);
+
+
+/***********************************\
       Hero Cast to oCNpc
 \***********************************/
 

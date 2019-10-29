@@ -15,7 +15,8 @@ func void B4DI_Bars_InitOnce() {
 	B4DI_xpBar_InitOnce();
 
 	
-
+	HookEngineF(oCMobContainer__Open_oCNpc, 6, B4DI_oCMobContainer__Open_oCNpc); //B4DI_oCMobContainer__Open_oCNpc()
+	HookEngineF(oCMobContainer__Close_oCNpc, 6, B4DI_oCMobContainer__Close_oCNpc); //B4DI_oCMobContainer__Open_oCNpc()
 	//MEM_Game.pause_screen as a TODO condition
 	HookEngine(cGameManager__ApplySomeSettings_rtn, 6, "B4DI_cGameManager__ApplySomeSettings_rtn");  // B4DI_cGameManager__ApplySomeSettings_rtn()
 	HookEngine(oCNpc__OpenScreen_Status, 7 , "B4DI_OpenScreen_Status"); 					// B4DI_xpBar_show()
@@ -24,7 +25,7 @@ func void B4DI_Bars_InitOnce() {
 	HookEngine(oCNpc__CloseInventory, 9 , "B4DI_inventory_closed");					// B4DI_inventory_closed()
 	//HookEngine(CGameManager__HandleCancelKey, 7 , "B4DI_inventory_closed");			// B4DI_inventory_closed()
 	//HookEngine(zCMenuItemInput__HasBeenCanceled, 6 , "B4DI_inventory_closed");			// B4DI_inventory_closed()
-	//HookEngine(oCItemContainer__Close, 7 , "B4DI_inventory_closed");			// B4DI_inventory_closed() //works
+	HookEngine(oCItemContainer__Close, 7 , "B4DI_oCItemContainer__Close");			// B4DI_oCItemContainer__Close() //works
 	HookEngine(oCNpc__CloseDeadNpc, 5 , "B4DI_inventory_closed");			// B4DI_inventory_closed() // does the job the best
 	//HookEngine(oCGame__UpdateStatus, 8 , "B4DI_Bars_update"); Cloud be an Option but does not cover draw/sheat weapons, option for focus bar update
 	// oCNpc::GetFocusNpc(void) alternative for focus bar
@@ -78,6 +79,7 @@ func void B4DI_Bars_InitOnce() {
 
 func void B4DI_Bars_InitAlways() {
 	isInventoryOpen = false;
+	heroOpenedThisContainer = false;
 	areItemPreviewsHidden = true;
 	B4DI_EditUI_enabled = false;
 	B4DI_heroInstance_InitAlways();

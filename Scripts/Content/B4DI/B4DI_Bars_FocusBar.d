@@ -10,10 +10,50 @@ func void B4DI_focusBar_show() {
 };
 
 func void B4DI_focusBar_hide() {
-	last_ID_ofFocus = 0;
+	last_focused_NpcID = 0;
 	B4DI_eBar_hideInstant(MEM_eBar_FOCUS_handle);
 	B4DI_eBar_ClearNpcRef(MEM_eBar_FOCUS_handle);
 	FocusBar_update_CallbackActive = false;
+};
+
+func void B4DI_focus_Set_focusedItem(var int c_itm_ptr) {
+	var c_item itm; itm = MEM_PtrToInst(oHero.focus_vob);
+	if( ( Hlp_GetInstanceID(itm) != last_focused_ItemID ) ) {
+		B4DI_debugSpy("item_inFocus: ", itm.name);
+		last_focused_ItemID = Hlp_GetInstanceID(itm);
+		
+		FocusedItem_update_CallbackActive = true;
+		
+		// Setze col = RGBA(.., .., .., ..); um die Farbe einzustellen
+		//TODO show preview??
+	} else{ 
+		//same item
+	};
+
+};
+
+func void B4DI_focus_Reset_focusedItem() {
+	last_focused_ItemID = 0;
+	FocusedItem_update_CallbackActive = false;
+};
+
+func void B4DI_focus_Set_focusedMobContainer(var int mobContainer_ptr) {
+	if( mobContainer_ptr != focused_MobContainer_ptr ) {
+		focused_MobContainer_ptr = mobContainer_ptr;
+		container_inFocus = MEM_PtrToInst(mobContainer_ptr);
+		B4DI_debugSpy("Chest in Focus= ", container_inFocus._oCMob_name);
+		B4DI_Info1("Chest in Focus PTR= ", focused_MobContainer_ptr);
+		B4DI_Info1("Chest in Focus HashIndex= ", container_inFocus._zCObject_hashIndex);
+		FocusedMobContainer_update_CallbackActive = true;
+	} else {
+
+	};
+};
+
+func void B4DI_focus_Reset_focusedMobContainer() {
+	focused_MobContainer_ptr = 0;
+	MEM_AssignInstNull(container_inFocus);
+	FocusedMobContainer_update_CallbackActive = false;	
 };
 
 func void B4DI_focusBar_Refresh(var int animated_value_diff){
@@ -66,23 +106,26 @@ func void B4DI_focusedNpcHP_setLastHP(){
 	lastNpcHP = npc_inFocus.attribute[ATR_HITPOINTS];
 };
 
-// Will be called Twice if (FocusBar_update_CallbackActive) 
+// Will be called Twice if (FocusBar_update_CallbackActive) begin and end of updatePlayerStatus
 func void B4DI_focusBar_update(){
 	//MEM_Info("B4DI_focusBar_update called");
 	//B4DI_Info1("B4DI_focusBar_update showPlayerStatus:", MEM_GAME.showPlayerStatus);
 	if( Hlp_Is_oCNpc(oHero.focus_vob) && MEM_GAME.showPlayerStatus ) {
-		MEM_Info("B4DI_focusBar_update Its an NPC!");
+		//MEM_Info("B4DI_focusBar_update Its an NPC!");
+		B4DI_focus_Reset_focusedMobContainer();
+		B4DI_focus_Reset_focusedItem();
+
 		var C_Npc npc_inFocus; npc_inFocus = MEM_PtrToInst(oHero.focus_vob);
 		var int current_ID_ofFocus; current_ID_ofFocus = Npc_GetID(npc_inFocus);
 		if( !Npc_isDead( npc_inFocus ) ) {
 
-			if (current_ID_ofFocus != last_ID_ofFocus ) {
+			if (current_ID_ofFocus != last_focused_NpcID ) {
 				B4DI_debugSpy("npc_inFocus Name: ", npc_inFocus.name);
 				B4DI_focusBar_BindNPC(oHero.focus_vob);
 				B4DI_focusBar_Refresh(B4DI_eBAR_INTITIAL_REFRESH);
-				last_ID_ofFocus = Npc_GetID(npc_inFocus);
+				last_focused_NpcID = Npc_GetID(npc_inFocus);
 				B4DI_focusedNpcHP_setLastHP();
-			} else if ( current_ID_ofFocus == last_ID_ofFocus ) {
+			} else if ( current_ID_ofFocus == last_focused_NpcID ) {
 				var int hp_diff; hp_diff = B4DI_focusedNpcHp_changed();
 				if ( hp_diff ) {
 					//with animation
@@ -105,21 +148,25 @@ func void B4DI_focusBar_update(){
 			//TODO Check for avilable loot?
 			B4DI_focusBar_hide();
 		};
+
 	} else if(Hlp_Is_oCItem(oHero.focus_vob) && MEM_GAME.showPlayerStatus ) {
-		var c_item itm; itm = MEM_PtrToInst(oHero.focus_vob);
-		if( ( Hlp_GetInstanceID(itm) != last_ID_ofFocus ) ) {
-			B4DI_debugSpy("item_inFocus: ", itm.name);
-			last_ID_ofFocus = Hlp_GetInstanceID(itm);
-			B4DI_eBar_hideInstant(MEM_eBar_FOCUS_handle);
-			// Setze col = RGBA(.., .., .., ..); um die Farbe einzustellen
-			//TODO show preview??
-		} else{ 
-			
-		};
-	//Is a neutral element / Callback of StatusUpdate Return / dialog
-	} else {
-		MEM_Info("B4DI_focusBar_update else branch");
 		B4DI_focusBar_hide();
+		B4DI_focus_Reset_focusedMobContainer();
+	
+		B4DI_focus_Set_focusedItem(oHero.focus_vob);
+		
+	//Is a neutral element / Callback of StatusUpdate Return / dialog
+	} else if( Hlp_Is_oCMobContainer(oHero.focus_vob) && MEM_GAME.showPlayerStatus ) {
+		//MEM_Info("B4DI_focusBar_update else branch");
+		B4DI_focusBar_hide();
+		B4DI_focus_Reset_focusedItem();
+
+		B4DI_focus_Set_focusedMobContainer(oHero.focus_vob);
+		
+	} else {
+		B4DI_focusBar_hide();
+		B4DI_focus_Reset_focusedItem();
+		B4DI_focus_Reset_focusedMobContainer();
 	};
 };
 
@@ -134,19 +181,14 @@ func void B4DI_focusBar_InitAlways(){
 	};
 	MEM_eBar_FOCUS = get(MEM_eBar_FOCUS_handle);
 	//Reset npcRef
-	//MEM_eBar_FOCUS.npcRef = 0;
 	B4DI_eBar_ClearNpcRef(MEM_eBar_FOCUS_handle);
 	//B4DI_focusBar_Refresh();
 
-
-	//TODO: Update on option change of Barsize
-	//TODO: implement customizable Positions Left Right Top bottom,...
-	//TODO: implement a Screen margin
-	//Bar_MoveLeftUpperToValidScreenSpace(MEM_eBar_FOCUS.bar, MEM_oBar_Focus.zCView_vposx, MEM_oBar_Focus.zCView_vposy );
-
-	last_ID_ofFocus = 0;
+	last_focused_NpcID = 0;
 	lastNpcHP = 0;
-	FocusBar_update_CallbackActive = 0;
+	FocusBar_update_CallbackActive = false;
+	B4DI_focus_Reset_focusedItem();
+	B4DI_focus_Reset_focusedMobContainer();
 
 	MEM_Info("B4DI_focusBar_InitAlways");
 };

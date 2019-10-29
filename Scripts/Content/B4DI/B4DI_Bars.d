@@ -9,6 +9,20 @@
 //  Inventory related
 //
 //#################################################################
+//========================================
+// ENGINE CALL
+//========================================
+func int B4DI_CALL_oCItemContainer__IsActive( var int itm_container_ptr ) {
+
+	CALL__thiscall(itm_container_ptr,oCItemContainer__IsActive_void);
+	var int returnVal;
+	returnVal = CALL_RetValAsInt();
+	
+	//B4DI_Info1("B4DI_CALL_oCItemContainer__IsActive return = ", returnVal );
+
+	return returnVal;
+};
+
 //#################################################################
 //PreViews
 //#################################################################
@@ -70,11 +84,32 @@ func void B4DI_Bars_showItemPreview() {
 	
 };
 
-
+var int debug_helper_hero_passive;
+var int debug_helper_hero_right;
+var int debug_helper_hero_invMode;
+var int debug_helper_hero_index;
 //=====Inv_GetSelectedItem=====
 //TODO check for other entries that might be selected items in loot/chests
 func int Inv_GetSelectedItem(){
-	var int itm_index; itm_index = oHero.inventory2_oCItemContainer_selectedItem + 2; 		//anscheinend sind die ersten beiden items in der List nie belegt.
+	if( !B4DI_CALL_oCItemContainer__IsActive(MEM_InstToPtr(oHero)+1640) ) { return 0; };
+	var int itm_index; itm_index = oHero.inventory2_oCItemContainer_selectedItem + 2;
+	if(debug_helper_hero_index != itm_index ) {
+		debug_helper_hero_index = itm_index;
+		B4DI_Info1("trying to select a Inventory Item at postion <<<<<", itm_index);
+	};		//anscheinend sind die ersten beiden items in der List nie belegt.
+	//if(debug_helper_hero_passive != oHero.inventory2_oCItemContainer_passive ) {
+	//	debug_helper_hero_passive = oHero.inventory2_oCItemContainer_passive;
+	//	B4DI_Info1("oHero.inventory2_oCItemContainer_passive <<<<<", oHero.inventory2_oCItemContainer_passive);
+	//};
+	//if(debug_helper_hero_right != oHero.inventory2_oCItemContainer_right ) {
+	//	debug_helper_hero_right = oHero.inventory2_oCItemContainer_right;
+	//	B4DI_Info1("inventory2_oCItemContainer_right= ", oHero.inventory2_oCItemContainer_right);
+	//};
+	//if(debug_helper_hero_invMode != oHero.inventory2_oCItemContainer_invMode ) {
+	//	debug_helper_hero_invMode = oHero.inventory2_oCItemContainer_invMode;	
+	//	B4DI_Info1("inventory2_oCItemContainer_invMode= ", oHero.inventory2_oCItemContainer_invMode);
+	//};
+
 	var zCListSort list; list = _^(oHero.inventory2_oCItemContainer_contents);
 	if (List_HasLengthS(_@(list), itm_index))
 	{	
@@ -85,6 +120,60 @@ func int Inv_GetSelectedItem(){
 	{
 		return 0;
 	};	
+};
+
+var int debug_helper_Container_passive;
+var int debug_helper_Container_right;
+var int debug_helper_Container_invMode;
+var int debug_helper_Container_index;
+var int debug_helper_Container_posx;
+var int debug_helper_Container_posy;
+
+func int Inv_GetSelectedMobItem(){
+	//continue if a MobContainer is current focus_vob
+	if (!focused_MobContainer_ptr) {return 0;};
+	//continue if the current focus_vob was used to open the inventory and not just opening the inventory while a chest is in focus
+	if (!heroOpenedThisContainer) {return 0;};
+
+	if( !B4DI_CALL_oCItemContainer__IsActive(container_inFocus.items) ) { return 0; };
+	opened_ItemContainer = _^(container_inFocus.items);
+	var int itm_index; itm_index = opened_ItemContainer.selectedItem + 2; 		//anscheinend sind die ersten beiden items in der List nie belegt.
+	if(debug_helper_Container_index != itm_index ) {
+		debug_helper_Container_index = itm_index;
+		B4DI_Info1("trying to select a container Item at postion <<<<<", itm_index);
+	};
+	
+	if(debug_helper_Container_posx != opened_ItemContainer.posx ) {
+		debug_helper_Container_posx = opened_ItemContainer.posx;
+		B4DI_Info2("opened_ItemContainer.posx <<<<<", opened_ItemContainer.posx, "opened_ItemContainer.posy <<<<<", opened_ItemContainer.posy);
+	};
+
+	//if(debug_helper_Container_passive != opened_ItemContainer.passive ) {
+	//	debug_helper_Container_passive = opened_ItemContainer.passive;
+	//	B4DI_Info1("opened_ItemContainer.passive <<<<<", opened_ItemContainer.passive);
+	//};
+	//if(debug_helper_Container_right != opened_ItemContainer.right ) {
+	//	debug_helper_Container_right = opened_ItemContainer.right;
+	//	B4DI_Info1("right= ", opened_ItemContainer.right);
+	//};
+	//if(debug_helper_Container_invMode != opened_ItemContainer.invMode ) {
+	//	debug_helper_Container_invMode = opened_ItemContainer.invMode;	
+	//	B4DI_Info1("invMode= ", opened_ItemContainer.invMode);
+	//};
+
+	var zCListSort list; list = _^(opened_ItemContainer.contents);
+	//B4DI_Info1("container Size <<<<<", List_LengthS( _@(list) ) );
+
+	if (List_HasLengthS(_@(list), itm_index))
+	{	
+		//MEM_Info("Trying to select a containter item <<<<<<<<<<<<<<<<<<<<< List is long enough");
+		var int itm_ptr; itm_ptr = List_GetS(_@(list), itm_index);
+		return itm_ptr;
+	}
+	else
+	{
+		return 0;
+	};
 };
 
 
@@ -102,12 +191,23 @@ func void B4DI_Bars_Inventory_update() {
 			B4DI_manaBar_Refresh(heroManaChanged);
 		};
 		//TODO PROTECT Against invalid Read -> empty inventory think about it further
-		var int temp_item_ptr; temp_item_ptr = Inv_GetSelectedItem();	
-		if (temp_item_ptr) {
-			selectedInvItem = _^(temp_item_ptr);
+		var int temp_item_ptr; temp_item_ptr = Inv_GetSelectedItem();
+		//B4DI_Info1("temp_item_ptr= ", temp_item_ptr);
+				
+		var int temp_chest_item_ptr; temp_chest_item_ptr = Inv_GetSelectedMobItem();
+		if (temp_item_ptr || temp_chest_item_ptr ) {
+			//if chest is in focus overwrite Item,...will cause Issues when inventory opend while chest is in focus but not used
+			if(temp_item_ptr) {
+				selectedInvItem = _^(temp_item_ptr);
+
+			} else if(temp_chest_item_ptr) {
+				selectedInvItem = _^(temp_chest_item_ptr);
+				//MEM_Info(selectedInvItem.description);
+			};
 			//show only preview for new items // description instead of name cause potions are not destinguishable by name, which is "potion" for all
 			if( (STR_Compare(lastSelectedItemName, selectedInvItem.description ) != STR_EQUAL) || (heroHpChanged /*!= false*/ ) || (heroManaChanged/* != false*/ ) ) { 
 				lastSelectedItemName = selectedInvItem.description;
+				MEM_Info(lastSelectedItemName);
 				//TODO Filter for bar influencing items What about different types: timed, procentual, absolute
 				//TODO pack into preView_Update Function?
 				MEM_Info(selectedInvItem.description);
@@ -164,6 +264,7 @@ func void B4DI_Bars_update(){
 	if( (Npc_IsInFightMode( hero, FMODE_MAGIC ) || heroManaChanged || isInventoryOpen ) && MEM_eBar_MANA.isFadedOut ) {
 		B4DI_eBar_show(MEM_eBar_MANA_handle);
 		B4DI_Info1("SpellMana:", oHero.spellMana);
+		Npc_GetActiveSpell(hero); //useless
 
 	} else if(Npc_IsInFightMode( hero, FMODE_NONE ) && !heroManaChanged && !isInventoryOpen && !MEM_eBar_MANA.isFadedOut) {
 		B4DI_eBar_hideFaded(MEM_eBar_MANA_handle);

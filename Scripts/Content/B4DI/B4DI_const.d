@@ -124,9 +124,22 @@ const int B4DI_PULSE_SIZE_CENTERED_XY 	= 0;
 const int B4DI_PULSE_SIZE_CENTERED_X  	= 1;
 const int B4DI_PULSE_SIZE_CENTERED_Y 	= 2;
 
+
+//========================================
+// Engine Function Calls
+//========================================
+const int oCItemContainer__GetSelectedItem_void = 7377600; //0x007092C0 // HookLen: 5 // Returns virtual oCItem *
+const int oCItemContainer__IsActive_void = 7360720; //0x007050D0 // Returns int
+
+
+
+
 //========================================
 // Hooks
 //========================================
+const int oCMobContainer__Open_oCNpc			= 7496960;		// 0x00726500 // HooKLen: 6
+const int oCMobContainer__Close_oCNpc			= 7497280;		// 0x00726640 // HookLen: 6
+
 const int oCNpc__OpenScreen_Status 				= 7592320;		// 0x73D980 // HookLen: 7
 const int cGameManager__ApplySomeSettings_rtn 	= 4362866; 		// 0x429272 // HookLen: 6
 // Kooked by Quickslots of lego wich is not implemented?

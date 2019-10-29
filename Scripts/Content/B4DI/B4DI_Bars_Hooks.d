@@ -71,7 +71,9 @@ func void B4DI_oCGame__UpdatePlayerStatus_FocusBar(){
 //========================================
 func void B4DI_oCGame__UpdatePlayerStatus_return(){
 	//MEM_Info("B4DI_oCGame__UpdatePlayerStatus_return called");
-	if (FocusBar_update_CallbackActive) {
+	if (FocusBar_update_CallbackActive 
+		|| FocusedItem_update_CallbackActive 
+		|| FocusedMobContainer_update_CallbackActive) {
 		B4DI_focusBar_update();
 	};
 	if (B4DI_HpBar_update_CallbackActive) {
@@ -127,6 +129,66 @@ func void B4DI_inventory_closed(){
 		B4DI_inventory_closeHelper();
 	};
 };
+
+//========================================
+// Opening Containers
+//========================================
+func void B4DI_oCMobContainer__Open_oCNpc(){
+	MEM_Info("B4DI_oCMobContainer__Open_oCNpc called");
+	var oCMobContainer caller; caller = MEM_PtrToInst(ECX);
+	var int caller_ptr; caller_ptr = ECX;
+	B4DI_debugSpy("caller= ", caller._oCMob_name);
+	//if( !Hlp_Is_oCMobContainer(focused_MobContainer_ptr) ) {return;};
+	//if( STR_Compare( caller._oCMob_name, container_inFocus._oCMob_name ) == STR_EQUAL ) {
+	if( caller_ptr == focused_MobContainer_ptr ) {
+		MEM_Info("caller == container_inFocus");
+		var C_NPC opener; opener = MEM_PtrToInst(MEM_ReadInt(ESP+4));
+		B4DI_debugSpy("opener= ", opener.name);
+		if (Npc_IsPlayer(opener)) {
+			MEM_Info("Npc_IsPlayer(opener) == true");
+			heroOpenedThisContainer = true;
+		} else {
+			MEM_Info("Npc_IsPlayer(opener) == false");
+			heroOpenedThisContainer = false;
+		};		
+	};
+};
+
+
+
+//========================================
+// Closing Containers
+//========================================
+func void B4DI_oCMobContainer__Close_oCNpc(){
+	MEM_Info("B4DI_oCMobContainer__Close_oCNpc called");
+	var int caller_ptr; caller_ptr = ECX;
+	//var oCMobContainer caller; caller = MEM_PtrToInst(ECX);
+	B4DI_Info2("B4DI_oCMobContainer__Close_oCNpc caller_ptr= ", caller_ptr, " focused_MobContainer_ptr= ", focused_MobContainer_ptr);
+	if(caller_ptr == focused_MobContainer_ptr) {
+		var C_NPC closer; closer = MEM_PtrToInst( MEM_ReadInt(ESP+4) );
+		if (Npc_IsPlayer(closer)) {
+			B4DI_debugSpy("closer= ", closer.name);
+			heroOpenedThisContainer = false;
+		} else {
+			//this should not happen
+		};		
+	};
+};
+
+//========================================
+// Closing ItemContainer
+//========================================
+func void B4DI_oCItemContainer__Close(){
+	MEM_Info("B4DI_oCItemContainer__Close: called");
+	var int caller_ptr; caller_ptr = ECX;
+	//var oCItemContainer caller; caller = MEM_PtrToInst(ECX);
+	//if( !Hlp_Is_oCItemContainer( MEM_InstToPtr(opened_ItemContainer) ) ) {return;};
+	if( caller_ptr == MEM_InstToPtr(opened_ItemContainer) ) {
+		MEM_Info("B4DI_oCItemContainer__Close: opened_ItemContainer got closed");
+		MEM_AssignInstNull(opened_ItemContainer);
+	};
+};
+
 
 //========================================
 // StatusScreen
@@ -243,7 +305,7 @@ func void B4DI_oCNpc__OnDamage_Hit(){
 		heroGotHit = false;
 		var int callerID; callerID = Npc_GetID(caller);
 		//B4DI_Info1("callerID: ",callerID);
-		if (callerID == last_ID_ofFocus){
+		if (callerID == last_focused_NpcID){
 			enemyInFocusGotHit = true;
 		};
 	};
