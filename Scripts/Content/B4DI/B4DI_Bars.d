@@ -15,26 +15,41 @@
 func int B4DI_CALL_oCItemContainer__IsActive( var int itm_container_ptr ) {
 
 	CALL__thiscall(itm_container_ptr,oCItemContainer__IsActive_void);
-	var int returnVal;
-	returnVal = CALL_RetValAsInt();
+	var int returnValue;
+	returnValue = CALL_RetValAsInt();
 	
-	//B4DI_Info1("B4DI_CALL_oCItemContainer__IsActive return = ", returnVal );
+	//B4DI_Info1("B4DI_CALL_oCItemContainer__IsActive return = ", returnValue );
 
-	return returnVal;
+	return returnValue;
+};
+
+func int B4DI_CALL_oCMag_Book__GetSelectedSpell() {
+	//get oCSpell*
+	CALL__thiscall( oHero.mag_book ,oCMag_Book__GetSelectedSpell__void );
+	var int returnValue;
+	returnValue = CALL_RetValAsPtr();
+
+	B4DI_Info1("B4DI_CALL_oCMag_Book__GetSelectedSpell return = ", returnValue );
+	if(!returnValue){ return 0; };
+	//get oCItem*
+	CALL_PtrParam(returnValue);
+	CALL__thiscall( oHero.mag_book, oCMag_Book__GetSpellItem__oCSpell_ptr );
+	returnValue = CALL_RetValAsPtr();
+
+	B4DI_Info1("oCMag_Book__GetSpellItem__oCSpell_ptr return = ", returnValue );
+
+	return returnValue;
 };
 
 //#################################################################
 //PreViews
 //#################################################################
 func void B4DI_Bars_hideItemPreview() {
-	//TODO Update
-	//View_Close(MEM_preView_HP_handle);
 
 	B4DI_eBar_HidePreview(MEM_eBar_HP_handle);
 	B4DI_eBar_HidePreview(MEM_eBar_MANA_handle);
 	areItemPreviewsHidden = true;
-	//B4DI_eBar_RefreshLabel(MEM_eBar_HP_handle);
-	//B4DI_eBar_RefreshLabel(MEM_eBar_MANA_handle);
+
 	MEM_Info("B4DI_Bars_hideItemPreview finished");
 };
 
@@ -61,6 +76,16 @@ func void B4DI_Bars_showItemPreview() {
 			B4DI_eBar_SetPreviewChangesMaximum(MEM_eBar_HP_handle);
 			B4DI_eBar_ShowPreview(MEM_eBar_HP_handle, value);
 		};
+		if( STR_Compare(type , NAME_HealingPerCast) == STR_EQUAL ) {
+			value = MEM_ReadStatArr(selectedInvItem.COUNT,index);
+			MEM_Info("B4DI_Bars_showItemPreview NAME_HealingPerCast");
+			B4DI_eBar_ShowPreview(MEM_eBar_HP_handle, value);
+		};
+		if( STR_Compare(type , NAME_HealingPerMana) == STR_EQUAL ) {
+			value = MEM_ReadStatArr(selectedInvItem.COUNT,index);
+			MEM_Info("B4DI_Bars_showItemPreview NAME_HealingPerMana");
+			B4DI_eBar_ShowPreview(MEM_eBar_HP_handle, value);
+		};
 		if( STR_Compare(type , NAME_Bonus_Mana ) == STR_EQUAL ) {
 			value = MEM_ReadStatArr(selectedInvItem.COUNT,index);
 			MEM_Info("B4DI_Bars_showItemPreview MANA");
@@ -76,7 +101,23 @@ func void B4DI_Bars_showItemPreview() {
 		if( STR_Compare(type , NAME_Mana_needed ) == STR_EQUAL ) {
 			value = MEM_ReadStatArr(selectedInvItem.COUNT,index);
 			MEM_Info("B4DI_Bars_showItemPreview MANA Needed");
-			//TODO preview manaNeeded
+			B4DI_eBar_ShowPreview(MEM_eBar_MANA_handle, -value);
+		};
+		if( STR_Compare(type , NAME_Manakosten ) == STR_EQUAL ) {
+			value = MEM_ReadStatArr(selectedInvItem.COUNT,index);
+			MEM_Info("B4DI_Bars_showItemPreview MANA costs");
+			B4DI_eBar_ShowPreview(MEM_eBar_MANA_handle, -value);
+		};
+		if( STR_Compare(type , NAME_MinManakosten ) == STR_EQUAL ) {
+			value = MEM_ReadStatArr(selectedInvItem.COUNT,index);
+			MEM_Info("B4DI_Bars_showItemPreview MANA MIN costs");
+			B4DI_eBar_ShowPreview(MEM_eBar_MANA_handle, -value);
+		};
+		//TODO think about how this actually works
+		if( STR_Compare(type , NAME_Addon_NeedsAllMana ) == STR_EQUAL ) {
+			value = B4DI_eBar_GetValue(MEM_eBar_MANA_handle);
+			MEM_Info("B4DI_Bars_showItemPreview NEEDS ALL MANA");
+			B4DI_eBar_ShowPreview(MEM_eBar_MANA_handle, -value);
 		};
 
 	end;
@@ -211,7 +252,7 @@ func void B4DI_Bars_Inventory_update() {
 				//TODO Filter for bar influencing items What about different types: timed, procentual, absolute
 				//TODO pack into preView_Update Function?
 				MEM_Info(selectedInvItem.description);
-				if(selectedInvItem.mainflag == ITEM_KAT_POTIONS || selectedInvItem.mainflag == ITEM_KAT_FOOD){
+				if(selectedInvItem.mainflag == ITEM_KAT_POTIONS || selectedInvItem.mainflag == ITEM_KAT_FOOD || selectedInvItem.mainflag == ITEM_KAT_RUNE ){
 					B4DI_Bars_showItemPreview();
 				} else {
 					if (!areItemPreviewsHidden) {
@@ -220,6 +261,10 @@ func void B4DI_Bars_Inventory_update() {
 				};
 			} else {
 				//TODO check for preview animation end, repeat
+			};
+		} else {
+			if (!areItemPreviewsHidden) {
+				B4DI_Bars_hideItemPreview();
 			};
 		};
 
@@ -235,6 +280,20 @@ func void B4DI_Bars_Inventory_update() {
 	//B4DI_eBar_RefreshLabel(MEM_eBar_HP_handle);
 	//B4DI_eBar_RefreshLabel(MEM_eBar_MANA_handle);
 
+};
+
+func void B4DI_Bars_ShowSpellPreview() {
+	var int spell_itm_ptr;
+	spell_itm_ptr = B4DI_CALL_oCMag_Book__GetSelectedSpell();
+	selectedInvItem = _^(spell_itm_ptr);
+	if(selectedInvItem.mainflag == ITEM_KAT_RUNE ){
+		B4DI_Bars_showItemPreview();
+	};
+};
+
+func void B4DI_Bars_HideSpellPreview() {
+	B4DI_Bars_hideItemPreview();
+	MEM_AssignInstNull(selectedInvItem);
 };
 
 //#################################################################
@@ -263,11 +322,14 @@ func void B4DI_Bars_update(){
 	//Mana
 	if( (Npc_IsInFightMode( hero, FMODE_MAGIC ) || heroManaChanged || isInventoryOpen ) && MEM_eBar_MANA.isFadedOut ) {
 		B4DI_eBar_show(MEM_eBar_MANA_handle);
-		B4DI_Info1("SpellMana:", oHero.spellMana);
-		Npc_GetActiveSpell(hero); //useless
+		//B4DI_Info1("SpellMana:", oHero.spellMana);
+		//Npc_GetActiveSpell(hero); //useless
+		B4DI_Bars_ShowSpellPreview();
+		
 
-	} else if(Npc_IsInFightMode( hero, FMODE_NONE ) && !heroManaChanged && !isInventoryOpen && !MEM_eBar_MANA.isFadedOut) {
+	} else if( !Npc_IsInFightMode( hero, FMODE_MAGIC ) && !heroManaChanged && !isInventoryOpen && !MEM_eBar_MANA.isFadedOut) {
 		B4DI_eBar_hideFaded(MEM_eBar_MANA_handle);
+		B4DI_Bars_HideSpellPreview();
 	};
 
 

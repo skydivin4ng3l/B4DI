@@ -287,9 +287,9 @@ func void B4DI_eBar_hideCustom( var int eBar_hndl, var int animated){
         if( !eBar_inst.isFadedOut ) { //TODO <------think about this
             eBar_inst.isFadedOut = 1;
             B4DI_eBar_fadeOut(eBar_hndl, false);
-            MEM_Info("B4DI_eBar_hideCustom Animated successful");
+            //MEM_Info("B4DI_eBar_hideCustom Animated successful");
         } else {
-            MEM_Info("B4DI_eBar_hideCustom already hidden");
+            //MEM_Info("B4DI_eBar_hideCustom already hidden");
         };
 
     };
@@ -324,7 +324,7 @@ func void B4DI_eBar_show( var int eBar_hndl){
         B4DI_eBar_SetAlpha(eBar_hndl, B4DI_barFadeInMax);
 
         //Bar_Show(eBar_inst.bar);
-        MEM_Info("B4DI_eBar_show successful");
+        //MEM_Info("B4DI_eBar_show successful");
     } else {
         //MEM_Info("B4DI_eBar_show already visible");
     };
@@ -421,7 +421,7 @@ func void B4DI_eBar_RefreshLabel(var int eBar_hndl) {
 
     };
 
-    B4DI_Info1("B4DI_eBar_RefreshLabel call while isFadedOut: ", eBar.isFadedOut);
+    //B4DI_Info1("B4DI_eBar_RefreshLabel call while isFadedOut: ", eBar.isFadedOut);
 };
 
 //========================================
@@ -433,7 +433,7 @@ func void B4DI_eBar_HidePreview(var int eBar_hndl){
     B4DI_BarPreview_hide(eBar.barPreview);
     B4DI_eBar_RefreshLabel(eBar_hndl);
 
-    MEM_Info("B4DI_eBar_HidePreview successful");
+    //MEM_Info("B4DI_eBar_HidePreview successful");
 };
 
 func void B4DI_eBar_ShowPreview(var int eBar_hndl, var int value) {
@@ -442,10 +442,12 @@ func void B4DI_eBar_ShowPreview(var int eBar_hndl, var int value) {
 
     B4DI_BarPreview_CalcPosScale(eBar.barPreview, value);
     B4DI_eBar_RefreshLabel(eBar_hndl);
-    B4DI_eBar_showLabel(eBar_hndl);
+    if(B4DI_barShowLabel || isInventoryOpen) {
+        B4DI_eBar_showLabel(eBar_hndl);
+    };
 
     areItemPreviewsHidden = false;
-    MEM_Info("B4DI_eBar_ShowPreview successful");
+    //MEM_Info("B4DI_eBar_ShowPreview successful");
 };
 
 func void B4DI_eBar_SetPreviewChangesMaximum(var int eBar_hndl){
@@ -459,6 +461,14 @@ func void B4DI_eBar_SetPreviewChangesMaximum(var int eBar_hndl){
 //========================================
 // eBar Value
 //========================================
+func int B4DI_eBar_GetValue( var int eBar_hndl ) {
+    if( !Hlp_IsValidHandle(eBar_hndl) ) { MEM_Warn("B4DI_eBar_SetValuesBasic failed"); return 0; };
+    var _extendedBar eBar; eBar = get(eBar_hndl);
+
+    return Bar_GetValue(eBar.bar);
+
+};
+
 func void B4DI_Bar_SetValuesBasic(var int bar_hndl, var int value, var int valueMax) {
     if( !Hlp_IsValidHandle(bar_hndl) ) { MEM_Warn("B4DI_Bar_SetValuesBasic failed"); return; };
     
@@ -508,7 +518,7 @@ func void B4DI_eBar_SetValuesAttributeBased(var int eBar_hndl, var int index_val
     var C_NPC npcRef_inst; npcRef_inst = MEM_PtrToInst(B4DI_eBar_GetNpcRef(eBar_hndl));
     
     if( !Hlp_IsValidNpc( npcRef_inst ) ) { 
-        MEM_Info("B4DI_eBar_SetValuesAttributeBased failed not correct NPC");
+        //MEM_Info("B4DI_eBar_SetValuesAttributeBased failed not correct NPC");
         return;
     };
         //MEM_Info("B4DI_eBar_SetValuesAttributeBased");
@@ -525,13 +535,12 @@ func void B4DI_eBar_SetValues(var int ebar_hndl, var int index_value, var int in
     var _extendedBar eBar; eBar = get(eBar_hndl);
     var int npcRef_ptr; npcRef_ptr = B4DI_eBar_GetNpcRef(eBar_hndl);
     if ( !npcRef_ptr ) {
-        MEM_Info("B4DI_eBar_SetValues npcRef is 0");
+        //MEM_Info("B4DI_eBar_SetValues npcRef is 0");
         B4DI_eBar_SetValuesBasic(eBar_hndl, index_value, index_valueMax);
     } else {
-        MEM_Info("B4DI_eBar_SetValues npcRef is NOT 0");
+        //MEM_Info("B4DI_eBar_SetValues npcRef is NOT 0");
         var C_NPC npcRef_inst; npcRef_inst = MEM_PtrToInst(npcRef_ptr);
         if ( !Hlp_IsValidNpc( npcRef_inst ) ) {
-            MEM_Info("B4DI_eBar_SetValues failed wrong npcRef");
             MEM_Warn("B4DI_eBar_SetValues failed wrong npcRef");
             return;
         };
@@ -560,7 +569,7 @@ func void B4DI_eBar_SetValuesAnimated( var int eBar_hndl,var int index_value, va
         //B4DI_Info1("B4DI_eBar_SetValuesAnimated: ", value_diff );
         eBar.barPostview = B4DI_BarPostview_Create(eBar_hndl, abs(value_diff) );
         B4DI_BarPostview_Show(eBar.barPostview);
-        B4DI_BarPostview_SetAlphaFunc(eBar.barPostview, zRND_ALPHA_FUNC_SUB);
+        B4DI_BarPostview_SetAlphaFunc(eBar.barPostview, zRND_ALPHA_FUNC_MUL2);
         B4DI_BarPostview_slide_size(eBar.barPostview, B4DI_BarPostview_SetSizeRightsidedPercentX);
 
         B4DI_eBar_SetValues(eBar_hndl, index_value, index_valueMax);
@@ -621,7 +630,7 @@ func void B4DI_eBar_RefreshAnimated(var int eBar_hndl, var int index_value, var 
     if ( !animated_value_diff ) {
         B4DI_eBar_SetValues(eBar_hndl, index_value, index_valueMax);
     } else {
-        MEM_Info("B4DI_eBar_RefreshAnimated Animation specific");
+        //MEM_Info("B4DI_eBar_RefreshAnimated Animation specific");
         B4DI_eBar_SetValuesAnimated(eBar_hndl, index_value, index_valueMax, animated_value_diff);
     };
 
@@ -629,7 +638,7 @@ func void B4DI_eBar_RefreshAnimated(var int eBar_hndl, var int index_value, var 
     var _bar bar; bar = get(eBar.bar);
 
     //MEM_Info("B4DI_eBar_RefreshAnimated");
-    B4DI_debugSpy("B4DI_eBar_RefreshAnimated finished ", View_GetTexture(bar.v1) );
+    //B4DI_debugSpy("B4DI_eBar_RefreshAnimated finished ", View_GetTexture(bar.v1) );
 };
 
 func void B4DI_eBar_Refresh(var int eBar_hndl, var int index_value, var int index_valueMax) {

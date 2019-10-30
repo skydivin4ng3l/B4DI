@@ -164,6 +164,18 @@ func void B4DI_BarPreview_hide( var int barPreview_hndl) {
     MEM_Info("B4DI_Bars_hideItemPreview");
 };
 
+func int B4DI_BarPreview_CalcSize( var int barPreview_hndl, var int diffValue ) {
+    if(!Hlp_IsValidHandle(barPreview_hndl)) { MEM_Warn("B4DI_BarPreview_CalcPosScale failed "); return 0; };
+    var _barPreview bp; bp = get(barPreview_hndl);
+    var _extendedBar eBar; eBar = get(bp.eBar_parent);
+    var _bar bar; bar = get(eBar.bar);
+
+    var int preview_vsizex;
+    preview_vsizex = (((diffValue *1000) / bar.valMax) * bar.barW / 1000);
+    
+    return preview_vsizex;
+};
+
 func void B4DI_BarPreview_CalcPosScale( var int barPreview_hndl, var int value) {
     if(!Hlp_IsValidHandle(barPreview_hndl)) {
         MEM_Warn("B4DI_BarPreview_CalcPosScale failed ");
@@ -186,10 +198,11 @@ func void B4DI_BarPreview_CalcPosScale( var int barPreview_hndl, var int value) 
     //MEM_Info(IntToString(diffValueToBarValMax));
     
     var int preview_vsizex;
+    View_SetAlphaFunc(bp.vPreview, zRND_ALPHA_FUNC_BLEND);
     //value(preview) with overshoot
-    if(diffValueToBarValMax < value){       
-        preview_vsizex = (((diffValueToBarValMax *1000) / bar.valMax) * bar.barW / 1000);
-        var int overshoot_vsizex; overshoot_vsizex = ((( (value - diffValueToBarValMax) *1000) / bar.valMax) * bar.barW / 1000);
+    if(diffValueToBarValMax < value) {       
+        preview_vsizex = B4DI_BarPreview_CalcSize( barPreview_hndl, diffValueToBarValMax ); /*(((diffValueToBarValMax *1000) / bar.valMax) * bar.barW / 1000);*/
+        var int overshoot_vsizex; overshoot_vsizex = B4DI_BarPreview_CalcSize( barPreview_hndl, value - diffValueToBarValMax); /*((( (value - diffValueToBarValMax) *1000) / bar.valMax) * bar.barW / 1000);*/
 
         View_Resize(bp.vPreView, preview_vsizex, vBar.vsizey);
         View_MoveTo(bp.vPreView, vBar.vposx + vBar.vsizex, vBar.vposy );
@@ -205,8 +218,9 @@ func void B4DI_BarPreview_CalcPosScale( var int barPreview_hndl, var int value) 
             SBi( diffValueToBarValMax ); SB("("); SBi(value); SB(")");
         };
 
-    } else {
-        preview_vsizex = (((value *1000) / bar.valMax) * bar.barW / 1000);
+    } else if( 0 < value ) {
+        preview_vsizex = B4DI_BarPreview_CalcSize( barPreview_hndl, value);
+        //preview_vsizex = (((value *1000) / bar.valMax) * bar.barW / 1000);
 
         B4DI_BarPreview_hideOverShoot(barPreview_hndl);
 
@@ -217,6 +231,33 @@ func void B4DI_BarPreview_CalcPosScale( var int barPreview_hndl, var int value) 
 
         if(B4DI_BARPREVIEW_HAS_OWN_LABEL){
             SBi(value);
+        };
+    } else {
+        B4DI_BarPreview_hideOverShoot(barPreview_hndl);
+        View_SetAlphaFunc(bp.vPreview, zRND_ALPHA_FUNC_MUL2);
+        if( bar.valMax > abs(value) ) {
+
+            preview_vsizex = B4DI_BarPreview_CalcSize( barPreview_hndl, abs(value) );
+            
+            View_Resize(bp.vPreView, preview_vsizex, vBar.vsizey);
+            View_MoveTo(bp.vPreView, vBar.vposx + vBar.vsizex - preview_vsizex, vBar.vposy );
+
+            B4DI_BarPreview_Show(barPreview_hndl);
+
+            if(B4DI_BARPREVIEW_HAS_OWN_LABEL){
+                SBi(value);
+            };  
+
+        } else {
+        // consumtion exceeds maximum
+            View_Resize(bp.vPreView, vBar.vsizex, vBar.vsizey);
+            View_MoveTo(bp.vPreView, vBar.vposx , vBar.vposy );
+
+            B4DI_BarPreview_Show(barPreview_hndl);            
+
+            if(B4DI_BARPREVIEW_HAS_OWN_LABEL){
+                SBi(value);
+            };
         };
     };
     //TODO preview for maximum increase
