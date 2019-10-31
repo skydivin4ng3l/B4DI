@@ -222,7 +222,7 @@ func int Bar_GetAnchor( var int bar_hndl ) {
     if(!Hlp_IsValidHandle(bar_hndl)) { return 0; };
     var _bar b; b = get(bar_hndl);
     var int curr_anchor; curr_anchor = b.anchorPoint_mode;
-    if ( curr_anchor < ANCHOR_LEFT_TOP || curr_anchor > ANCHOR_CENTER_RIGHT ) {
+    if ( curr_anchor < ANCHOR_LEFT_TOP || curr_anchor > ANCHOR_RIGHT_BOTTOM ) {
         curr_anchor = ANCHOR_LEFT_TOP;
         b.anchorPoint_mode = curr_anchor;
     };

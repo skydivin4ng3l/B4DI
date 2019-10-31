@@ -429,7 +429,10 @@ func void ViewPtr_MoveToAdvanced(var int ptr, var int x, var int y, var int anch
     } else if ( anchorPoint_mode == ANCHOR_RIGHT_TOP || anchorPoint_mode == ANCHOR_RIGHT_BOTTOM ) {
         posx_new = x - sizex_pre;
 
-    } else if ( anchorPoint_mode >= ANCHOR_CENTER ) {
+    } else if ( anchorPoint_mode == ANCHOR_CENTER  || anchorPoint_mode == ANCHOR_CENTER_LEFT 
+        || anchorPoint_mode == ANCHOR_CENTER_RIGHT || anchorPoint_mode == ANCHOR_CENTER_TOP
+        || anchorPoint_mode == ANCHOR_CENTER_BOTTOM ) {
+
         posx_new = x - ( sizex_pre )/2;
         posy_new = y - ( sizey_pre )/2;
 

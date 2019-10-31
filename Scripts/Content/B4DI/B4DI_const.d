@@ -95,18 +95,18 @@ const int B4DI_NUM_OF_AXIS = 2;
 const int B4DI_ALIGNMENT_USE_ANCHOR			= -1; //usable to add Object to suitable Slot based on its anchorpoint
 
 const int B4DI_ALIGNMENT_LEFT_TOP			= 0; //Default
-const int B4DI_ALIGNMENT_LEFT_BOTTOM		= 1;
+const int B4DI_ALIGNMENT_CENTER_TOP			= 1;
 const int B4DI_ALIGNMENT_RIGHT_TOP			= 2;
-const int B4DI_ALIGNMENT_RIGHT_BOTTOM		= 3;
+const int B4DI_ALIGNMENT_CENTER_LEFT		= 3;
 const int B4DI_ALIGNMENT_CENTER				= 4;
-const int B4DI_ALIGNMENT_CENTER_TOP			= 5;
-const int B4DI_ALIGNMENT_CENTER_BOTTOM		= 6;
-const int B4DI_ALIGNMENT_CENTER_LEFT		= 7;
-const int B4DI_ALIGNMENT_CENTER_RIGHT		= 8;
+const int B4DI_ALIGNMENT_CENTER_RIGHT		= 5;
+const int B4DI_ALIGNMENT_LEFT_BOTTOM		= 6;
+const int B4DI_ALIGNMENT_CENTER_BOTTOM		= 7;
+const int B4DI_ALIGNMENT_RIGHT_BOTTOM		= 8;
 
 const int B4DI_ALIGNMENT_SLOT_ARRAY_SIZE	= 9;
 
-const int B4DI_AlignmentMananger_SlotsOrder[B4DI_ALIGNMENT_SLOT_ARRAY_SIZE] = { B4DI_ALIGNMENT_LEFT_TOP,
+/*const int B4DI_AlignmentMananger_SlotsOrder[B4DI_ALIGNMENT_SLOT_ARRAY_SIZE] = { B4DI_ALIGNMENT_LEFT_TOP,
 																				B4DI_ALIGNMENT_CENTER_TOP,
 																				B4DI_ALIGNMENT_RIGHT_TOP,
 																				B4DI_ALIGNMENT_CENTER_LEFT,
@@ -114,7 +114,7 @@ const int B4DI_AlignmentMananger_SlotsOrder[B4DI_ALIGNMENT_SLOT_ARRAY_SIZE] = { 
 																				B4DI_ALIGNMENT_CENTER_RIGHT,
 																				B4DI_ALIGNMENT_LEFT_BOTTOM,
 																				B4DI_ALIGNMENT_CENTER_BOTTOM,
-																				B4DI_ALIGNMENT_RIGHT_BOTTOM };
+																				B4DI_ALIGNMENT_RIGHT_BOTTOM };*/
 
 //========================================
 // Animation Modes

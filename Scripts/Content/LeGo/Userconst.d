@@ -34,14 +34,14 @@ const int ALIGN_BOTTOM = 4;
 const int ANCHOR_USE_OBJECTS_ANCHOR	= -1;
 
 const int ANCHOR_LEFT_TOP			= 0; //Default
-const int ANCHOR_LEFT_BOTTOM		= 1;
+const int ANCHOR_CENTER_TOP			= 1;
 const int ANCHOR_RIGHT_TOP			= 2;
-const int ANCHOR_RIGHT_BOTTOM		= 3;
+const int ANCHOR_CENTER_LEFT		= 3;
 const int ANCHOR_CENTER				= 4;
-const int ANCHOR_CENTER_TOP			= 5;
-const int ANCHOR_CENTER_BOTTOM		= 6;
-const int ANCHOR_CENTER_LEFT		= 7;
-const int ANCHOR_CENTER_RIGHT		= 8;
+const int ANCHOR_CENTER_RIGHT		= 5;
+const int ANCHOR_LEFT_BOTTOM		= 6;
+const int ANCHOR_CENTER_BOTTOM		= 7;
+const int ANCHOR_RIGHT_BOTTOM		= 8;
 
 //========================================
 // ValidScreenSpace (benutzt in View)

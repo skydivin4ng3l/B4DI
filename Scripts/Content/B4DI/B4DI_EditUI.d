@@ -71,7 +71,7 @@ func void B4DI_EditUI_generateButtonForAlignmentSlot( var int vposx, var int vpo
     var int new_btn_hndl;
     new_btn_hndl = Button_Create( new_vposx, new_vposy, vsizex, vsizey, tex, B4DI_EditUI_SelectSlot_Button_entered, B4DI_EditUI_SelectSlot_Button_left, B4DI_EditUI_SelectSlot_Button_click );
     
-    Button_SetUserData( new_btn_hndl, MEM_ReadStatArr( B4DI_AlignmentMananger_SlotsOrder, index_alignmentSlot ) );
+    Button_SetUserData( new_btn_hndl, /*MEM_ReadStatArr( B4DI_AlignmentMananger_SlotsOrder,*/ index_alignmentSlot /*)*/ );
     Button_SetCaption(new_btn_hndl, i2s(index_alignmentSlot), B4DI_LABEL_FONT);
     Button_Show(new_btn_hndl);
     Button_Activate(new_btn_hndl);
