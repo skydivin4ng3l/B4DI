@@ -411,6 +411,7 @@ func void B4DI_eBar_RefreshLabel(var int eBar_hndl) {
 
     //add text in closed mode
     Bar_SetLabelText(eBar.bar, label, B4DI_LABEL_FONT );
+    //TODO Fix adjustment of alpha also while isFadeOut=1 caused by partial fadeout
     if(eBar.isFadedOut) {
         //Special case for MEM_eBar_FOCUS_handle cause it should not be drawn at all if fadedout
         if(eBar_hndl != MEM_eBar_FOCUS_handle) {
@@ -419,6 +420,12 @@ func void B4DI_eBar_RefreshLabel(var int eBar_hndl) {
             B4DI_eBar_hideInstant(MEM_eBar_FOCUS_handle); 
         };
 
+    } else {
+        if(eBar_hndl != MEM_eBar_FOCUS_handle) {
+            B4DI_eBar_SetAlpha(eBar_hndl, B4DI_barFadeInMax); 
+        } else {
+            B4DI_eBar_hideInstant(MEM_eBar_FOCUS_handle); //TODO questionable
+        };        
     };
 
     //B4DI_Info1("B4DI_eBar_RefreshLabel call while isFadedOut: ", eBar.isFadedOut);
