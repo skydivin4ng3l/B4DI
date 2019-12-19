@@ -134,11 +134,19 @@ const int Gamestate_Saving      = 3;
 //========================================
 // Cursor
 //========================================
-const int CUR_LeftClick  = 0;
-const int CUR_RightClick = 1;
-const int CUR_MidClick   = 2;
-const int CUR_WheelUp    = 3;
-const int CUR_WheelDown  = 4;
+const int CUR_LeftClick		= 0;
+const int CUR_RightClick	= 1;
+const int CUR_MidClick		= 2;
+const int CUR_WheelUp		= 3;
+const int CUR_WheelDown		= 4;
+
+const int CUR_LeftHold		= 5;
+const int CUR_LeftReleased	= 6;
+const int CUR_RightHold		= 7;
+const int CUR_RightReleased	= 8;
+const int CUR_MidHold		= 9;
+const int CUR_MidReleased	= 10;
+
 
 //========================================
 // Gothic ini float reader

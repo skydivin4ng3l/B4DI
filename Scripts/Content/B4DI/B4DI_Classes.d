@@ -26,11 +26,12 @@ class _alignmentObject {
 
     var int objectHandle;                //obj(h)
     
-    var int updateHandler;               //function ID which will be called to update the position (and size) of the obj_hndl
-    var int getSizeHandler;              //function ID which will be called to get the size of the obj_hndl
+    var int updateHandler;              //function ID which will be called to update the position (and size) of the obj_hndl
+    var int getSizeHandler;             //function ID which will be called to get the size of the obj_hndl
     var int getPosHandler;              //function ID which will be called to get the Position of the obj_hndl
+    var int getTitleHandler;            //function ID which will be called to get the Title of the obj_hndl as Identifcation for EditUI
 
-    var int alignmentSlot;               //index of aM.alignmentSlots array with the listptr the object is currenlty Listed in
+    var int alignmentSlot;              //index of aM.alignmentSlots array with the listptr the object is currenlty Listed in
 };
 
 instance _alignmentObject@(_alignmentObject);
@@ -169,6 +170,7 @@ prototype B4DI_MyXpBar(Bar) {
     middleTex = "Bar_TempMax.tga";
     value = 100;
     valueMax = 100;
+
 };
 
 //////
@@ -177,6 +179,7 @@ instance B4DI_XpBar(B4DI_MyXpBar){
     //x = 10+128;
     //y = 20+16;
     anchorPoint_mode = ANCHOR_CENTER_BOTTOM;
+    title = "EXP-Bar";
 };
 
 instance B4DI_HpBar(GothicBar){
@@ -185,6 +188,7 @@ instance B4DI_HpBar(GothicBar){
     barTop = 2;     // 2 is almost too small
     barTex = "Bar_Health.tga";
     anchorPoint_mode = ANCHOR_LEFT_BOTTOM;
+    title = "HP-Bar";
 };
 
 instance B4DI_ManaBar(GothicBar){
@@ -194,6 +198,7 @@ instance B4DI_ManaBar(GothicBar){
     barTex = "Bar_Mana.tga";
     //anchorPoint_mode = ANCHOR_RIGHT_BOTTOM;
     anchorPoint_mode = ANCHOR_LEFT_BOTTOM;
+    title = "MANA-Bar";
 };
 
 instance B4DI_FocusBar(GothicBar){
@@ -203,6 +208,8 @@ instance B4DI_FocusBar(GothicBar){
     barTex = "Bar_Health.tga";
     //value = 0;
     anchorPoint_mode = ANCHOR_CENTER_TOP;
+    title = "FOCUS-Bar";
+    //title = cs3(MENUITEM_GAME_FIGHTFOCUS.text[0]," ", MENU_ITEM_ATTRIBUTE_4_TITLE.text[0]);
 };
 
 /***********************************\

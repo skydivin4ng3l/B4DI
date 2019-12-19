@@ -29,6 +29,7 @@ func void B4DI_manaBar_InitAlways(){
 	};
 	B4DI_eBar_SetNpcRef(MEM_eBar_MANA_handle, MEM_InstToPtr(hero));
 	MEM_eBar_MANA = get(MEM_eBar_MANA_handle);
+	//B4DI_eBar_Bar_SetTitleString( MEM_eBar_MANA_handle, B4DI_GetMenuItemText("MENU_ITEM_ATTRIBUTE_3_TITLE",0) );
 	B4DI_manaBar_Refresh(B4DI_eBAR_INTITIAL_REFRESH);
 
 	lastHeroMANA = hero.attribute[ATR_MANA];

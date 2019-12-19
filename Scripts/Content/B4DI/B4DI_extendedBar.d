@@ -150,6 +150,23 @@ func int B4DI_eBar_Bar_GetPos( var int eBar_hndl, var int axis ) {
 };
 
 //========================================
+// eBar Bar Title
+//========================================
+func void B4DI_eBar_Bar_SetTitleString( var int eBar_hndl, var string new_title_string ) {
+    if(!Hlp_IsValidHandle(ebar_hndl)) { MEM_Warn("B4DI_eBar_SetTitleString failed"); return; };
+    var _extendedBar eBar; eBar = get(eBar_hndl);
+
+    Bar_SetTitleString( eBar.bar, new_title_string );
+};
+
+func string B4DI_eBar_Bar_GetTitleString( var int eBar_hndl ) {
+    if(!Hlp_IsValidHandle(ebar_hndl)) { MEM_Warn("B4DI_eBar_GetTitleString failed"); return ""; };
+    var _extendedBar eBar; eBar = get(eBar_hndl);
+
+    return Bar_GetTitleString(eBar.bar);
+};
+
+//========================================
 // eBar add to alignment lists
 //========================================
 func void B4DI_eBar_AddToAlignmentSlot( var int eBar_hndl, var int alignmentSlot ) {
@@ -159,7 +176,7 @@ func void B4DI_eBar_AddToAlignmentSlot( var int eBar_hndl, var int alignmentSlot
     if (alignmentSlot == B4DI_ALIGNMENT_USE_ANCHOR) {
         alignmentSlot = Bar_GetAnchor(eBar.bar);
     };
-    B4DI_AlignmentManager_AddToSlotInitial(MEM_mainAlignmentManager_handle, eBar_hndl, alignmentSlot, B4DI_eBar_AlignmentManager_Updatehandler, B4DI_eBar_Bar_GetSize, B4DI_eBar_Bar_GetPos );
+    B4DI_AlignmentManager_AddToSlotInitial(MEM_mainAlignmentManager_handle, eBar_hndl, alignmentSlot, B4DI_eBar_AlignmentManager_Updatehandler, B4DI_eBar_Bar_GetSize, B4DI_eBar_Bar_GetPos, B4DI_eBar_Bar_GetTitleString );
     
     //B4DI_eBar_Bar_StorePosSize(eBar_hndl);
     //this will break dynScaling of initValues and maybe not necessay until sizelimits are introduced correctly
@@ -336,6 +353,7 @@ func void B4DI_eBar_show( var int eBar_hndl){
 
 
 };
+
 
 //========================================
 // eBar Label
@@ -576,7 +594,7 @@ func void B4DI_eBar_SetValuesAnimated( var int eBar_hndl,var int index_value, va
         //B4DI_Info1("B4DI_eBar_SetValuesAnimated: ", value_diff );
         eBar.barPostview = B4DI_BarPostview_Create(eBar_hndl, abs(value_diff) );
         B4DI_BarPostview_Show(eBar.barPostview);
-        B4DI_BarPostview_SetAlphaFunc(eBar.barPostview, zRND_ALPHA_FUNC_MUL2);
+        B4DI_BarPostview_SetAlphaFunc(eBar.barPostview, zRND_ALPHA_FUNC_ADD);
         B4DI_BarPostview_slide_size(eBar.barPostview, B4DI_BarPostview_SetSizeRightsidedPercentX);
 
         B4DI_eBar_SetValues(eBar_hndl, index_value, index_valueMax);

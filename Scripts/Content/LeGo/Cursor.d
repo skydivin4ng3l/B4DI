@@ -49,15 +49,6 @@ func void Cursor_Show() {
 };
 
 //========================================
-// Maussteuerung An-/Ausschalten
-//========================================
-func void SetMouseEnabled(var int bEnabled) {
-    CALL_IntParam(!!bEnabled /*Nur zur Sicherheit*/);
-    CALL_IntParam(2);
-    CALL__thiscall(MEM_ReadInt(zCInput_zinput), zCInput_Win32__SetDeviceEnabled);
-};
-
-//========================================
 // [intern] Klasse (von Engine genutzt)
 //========================================
 class _Cursor {
@@ -69,12 +60,45 @@ class _Cursor {
     var int keyRight;
 };
 
+//instance _Cursor@(_Cursor);
+
+//var _Cursor saved_c;
+
+//func void SetBackUpNoEngineMouse() {
+//    var _Cursor c; c = _^(Cursor_Ptr);
+//    saved_c.relX = c.relX;
+//    saved_c.relY = c.relY;
+//    saved_c.wheel = c.wheel;
+//    saved_c.keyLeft = c.keyLeft;
+//    saved_c.keyMid = c.keyMid;
+//    saved_c.KeyRight = c.KeyRight;
+
+//};
+
+//========================================
+// Maussteuerung An-/Ausschalten
+//========================================
+func void SetMouseEnabled(var int bEnabled) {
+    CALL_IntParam(!!bEnabled /*Nur zur Sicherheit*/);
+    CALL_IntParam(2);
+    CALL__thiscall(MEM_ReadInt(zCInput_zinput), zCInput_Win32__SetDeviceEnabled);
+    //if( bEnabled ) {
+    //    var int saved_c_ptr;
+    //    saved_c_ptr = create(_Cursor@);
+    //    saved_c = _^(saved_c_ptr);
+    //} else {
+    //    MEM_AssignInstNull(saved_c);
+    //};
+};
+
+
 //========================================
 // [intern] Tasten
 //========================================
 func void Cursor_KeyState(var int ptr, var int pressed) {
     var int keyState; keyState = MEM_ReadInt(ptr);
     // Kopiert aus der Ikarus.d
+    //B4DI_Info2("Cursor_KeyState= ", keyState, " pressed= ", pressed);
     if (keyState == KEY_UP) {
         if (pressed) {
             keyState = KEY_PRESSED;
@@ -89,7 +113,7 @@ func void Cursor_KeyState(var int ptr, var int pressed) {
         if (!pressed) {
             keyState = KEY_RELEASED;
         };
-    } else {
+    } else /* keyState == KEY_RELEASED */ {
         if (pressed) {
             keyState = KEY_PRESSED;
         } else {
@@ -120,6 +144,7 @@ func void _Cursor_GetVal() {
     Cursor_Y = roundf(Cursor_fY);
     Cursor_Wheel = c.wheel;
 
+    //B4DI_Info1("c.keyLeft= ",c.keyLeft);
     Cursor_KeyState(_@(Cursor_Left),  c.keyLeft);
     Cursor_KeyState(_@(Cursor_Right), c.keyRight);
     Cursor_KeyState(_@(Cursor_Mid),   c.keyMid);
@@ -127,12 +152,30 @@ func void _Cursor_GetVal() {
 	if(Cursor_Left == KEY_PRESSED) {
 		Event_Execute(Cursor_Event, CUR_LeftClick);
 	};
+    if(Cursor_Left == KEY_HOLD) {
+        Event_Execute(Cursor_Event, CUR_LeftHold);
+    };
+    if(Cursor_Left == KEY_RELEASED) {
+        Event_Execute(Cursor_Event, CUR_LeftReleased);
+    };
 	if(Cursor_Right == KEY_PRESSED) {
 		Event_Execute(Cursor_Event, CUR_RightClick);
 	};
+    if(Cursor_Right == KEY_HOLD) {
+        Event_Execute(Cursor_Event, CUR_RightHold);
+    };
+    if(Cursor_Right == KEY_RELEASED) {
+        Event_Execute(Cursor_Event, CUR_RightReleased);
+    };
 	if(Cursor_Mid == KEY_PRESSED) {
 		Event_Execute(Cursor_Event, CUR_MidClick);
 	};
+    if(Cursor_Mid == KEY_HOLD) {
+        Event_Execute(Cursor_Event, CUR_MidHold);
+    };
+    if(Cursor_Mid == KEY_RELEASED) {
+        Event_Execute(Cursor_Event, CUR_MidReleased);
+    };
 	if(Cursor_Wheel != 0) {
 		if(Cursor_Wheel > 0) {
 			Event_Execute(Cursor_Event, CUR_WheelUp);

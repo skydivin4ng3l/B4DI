@@ -52,8 +52,8 @@ func void B4DI_xpBar_InitAlways(){
 		MEM_eBar_XP_handle = B4DI_eBar_CreateCustomXY(B4DI_XpBar, MEM_oBar_Focus.zCView_vposx, MEM_oBar_Hp.zCView_vposy, B4DI_ALIGNMENT_USE_ANCHOR);
 	};
 	MEM_eBar_XP = get(MEM_eBar_XP_handle);
+	//B4DI_eBar_Bar_SetTitleString( MEM_eBar_XP_handle, B4DI_GetMenuItemText("MENU_ITEM_EXP_TITLE",0) );
 	B4DI_XpBar_calcXp();
-
 	//TODO: Update on option change of Barsize
 	//TODO: implement customizable Positions Left Right Top bottom,...
 	//TODO: implement a Screen margin

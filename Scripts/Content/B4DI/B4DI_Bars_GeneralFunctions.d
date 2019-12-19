@@ -19,6 +19,28 @@
 //	Anim8q(bar_inst.anim8FadeOut,   0, 2000, A8_SlowEnd);
 
 //};
+func void B4DI_PauseGame() {
+	CALL_IntParam(0);
+    CALL__thiscall(MEM_InstToPtr(MEM_Game),oCGame__Pause_int_);
+};
+
+func void B4DI_UnPauseGame() {
+	CALL__thiscall(MEM_InstToPtr(MEM_Game),oCGame__Unpause_void_);
+};
+
+func string B4DI_GetMenuItemText( var string Menuitem, var int index ) {
+	var int menuItem_ptr;
+	menuItem_ptr = MEM_GetMenuItemByString(Menuitem);
+
+	if(!menuItem_ptr) { MEM_Warn("B4DI_GetMenuItemText0: Invalid Menuitem"); return ""; };
+	var int text_arrayOffset; text_arrayOffset = 20;
+
+	var string result;
+	result = MEM_ReadString( menuItem_ptr + text_arrayOffset + sizeof_zString*index);
+	MEM_Info(result);
+	return result;
+};
+
 //========================================
 // B4DI_ArrayCreateExactSize
 // 			MEM_ArrayCreate with Exact size and handle

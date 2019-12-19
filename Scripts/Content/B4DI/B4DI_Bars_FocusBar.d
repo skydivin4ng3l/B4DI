@@ -180,6 +180,7 @@ func void B4DI_focusBar_InitAlways(){
 		MEM_eBar_FOCUS_handle = B4DI_eBar_CreateAsReplacement(B4DI_FocusBar, MEM_GAME.focusBar );
 	};
 	MEM_eBar_FOCUS = get(MEM_eBar_FOCUS_handle);
+	//B4DI_eBar_Bar_SetTitleString(MEM_eBar_FOCUS_handle, B4DI_GetMenuItemText("MENUITEM_GAME_FIGHTFOCUS",0));
 	//Reset npcRef
 	B4DI_eBar_ClearNpcRef(MEM_eBar_FOCUS_handle);
 	//B4DI_focusBar_Refresh();

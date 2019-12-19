@@ -45,13 +45,12 @@ func void B4DI_hpBar_InitAlways(){
 	};
 	B4DI_eBar_SetNpcRef(MEM_eBar_HP_handle, MEM_InstToPtr(hero));
 	MEM_eBar_Hp = get(MEM_eBar_HP_handle);
+	//B4DI_eBar_Bar_SetTitleString(MEM_eBar_HP_handle, B4DI_GetMenuItemText("MENU_ITEM_ATTRIBUTE_4_TITLE",0));
 	B4DI_HpBar_Refresh(B4DI_eBAR_INTITIAL_REFRESH);
 
 	lastHeroHP = hero.attribute[ATR_HITPOINTS];
 	lastHeroMaxHP = hero.attribute[ATR_HITPOINTS_MAX];
-	//TODO: Update on option change of Barsize
-	//TODO: implement customizable Positions Left Right Top bottom,...
-	//TODO: implement a Screen margin
+	
 	//Bar_MoveLeftUpperToValidScreenSpace(MEM_eBar_HP.bar, MEM_oBar_Hp.zCView_vposx, MEM_oBar_Hp.zCView_vposy );
 	//B4DI_eBar_AlignmentManager_Updatehandler(MEM_eBar_HP_handle, MEM_oBar_Hp.zCView_vposx, MEM_oBar_Hp.zCView_vposy, B4DI_ALIGNMENT_USE_ANCHOR );
 	B4DI_HpBar_update_CallbackActive = false;

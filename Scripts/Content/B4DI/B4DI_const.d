@@ -134,10 +134,18 @@ const int oCItemContainer__IsActive_void		= 7360720; //0x007050D0 // Returns int
 const int oCMag_Book__GetSelectedSpell__void	= 4683648; //0x00477780 // returns oCSpell *
 const int oCMag_Book__GetSpellItem__oCSpell_ptr	= 4692992; //0x00479C00 // returns oCItem *
 
+//void __thiscall oCMenu_Status::InitForDisplay(void)     	0x0047DDC0	0	7
+const int oCMenu_Status__InitForDisplay			= 4709824;	//0x0047DDC0 //HookLen: 7
 
 //========================================
 // Hooks
 //========================================
+
+//virtual void __thiscall oCGame::Pause(int)      	0x006C8AD0	0	7
+const int oCGame__Pause_int_ 					= 7113424; //0x006C8AD0 // HookLen: 7
+//virtual void __thiscall oCGame::Unpause(void)     	0x006C8D50	0	7
+const int oCGame__Unpause_void_					= 7114064; //0x006C8D50 // HookLen: 7
+
 
 //oCItem * __thiscall oCNpc::GetSpellItem(int)      	0x00680270	0	10
 const int oCNpc__GetSpellItem_int				= 6816368;		// 0x00680270 // HookLen: 10

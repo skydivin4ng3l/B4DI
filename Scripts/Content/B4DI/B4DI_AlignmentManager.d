@@ -225,6 +225,25 @@ func int B4DI_AlignmentManager_Update_CallGetPosHandler( var int aO_hndl, var in
 };
 
 //========================================
+// [intern] Call getTitleHandler
+//========================================
+func string B4DI_AlignmentManager_Update_CallGetTitleHandler( var int aO_hndl ) {
+	if ( !Hlp_IsValidHandle( aO_hndl ) ) { MEM_Warn("B4DI_AlignmentManager_Update_CallGetTitleHandler; Invalid Handle"); return ""; };
+	var _alignmentObject aObj; aObj = get(aO_hndl);
+	
+	MEM_PushIntParam(aObj.objectHandle);
+
+	MEM_CallByID(aObj.getTitleHandler);
+
+	var string result; result = MEM_PopStringResult();
+
+	//B4DI_DebugSpy("B4DI_AlignmentManager_Update_CallGetTitleHandler called resulting in Title_string= ", result);
+
+	return result;
+};
+
+
+//========================================
 // Get ObjectListHead of Slot
 //========================================
 func int B4DI_AlignmentManager_GetObjectListHeadOfSlotPTR( var int aM_hndl, var int index_alignmentSlot ) {
@@ -377,7 +396,7 @@ func void B4DI_AlignmentManager_SetSizeLimit_forSlot( var int aM_hndl, var int i
 //========================================
 // AlignmentObject Create
 //========================================
-func int B4DI_AlignmentObject_Create( var int aM_hndl, var int obj_hndl, var func updateHandler, var func getSizeHandler, var func getPosHandler, var int index_alignmentSlot ) {
+func int B4DI_AlignmentObject_Create( var int aM_hndl, var int obj_hndl, var func updateHandler, var func getSizeHandler, var func getPosHandler, var func getTitleHandler, var int index_alignmentSlot ) {
 	if ( !Hlp_IsValidHandle( aM_hndl ) || !Hlp_IsValidHandle( obj_hndl ) ) { MEM_Warn("B4DI_AlignmentObject_Create; Invalid Handle"); return 0; };
 	var _alignmentManager aM; aM = get( aM_hndl );
 	var int new_aO_hndl; new_aO_hndl = new( _alignmentObject@ );
@@ -392,6 +411,7 @@ func int B4DI_AlignmentObject_Create( var int aM_hndl, var int obj_hndl, var fun
 	new_aO.updateHandler = MEM_GetFuncID(updateHandler);
 	new_aO.getSizeHandler = MEM_GetFuncID(getSizeHandler);
 	new_aO.getPosHandler = MEM_GetFuncID(getPosHandler);
+	new_aO.getTitleHandler = MEM_GetFuncID(getTitleHandler);
 	//in which slot is the object supposed to be
 	new_aO.alignmentSlot = index_alignmentSlot;
 
@@ -448,14 +468,14 @@ func void _B4DI_AlignmentManager_AddToSlot( var int aM_hndl, var int aO_hndl, va
 //========================================
 // AlignmentManager Add Object to Slot/initialize
 //========================================
-func void B4DI_AlignmentManager_AddToSlotInitial( var int aM_hndl, var int obj_hndl, var int index_targetAlignmentSlot, var func updateHandler, var func getSizeHandler, var func getPosHandler ) {
+func void B4DI_AlignmentManager_AddToSlotInitial( var int aM_hndl, var int obj_hndl, var int index_targetAlignmentSlot, var func updateHandler, var func getSizeHandler, var func getPosHandler, var func getTitleHandler ) {
 	B4DI_Info1("B4DI_AlignmentManager_AddToSlotInitial: Slot", index_targetAlignmentSlot);
 	if ( !Hlp_IsValidHandle( aM_hndl ) || !Hlp_IsValidHandle( obj_hndl ) ) { MEM_Warn("B4DI_AlignmentManager_AddToSlotInitial; Invalid Handle"); return; };
 	var _alignmentManager aM; aM = get( aM_hndl );
 
 	var int aO_hndl; aO_hndl = B4DI_AlignmentObject_GetHandleOfObj(aM_hndl, obj_hndl);
 	if ( !Hlp_IsValidHandle(aO_hndl) ) {
-		aO_hndl = B4DI_AlignmentObject_Create( aM_hndl, obj_hndl, updateHandler, getSizeHandler, getPosHandler, index_targetAlignmentSlot );
+		aO_hndl = B4DI_AlignmentObject_Create( aM_hndl, obj_hndl, updateHandler, getSizeHandler, getPosHandler, getTitleHandler, index_targetAlignmentSlot );
 	};
 	
 	_B4DI_AlignmentManager_AddToSlot(aM_hndl, aO_hndl, index_targetAlignmentSlot);

@@ -32,10 +32,12 @@ func void B4DI_EditUI_generateButtonForAlignmentObject( var int obj_hndl, var in
     var int vsizex; vsizex = B4DI_AlignmentManager_Update_CallGetSizeHandler( aO_hndl, PS_X ); 
     var int vsizey; vsizey = B4DI_AlignmentManager_Update_CallGetSizeHandler( aO_hndl, PS_Y ); 
     var string tex; tex = "Bar_Back.tga";
+    var string caption; caption = B4DI_AlignmentManager_Update_CallGetTitleHandler( aO_hndl );
 
     var int new_btn_hndl;
     new_btn_hndl = Button_Create( vposx, vposy, vsizex, vsizey, tex, B4DI_EditUI_SelectElement_Button_entered, B4DI_EditUI_SelectElement_Button_left, B4DI_EditUI_SelectElement_Button_click );
     Button_SetUserData( new_btn_hndl, obj_hndl );
+    Button_SetCaption(new_btn_hndl, caption, B4DI_LABEL_FONT );
     Button_Show(new_btn_hndl);
     Button_Activate(new_btn_hndl);
 
@@ -96,11 +98,12 @@ func void B4DI_EditUI_generateButtonForAllAlignmentSlots() {
 
 
 func void B4DI_EditUI_enable(){
+    B4DI_PauseGame();
     B4DI_EditUI_enabled = true;
     B4DI_enableEditUIMode = false;
     MEM_SetGothOpt("B4DI", "B4DI_enableEditUIMode", "0");
 	Cursor_Show();
-    Cursor_NoEngine = true;
+    //Cursor_NoEngine = true;
 	Event_AddOnce(Cursor_Event, B4DI_EditUI_CursorListener);
     B4DI_EditUI_generateButtonsForAllAlignmentObjects(MEM_mainAlignmentManager_handle);
 };
@@ -108,32 +111,54 @@ func void B4DI_EditUI_enable(){
 
 func void B4DI_EditUI_disable(){
     B4DI_EditUI_enabled = false;
-    Cursor_NoEngine = false;
+    //Cursor_NoEngine = false;
     Button_DeleteMouseover();
 	Cursor_Hide();
 	if( Event_Has(Cursor_Event, B4DI_EditUI_CursorListener)) {
 		Event_Remove(Cursor_Event, B4DI_EditUI_CursorListener);
 	};
     B4DI_EditUI_Buttons_deleteAll();
+    B4DI_UnPauseGame();
 
 };
 
 func void B4DI_EditUI_CursorListener(var int state) {
 	if(state == CUR_WheelUp) {
-        PrintS("Wheel up!");
+        //PrintS("Wheel up!");
+        MEM_Info("Wheel up!");
     };
     if(state == CUR_WheelDown) {
-        PrintS("Wheel down!");
+        //PrintS("Wheel down!");
+        MEM_Info("Wheel down!");
     };
     if(state == CUR_LeftClick) {
-        PrintS("Leftclick!");
+        //PrintS("Leftclick!");
+        MEM_Info("Leftclick!");
+    };
+    if(state == CUR_LeftHold) {
+        //PrintS("LeftHold!");
+        MEM_Info("LeftHold!");
+    };
+    if(state == CUR_LeftReleased) {
+        //PrintS("LeftReleased!");
+        MEM_Info("LeftReleased!");
     };
     if(state == CUR_RightClick) {
-        PrintS("Rightclick!");
+        //PrintS("Rightclick!");
+        MEM_Info("Rightclick!");
         B4DI_EditUI_disable();
     };
     if(state == CUR_MidClick) {
-        PrintS("Wheelclick!");
+        //PrintS("Wheelclick!");
+        MEM_Info("Wheelclick!");
+    };
+    if(state == CUR_MidHold) {
+        //PrintS("MidHold!");
+        MEM_Info("MidHold!");
+    };
+    if(state == CUR_MidReleased) {
+        //PrintS("MidReleased!");
+        MEM_Info("MidReleased!");
     };
 };
 

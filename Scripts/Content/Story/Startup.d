@@ -20,7 +20,7 @@ func void INIT_GLOBAL()
 {
 	// wird fuer jede Welt aufgerufen (vor INIT_<LevelName>)
 	Game_InitGerman();
-	LeGo_Init(LeGo_Cursor |LeGo_Bloodsplats | LeGo_Gamestate | LeGo_ConsoleCommands | LeGo_PrintS | LeGo_Bars | LeGo_Buffs );
+	LeGo_Init(LeGo_Cursor |LeGo_Bloodsplats | LeGo_Gamestate | LeGo_ConsoleCommands | LeGo_PrintS | LeGo_Bars | LeGo_Buffs | LeGo_Buttons | LeGo_EventHandler | LeGo_Render );
 	B4DI_Init(B4DI_ALL);
 
 	MoreAlphaVobs(2048); //normal: 256

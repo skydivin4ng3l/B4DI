@@ -18,6 +18,7 @@ class Bar {
     var int value;
     var int valueMax;
     var int anchorPoint_mode;   //0-8 See Anchor Const
+    var string title;              // string handle a to translation string eg
 };
 
 //========================================
@@ -36,6 +37,7 @@ prototype GothicBar(Bar) {
     value = 100;
     valueMax = 100;
     anchorPoint_mode = ANCHOR_LEFT_TOP;
+    title = "GothicBar";
 };
 
 //========================================
@@ -57,8 +59,8 @@ class _bar {
     var int initVSizes[4];    // Array<int>
     var int initVPos[12];     // Array<int>
     var int isFadedOut;       // Bool
-    var int anchorPoint_mode; // Anchor for advanced resizing
-                              //var int anim8FadeOut;               // A8Head(h)
+    var int anchorPoint_mode;   // Anchor for advanced resizing
+    var int title;              // string(h)
 };
 
 instance _bar@(_bar);
@@ -75,6 +77,9 @@ func void _bar_Delete(var _bar b) {
     };
     if(Hlp_IsValidHandle(b.vLabel)) {
         delete(b.vLabel);
+    };
+    if(Hlp_IsValidHandle(b.title)) {
+        delete(b.title);
     };
     
 }; 
@@ -318,6 +323,31 @@ func void Bar_dynamicResolutionBasedScale(var int bar_hndl, var int scalingFacto
     Bar_ResizePercentagedAdvanced(bar_hndl, dynResScalingFactor, SCALING_ABSOLUTE, Bar_GetAnchor(bar_hndl), VALIDSCREENSPACE, VIEW_NO_SIZE_LIMIT, VIEW_NO_SIZE_LIMIT );
 };
 
+func void Bar_SetTitleString( var int bar_hndl, var string new_title_string ) {
+    if(!Hlp_IsValidHandle(bar_hndl)) { MEM_Warn("Bar_SetTitleString: Invalid bar_hndl"); return; };
+    var _bar bar; bar = get(bar_hndl);
+
+    var _string new_title;
+    if( !Hlp_IsValidHandle(bar.title) ) {
+        bar.title = new(string@);
+    };
+    new_title = get(bar.title);
+    new_title.s = new_title_string;
+
+};
+
+func string Bar_GetTitleString( var int bar_hndl ) {
+    if(!Hlp_IsValidHandle(bar_hndl)) { MEM_Warn("Bar_GetTitleString: Invalid bar_hndl"); return ""; };
+    var _bar bar; bar = get(bar_hndl);
+
+    if( !Hlp_IsValidHandle(bar.title) ) { return ""; };
+
+    var _string title;
+    title = get(bar.title);
+
+    return title.s;
+};
+
 //========================================
 // Neue Bar erstellen
 //========================================
@@ -346,6 +376,7 @@ func int Bar_Create(var int inst) {
     View_SetTexture(b.v1, bu.barTex);
     
     b.anchorPoint_mode = bu.anchorPoint_mode;
+    Bar_SetTitleString( bh, bu.title );
 
     Bar_storePosSize(bh);
     Bar_SetValue(bh, bu.value);
@@ -389,6 +420,7 @@ func int Bar_CreateCenterDynamic(var int constructor_instance) {
     Bar_SetValue(new_bar_hndl, bar_constr.value);
 
     bar.anchorPoint_mode = bar_constr.anchorPoint_mode;
+    Bar_SetTitleString(new_bar_hndl, bar_constr.title);
 
     var zCView v; v = View_Get(bar.v0);
     //v.alphafunc = zRND_ALPHA_FUNC_ADD;
@@ -617,6 +649,7 @@ func void Bar_DeleteLabelText(var int bar_hndl) {
 
     View_DeleteText(bar.vLabel);
 };
+
 
 
 

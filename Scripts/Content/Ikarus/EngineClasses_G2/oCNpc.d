@@ -57,11 +57,11 @@ const int zCVob_trafoObjToWorld_Z = 11;
 class zCVob
 {
 //zCObject {
-  var int    _vtbl;
-  var int    _zCObject_refCtr;
-  var int    _zCObject_hashIndex;
-  var int    _zCObject_hashNext;
-  var string _zCObject_objectName;
+  var int    _vtbl;                     // 0x0000
+  var int    _zCObject_refCtr;          // 0x0004
+  var int    _zCObject_hashIndex;       // 0x0008
+  var int    _zCObject_hashNext;        // 0x000c
+  var string _zCObject_objectName;      // 0x0020
 //}
   var int    globalVobTreeNode;         // 0x0024 zCTree<zCVob>*
   var int    lastTimeDrawn;             // 0x0028 zTFrameCtr

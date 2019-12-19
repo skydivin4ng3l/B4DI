@@ -125,33 +125,43 @@ func void B4DI_Bars_showItemPreview() {
 	
 };
 
-var int debug_helper_hero_passive;
-var int debug_helper_hero_right;
-var int debug_helper_hero_invMode;
-var int debug_helper_hero_index;
-//=====Inv_GetSelectedItem=====
-//TODO check for other entries that might be selected items in loot/chests
-func int Inv_GetSelectedItem(){
-	if( !B4DI_CALL_oCItemContainer__IsActive(MEM_InstToPtr(oHero)+1640) ) { return 0; };
-	var int itm_index; itm_index = oHero.inventory2_oCItemContainer_selectedItem + 2;
-	if(debug_helper_hero_index != itm_index ) {
-		debug_helper_hero_index = itm_index;
-		B4DI_Info1("trying to select a Inventory Item at postion <<<<<", itm_index);
-	};		//anscheinend sind die ersten beiden items in der List nie belegt.
-	//if(debug_helper_hero_passive != oHero.inventory2_oCItemContainer_passive ) {
-	//	debug_helper_hero_passive = oHero.inventory2_oCItemContainer_passive;
-	//	B4DI_Info1("oHero.inventory2_oCItemContainer_passive <<<<<", oHero.inventory2_oCItemContainer_passive);
-	//};
-	//if(debug_helper_hero_right != oHero.inventory2_oCItemContainer_right ) {
-	//	debug_helper_hero_right = oHero.inventory2_oCItemContainer_right;
-	//	B4DI_Info1("inventory2_oCItemContainer_right= ", oHero.inventory2_oCItemContainer_right);
-	//};
-	//if(debug_helper_hero_invMode != oHero.inventory2_oCItemContainer_invMode ) {
-	//	debug_helper_hero_invMode = oHero.inventory2_oCItemContainer_invMode;	
-	//	B4DI_Info1("inventory2_oCItemContainer_invMode= ", oHero.inventory2_oCItemContainer_invMode);
-	//};
 
-	var zCListSort list; list = _^(oHero.inventory2_oCItemContainer_contents);
+var int debug_helper_itemContainer_passive;
+var int debug_helper_itemContainer_right;
+var int debug_helper_itemContainer_invMode;
+var int debug_helper_item_index;
+
+func int B4DI_oCItemContainer_GetSelectedItem( var int itemContainer_ptr ) {
+	if (!Hlp_Is_oCItemContainer( itemContainer_ptr ) ) { return 0; };
+	var oCItemContainer itemContainer; 
+	itemContainer = MEM_PtrToInst(itemContainer_ptr);
+
+	var int itm_index; itm_index = itemContainer.selectedItem + 2;
+	if(debug_helper_item_index != itm_index ) {
+		debug_helper_item_index = itm_index;
+		B4DI_Info1("trying to select a oCItemContainer Item at postion <<<<<", itm_index);
+	};		//anscheinend sind die ersten beiden items in der List nie belegt.
+	//if(debug_helper_itemContainer_passive != itemContainer.passive ) {
+	//	debug_helper_itemContainer_passive = itemContainer.passive;
+	//	B4DI_Info1("itemContainer.passive <<<<<", itemContainer.passive);
+	//};
+	//if(debug_helper_item_right != itemContainer.right ) {
+	//	debug_helper_item_right = itemContainer.right;
+	//	B4DI_Info1("itemContainer.right= ", itemContainer.right);
+	//};
+	//if(debug_helper_hero_invMode != itemContainer.invMode ) {
+	//	debug_helper_hero_invMode = itemContainer.invMode;	
+	//	B4DI_Info1("itemContainer.invMode= ", itemContainer.invMode);
+	//};
+	//ViewPtr_ResizeAdvanced( itemContainer.viewItemInfoItem, PS_VMAX/2, PS_VMAX/2, ANCHOR_CENTER_BOTTOM, VALIDSCREENSPACE, VIEW_NO_SIZE_LIMIT, VIEW_NO_SIZE_LIMIT ); 
+	ViewPtr_SetAlpha(itemContainer.viewItemInfoItem, 0);
+	ViewPtr_SetAlpha(itemContainer.viewItemInfo, 0);
+	ViewPtr_SetAlpha(itemContainer.textView, 0);
+	ViewPtr_SetAlpha(itemContainer.viewItemActiveHighlighted, 0);
+	
+
+
+	var zCListSort list; list = MEM_PtrToInst(itemContainer.contents);
 	if (List_HasLengthS(_@(list), itm_index))
 	{	
 		var int itm_ptr; itm_ptr = List_GetS(_@(list), itm_index);
@@ -163,12 +173,16 @@ func int Inv_GetSelectedItem(){
 	};	
 };
 
-var int debug_helper_Container_passive;
-var int debug_helper_Container_right;
-var int debug_helper_Container_invMode;
-var int debug_helper_Container_index;
-var int debug_helper_Container_posx;
-var int debug_helper_Container_posy;
+
+//=====Inv_GetSelectedItem=====
+func int Inv_GetSelectedItem(){
+	var int hero_itemContainer_ptr;
+	hero_itemContainer_ptr = MEM_InstToPtr(oHero)+1640;
+	if( !B4DI_CALL_oCItemContainer__IsActive(hero_itemContainer_ptr) ) { return 0; };
+	
+	return B4DI_oCItemContainer_GetSelectedItem( hero_itemContainer_ptr );
+		
+};
 
 func int Inv_GetSelectedMobItem(){
 	//continue if a MobContainer is current focus_vob
@@ -178,43 +192,8 @@ func int Inv_GetSelectedMobItem(){
 
 	if( !B4DI_CALL_oCItemContainer__IsActive(container_inFocus.items) ) { return 0; };
 	opened_ItemContainer = _^(container_inFocus.items);
-	var int itm_index; itm_index = opened_ItemContainer.selectedItem + 2; 		//anscheinend sind die ersten beiden items in der List nie belegt.
-	if(debug_helper_Container_index != itm_index ) {
-		debug_helper_Container_index = itm_index;
-		B4DI_Info1("trying to select a container Item at postion <<<<<", itm_index);
-	};
 	
-	if(debug_helper_Container_posx != opened_ItemContainer.posx ) {
-		debug_helper_Container_posx = opened_ItemContainer.posx;
-		B4DI_Info2("opened_ItemContainer.posx <<<<<", opened_ItemContainer.posx, "opened_ItemContainer.posy <<<<<", opened_ItemContainer.posy);
-	};
-
-	//if(debug_helper_Container_passive != opened_ItemContainer.passive ) {
-	//	debug_helper_Container_passive = opened_ItemContainer.passive;
-	//	B4DI_Info1("opened_ItemContainer.passive <<<<<", opened_ItemContainer.passive);
-	//};
-	//if(debug_helper_Container_right != opened_ItemContainer.right ) {
-	//	debug_helper_Container_right = opened_ItemContainer.right;
-	//	B4DI_Info1("right= ", opened_ItemContainer.right);
-	//};
-	//if(debug_helper_Container_invMode != opened_ItemContainer.invMode ) {
-	//	debug_helper_Container_invMode = opened_ItemContainer.invMode;	
-	//	B4DI_Info1("invMode= ", opened_ItemContainer.invMode);
-	//};
-
-	var zCListSort list; list = _^(opened_ItemContainer.contents);
-	//B4DI_Info1("container Size <<<<<", List_LengthS( _@(list) ) );
-
-	if (List_HasLengthS(_@(list), itm_index))
-	{	
-		//MEM_Info("Trying to select a containter item <<<<<<<<<<<<<<<<<<<<< List is long enough");
-		var int itm_ptr; itm_ptr = List_GetS(_@(list), itm_index);
-		return itm_ptr;
-	}
-	else
-	{
-		return 0;
-	};
+	return B4DI_oCItemContainer_GetSelectedItem(container_inFocus.items);
 };
 
 

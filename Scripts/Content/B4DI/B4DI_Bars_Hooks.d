@@ -3,6 +3,20 @@
 //  Hooking Functions to Update bars
 //
 //#################################################################
+func void B4DI_oCGame__Pause() {
+	var int argument;
+	argument = MEM_ReadInt(ESP+4);
+	B4DI_Info1("B4DI_oCGame__Pause called with: ", argument);
+	if (B4DI_EditUI_enabled) {
+		B4DI_EditUI_disable();
+	};
+};
+
+func void B4DI_oCMenu_Status__InitForDisplay() {
+	B4DI_Info1("B4DI_oCMenu_Status__InitForDisplay= ", ECX);
+	//oCStatusScreen +4 ist oCMenu_Status
+};
+
 //========================================
 // ManaBar
 //========================================
@@ -131,15 +145,14 @@ func void B4DI_inventory_closed(){
 };
 
 //========================================
-// Opening Containers
+// Opening MobContainers
 //========================================
 func void B4DI_oCMobContainer__Open_oCNpc(){
 	MEM_Info("B4DI_oCMobContainer__Open_oCNpc called");
 	var oCMobContainer caller; caller = MEM_PtrToInst(ECX);
 	var int caller_ptr; caller_ptr = ECX;
 	B4DI_debugSpy("caller= ", caller._oCMob_name);
-	//if( !Hlp_Is_oCMobContainer(focused_MobContainer_ptr) ) {return;};
-	//if( STR_Compare( caller._oCMob_name, container_inFocus._oCMob_name ) == STR_EQUAL ) {
+
 	if( caller_ptr == focused_MobContainer_ptr ) {
 		MEM_Info("caller == container_inFocus");
 		var C_NPC opener; opener = MEM_PtrToInst(MEM_ReadInt(ESP+4));
@@ -157,7 +170,7 @@ func void B4DI_oCMobContainer__Open_oCNpc(){
 
 
 //========================================
-// Closing Containers
+// Closing MobContainers
 //========================================
 func void B4DI_oCMobContainer__Close_oCNpc(){
 	MEM_Info("B4DI_oCMobContainer__Close_oCNpc called");
@@ -290,6 +303,10 @@ func void B4DI_oCNpc__SetWeaponMode2__zSTRING(){
 		B4DI_debugSpy("B4DI_oCNpc__SetWeaponMode2__zSTRING fMode is: ", IntToString(caller.fmode));
 		B4DI_update_fight_mode();
 	};
+};
+
+func void B4DI_oCNpc__GetSpellItem() {
+	MEM_Info( "B4DI_oCNpc__GetSpellItem called" );
 };
 
 //========================================

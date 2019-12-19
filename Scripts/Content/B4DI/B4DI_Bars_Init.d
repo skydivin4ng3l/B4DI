@@ -15,6 +15,12 @@ func void B4DI_Bars_InitOnce() {
 	B4DI_xpBar_InitOnce();
 
 	
+	
+	HookEngineF( oCGame__Pause_int_, 7, B4DI_oCGame__Pause);
+	HookEngineF( oCMenu_Status__InitForDisplay, 7, B4DI_oCMenu_Status__InitForDisplay);
+	
+	HookEngineF(oCNpc__GetSpellItem_int, 10, B4DI_oCNpc__GetSpellItem); //B4DI_oCNpc__GetSpellItem()
+	
 	HookEngineF(oCMobContainer__Open_oCNpc, 6, B4DI_oCMobContainer__Open_oCNpc); //B4DI_oCMobContainer__Open_oCNpc()
 	HookEngineF(oCMobContainer__Close_oCNpc, 6, B4DI_oCMobContainer__Close_oCNpc); //B4DI_oCMobContainer__Open_oCNpc()
 	//MEM_Game.pause_screen as a TODO condition
